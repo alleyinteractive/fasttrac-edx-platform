@@ -140,13 +140,14 @@ class AccountCreationForm(forms.Form):
             "min_length": _PASSWORD_INVALID_MSG,
         }
     )
-    name = forms.CharField(
-        min_length=2,
-        error_messages={
-            "required": _NAME_TOO_SHORT_MSG,
-            "min_length": _NAME_TOO_SHORT_MSG,
-        }
-    )
+    # comment out since we concat first and last name for this
+    # name = forms.CharField(
+    #     min_length=2,
+    #     error_messages={
+    #         "required": _NAME_TOO_SHORT_MSG,
+    #         "min_length": _NAME_TOO_SHORT_MSG,
+    #     }
+    # )
 
     def __init__(
             self,

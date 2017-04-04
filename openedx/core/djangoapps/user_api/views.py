@@ -157,8 +157,10 @@ class LoginSessionView(APIView):
 class RegistrationView(APIView):
     """HTTP end-points for creating a new user. """
 
-    DEFAULT_FIELDS = ["email", "name", "username", "password",
-    "company", "title", "phone_number", "newsletter"]
+    DEFAULT_FIELDS = [
+        "email", "username", "password",
+        "title", "newsletter", "company", "phone_number"
+    ]
 
     EXTRA_FIELDS = [
         "first_name",
@@ -169,8 +171,6 @@ class RegistrationView(APIView):
         "gender",
         "year_of_birth",
         "level_of_education",
-        "company",
-        "title",
         "mailing_address",
         "goals",
         "honor_code",
@@ -589,7 +589,6 @@ class RegistrationView(APIView):
             label=newsletter_label,
             field_type="select",
             options=options,
-            include_default_option=True,
             required=required
         )
 
@@ -654,7 +653,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's mailing address.
-        mailing_address_label = _(u"Mailing address")
+        mailing_address_label = _(u"Address")
 
         form_desc.add_field(
             "mailing_address",
