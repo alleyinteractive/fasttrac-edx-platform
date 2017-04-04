@@ -843,33 +843,6 @@ class RegistrationView(APIView):
             }
         )
 
-    def _add_state_field(self, form_desc, required=True):
-        """Add a state field to a form description.
-
-        Arguments:
-            form_desc: A form description
-
-        Keyword Arguments:
-            required (bool): Whether this field is required; defaults to True
-
-        """
-        # Translators: This label appears above a dropdown menu on the registration
-        # form used to select the country in which the user lives.
-        state_label = _(u"State")
-        error_msg = _(u"Please select your state.")
-
-        form_desc.add_field(
-            "state",
-            label=state_label,
-            field_type="select",
-            options=list(countries),
-            include_default_option=True,
-            required=required,
-            error_messages={
-                "required": error_msg
-            }
-        )
-
     def _add_honor_code_field(self, form_desc, required=True):
         """Add an honor code field to a form description.
 
