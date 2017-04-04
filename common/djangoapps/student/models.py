@@ -303,8 +303,27 @@ class UserProfile(models.Model):
     country = CountryField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
-    bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
+
+    # FastTrac changes
+    BIO_CHOICES = (
+        ('start', ugettext_noop('I want to start a business')),
+        ('support', ugettext_noop('I support those who are starting businesses')),
+        ('have', ugettext_noop('I have a business')),
+        ('other', ugettext_noop('Other')),
+    )
+    bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False, choices=BIO_CHOICES)
+
+    # FastTrac custom fields
+    NEWSLETTER_CHOICES = (
+        ('y', ugettext_noop('Yes')),
+        ('n', ugettext_noop('No')),
+    )
+
+    company = models.CharField(null=True, blank=True, default='', max_length=255)
+    title = models.CharField(null=True, blank=True, default='', max_length=255)
+    phone_number = models.CharField(null=True, blank=True, default='', max_length=255)
+    newsletter = models.CharField(default='n', choices=NEWSLETTER_CHOICES, max_length=255)
 
     @property
     def has_profile_image(self):
