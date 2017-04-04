@@ -320,10 +320,18 @@ class UserProfile(models.Model):
         ('n', ugettext_noop('No')),
     )
 
+    # TODO: ask an Indian to write US states here
+    STATE_CHOICES = (
+        ('y', ugettext_noop('Yes')),
+        ('n', ugettext_noop('No')),
+    )
+
     company = models.CharField(null=True, blank=True, default='', max_length=255)
     title = models.CharField(null=True, blank=True, default='', max_length=255)
     phone_number = models.CharField(null=True, blank=True, default='', max_length=255)
     newsletter = models.CharField(default='n', choices=NEWSLETTER_CHOICES, max_length=255)
+    state = models.CharField(null=True, blank=True, default='na', choices=STATE_CHOICES, max_length=255)
+    zipcode = models.CharField(null=True, blank=True, default='', max_length=255)
 
     @property
     def has_profile_image(self):
