@@ -771,6 +771,9 @@ class RegistrationView(APIView):
         form_desc.add_field(
             "state",
             label=state_label,
+            field_type="select",
+            options=[(name, _(label)) for name, label in UserProfile.STATE_CHOICES],
+            include_default_option=True,
             required=required
         )
 
