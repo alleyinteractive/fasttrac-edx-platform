@@ -602,7 +602,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's highest completed level of education.
-        newsletter_label = _(u"Newsletter")
+        newsletter_label = _(u"Would you like to subscribe to the Kauffman Education Newsletter?")
 
         options = [(name, _(label)) for name, label in UserProfile.NEWSLETTER_CHOICES]
 
@@ -627,7 +627,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's highest completed level of education.
-        bio_label = _(u"Describe yourself")
+        bio_label = _(u"How would you describe yourself?")
 
         options = [(name, _(label)) for name, label in UserProfile.BIO_CHOICES]
 
@@ -766,7 +766,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # which allows the user to input the State/Province/Region in which they live.
-        state_label = _(u"State/Province/Region")
+        state_label = _(u"State")
 
         form_desc.add_field(
             "state",
