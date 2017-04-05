@@ -120,6 +120,17 @@
                     model: accountSettingsModel,
                     editable: editable,
                     showMessages: false,
+                    title: gettext('Full name'),
+                    placeholderValue: gettext("Tell other learners a little about yourself: where you live, what your interests are, why you're taking courses, or what you hope to learn."),
+                    valueAttribute: "name",
+                    helpMessage: '',
+                    persistChanges: true,
+                    messagePosition: 'header'
+                }),
+                new FieldsView.TextareaFieldView({
+                    model: accountSettingsModel,
+                    editable: editable,
+                    showMessages: false,
                     title: gettext('About me'),
                     placeholderValue: gettext("Tell other learners a little about yourself: where you live, what your interests are, why you're taking courses, or what you hope to learn."),
                     valueAttribute: "bio",

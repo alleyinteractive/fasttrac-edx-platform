@@ -157,21 +157,23 @@ class LoginSessionView(APIView):
 class RegistrationView(APIView):
     """HTTP end-points for creating a new user. """
 
-    DEFAULT_FIELDS = ["email", "name", "username", "password"]
+    DEFAULT_FIELDS = ["email", "username", "password"]
 
     EXTRA_FIELDS = [
         "first_name",
         "last_name",
+        "mailing_address",
         "city",
         "state",
+        "zipcode",
         "country",
-        "gender",
-        "year_of_birth",
-        "level_of_education",
         "company",
         "title",
-        "mailing_address",
-        "goals",
+        "phone_number",
+        "newsletter",
+        "bio",
+        "gender",
+        "year_of_birth",
         "honor_code",
         "terms_of_service",
     ]
@@ -503,6 +505,142 @@ class RegistrationView(APIView):
             required=required
         )
 
+    def _add_company_field(self, form_desc, required=True):
+        """Add a company field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's highest completed level of education.
+        company_label = _(u"Company")
+
+        # The labels are marked for translation in UserProfile model definition.
+        form_desc.add_field(
+            "company",
+            label=company_label,
+            required=required
+        )
+
+    def _add_zipcode_field(self, form_desc, required=True):
+        """Add a zipcode field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's highest completed level of education.
+        zipcode_label = _(u"Zip/Postal Code")
+
+        # The labels are marked for translation in UserProfile model definition.
+        form_desc.add_field(
+            "zipcode",
+            label=zipcode_label,
+            required=required
+        )
+
+    def _add_title_field(self, form_desc, required=True):
+        """Add a title field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's highest completed level of education.
+        title_label = _(u"Title")
+
+        # The labels are marked for translation in UserProfile model definition.
+        form_desc.add_field(
+            "title",
+            label=title_label,
+            required=required
+        )
+
+    def _add_phone_number_field(self, form_desc, required=True):
+        """Add a phone_number field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's highest completed level of education.
+        phone_number_label = _(u"Phone Number")
+
+        # The labels are marked for translation in UserProfile model definition.
+        form_desc.add_field(
+            "phone_number",
+            label=phone_number_label,
+            required=required,
+            placeholder='(111) 222 - 3333'
+        )
+
+    def _add_newsletter_field(self, form_desc, required=True):
+        """Add a newsletter field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's highest completed level of education.
+        newsletter_label = _(u"Would you like to subscribe to the Kauffman Education Newsletter?")
+
+        options = [(name, _(label)) for name, label in UserProfile.NEWSLETTER_CHOICES]
+
+        # The labels are marked for translation in UserProfile model definition.
+        form_desc.add_field(
+            "newsletter",
+            label=newsletter_label,
+            field_type="select",
+            options=options,
+            required=required
+        )
+
+    def _add_bio_field(self, form_desc, required=True):
+        """Add a bio field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's highest completed level of education.
+        bio_label = _(u"How would you describe yourself?")
+
+        options = [(name, _(label)) for name, label in UserProfile.BIO_CHOICES]
+
+        # The labels are marked for translation in UserProfile model definition.
+        form_desc.add_field(
+            "bio",
+            label=bio_label,
+            field_type="select",
+            options=options,
+            required=required,
+            include_default_option=True
+        )
+
     def _add_gender_field(self, form_desc, required=True):
         """Add a gender field to a form description.
 
@@ -564,7 +702,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's mailing address.
-        mailing_address_label = _(u"Mailing address")
+        mailing_address_label = _(u"Address")
 
         form_desc.add_field(
             "mailing_address",
@@ -628,51 +766,14 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # which allows the user to input the State/Province/Region in which they live.
-        state_label = _(u"State/Province/Region")
+        state_label = _(u"State")
 
         form_desc.add_field(
             "state",
             label=state_label,
-            required=required
-        )
-
-    def _add_company_field(self, form_desc, required=False):
-        """Add a Company field to a form description.
-
-        Arguments:
-            form_desc: A form description
-
-        Keyword Arguments:
-            required (bool): Whether this field is required; defaults to False
-
-        """
-        # Translators: This label appears above a field on the registration form
-        # which allows the user to input the Company
-        company_label = _(u"Company")
-
-        form_desc.add_field(
-            "company",
-            label=company_label,
-            required=required
-        )
-
-    def _add_title_field(self, form_desc, required=False):
-        """Add a Title field to a form description.
-
-        Arguments:
-            form_desc: A form description
-
-        Keyword Arguments:
-            required (bool): Whether this field is required; defaults to False
-
-        """
-        # Translators: This label appears above a field on the registration form
-        # which allows the user to input the Title
-        title_label = _(u"Title")
-
-        form_desc.add_field(
-            "title",
-            label=title_label,
+            field_type="select",
+            options=[(name, _(label)) for name, label in UserProfile.STATE_CHOICES],
+            include_default_option=True,
             required=required
         )
 
@@ -693,7 +794,8 @@ class RegistrationView(APIView):
         form_desc.add_field(
             "first_name",
             label=first_name_label,
-            required=required
+            required=required,
+            placeholder='Jane'
         )
 
     def _add_last_name_field(self, form_desc, required=False):
@@ -713,7 +815,8 @@ class RegistrationView(APIView):
         form_desc.add_field(
             "last_name",
             label=last_name_label,
-            required=required
+            required=required,
+            placeholder='Doe'
         )
 
     def _add_country_field(self, form_desc, required=True):

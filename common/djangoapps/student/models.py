@@ -303,8 +303,31 @@ class UserProfile(models.Model):
     country = CountryField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
-    bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
+
+    # FastTrac changes
+    BIO_CHOICES = (
+        ('start', ugettext_noop('I want to start a business')),
+        ('support', ugettext_noop('I support those who are starting businesses')),
+        ('have', ugettext_noop('I have a business')),
+        ('other', ugettext_noop('Other')),
+    )
+    bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False, choices=BIO_CHOICES)
+
+    # FastTrac custom fields
+    NEWSLETTER_CHOICES = (
+        ('y', ugettext_noop('Yes')),
+        ('n', ugettext_noop('No')),
+    )
+
+    STATE_CHOICES = (('NA', 'N/A'), ('AL', 'Alabama'), ('AZ', 'Arizona'), ('AR', 'Arkansas'), ('CA', 'California'), ('CO', 'Colorado'), ('CT', 'Connecticut'), ('DE', 'Delaware'), ('DC', 'District of Columbia'), ('FL', 'Florida'), ('GA', 'Georgia'), ('ID', 'Idaho'), ('IL', 'Illinois'), ('IN', 'Indiana'), ('IA', 'Iowa'), ('KS', 'Kansas'), ('KY', 'Kentucky'), ('LA', 'Louisiana'), ('ME', 'Maine'), ('MD', 'Maryland'), ('MA', 'Massachusetts'), ('MI', 'Michigan'), ('MN', 'Minnesota'), ('MS', 'Mississippi'), ('MO', 'Missouri'), ('MT', 'Montana'), ('NE', 'Nebraska'), ('NV', 'Nevada'), ('NH', 'New Hampshire'), ('NJ', 'New Jersey'), ('NM', 'New Mexico'), ('NY', 'New York'), ('NC', 'North Carolina'), ('ND', 'North Dakota'), ('OH', 'Ohio'), ('OK', 'Oklahoma'), ('OR', 'Oregon'), ('PA', 'Pennsylvania'), ('RI', 'Rhode Island'), ('SC', 'South Carolina'), ('SD', 'South Dakota'), ('TN', 'Tennessee'), ('TX', 'Texas'), ('UT', 'Utah'), ('VT', 'Vermont'), ('VA', 'Virginia'), ('WA', 'Washington'), ('WD', 'Washington DC'), ('WV', 'West Virginia'), ('WI', 'Wisconsin'), ('WY', 'Wyoming'))
+
+    company = models.CharField(null=True, blank=True, default='', max_length=255)
+    title = models.CharField(null=True, blank=True, default='', max_length=255)
+    phone_number = models.CharField(null=True, blank=True, default='', max_length=255)
+    newsletter = models.CharField(default='n', choices=NEWSLETTER_CHOICES, max_length=255)
+    state = models.CharField(null=True, blank=True, default='na', choices=STATE_CHOICES, max_length=255)
+    zipcode = models.CharField(null=True, blank=True, default='', max_length=255)
 
     @property
     def has_profile_image(self):
