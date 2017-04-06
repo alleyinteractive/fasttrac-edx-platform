@@ -170,7 +170,7 @@ class RegistrationView(APIView):
         "company",
         "title",
         "phone_number",
-        # "newsletter",
+        "newsletter",
         "bio",
         "gender",
         "year_of_birth",
