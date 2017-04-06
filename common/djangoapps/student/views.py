@@ -1547,8 +1547,7 @@ def _do_create_account(form, custom_form=None):
     profile_fields = [
         "gender", "mailing_address", "city", "country", "bio",
         "year_of_birth",
-        "title", "company", "phone_number",
-        "newsletter"
+        "title", "company", "phone_number", "newsletter"
     ]
     profile = UserProfile(
         user=user,
