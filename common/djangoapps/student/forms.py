@@ -171,6 +171,7 @@ class AccountCreationForm(forms.Form):
 
         # TODO: These messages don't say anything about minimum length
         error_message_dict = {
+            "level_of_education": _("A level of education is required"),
             "gender": _("Your gender is required"),
             "year_of_birth": _("Your year of birth is required"),
             "mailing_address": _("Your mailing address is required"),
