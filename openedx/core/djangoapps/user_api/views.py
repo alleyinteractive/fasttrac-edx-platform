@@ -170,7 +170,7 @@ class RegistrationView(APIView):
         "company",
         "title",
         "phone_number",
-        "newsletter",
+        # "newsletter",
         "bio",
         "gender",
         "year_of_birth",
@@ -590,7 +590,7 @@ class RegistrationView(APIView):
             placeholder='(111) 222 - 3333'
         )
 
-    def _add_newsletter_field(self, form_desc, required=True):
+    def _add_newsletter_field(self, form_desc, required=False):
         """Add a newsletter field to a form description.
 
         Arguments:
