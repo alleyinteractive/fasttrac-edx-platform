@@ -147,11 +147,13 @@
             for (var i = 0; i < sectionTwoFields.length; i++) {
                 var field = sectionTwoFields[i];
                 sectionTwoFieldViews.push(
-                    new FieldsView.ReadonlyFieldView({
+                    new FieldsView.TextareaFieldView({
                         model: accountSettingsModel,
                         title: field.toUpperCase(),
                         valueAttribute: field,
-                        messagePosition: 'header'
+                        messagePosition: 'header',
+                        editable: editable,
+                        persistChanges: true
                     })
                 );
             }
