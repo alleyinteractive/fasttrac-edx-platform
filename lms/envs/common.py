@@ -2708,13 +2708,13 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         # Not an actual field, but used to signal whether badges should be public.
         'accomplishments_shared',
         # FastTrac
-        'state',
-        'zipcode',
-        'company',
-        'title',
-        'city',
-        'phone_number',
-        'newsletter',
+        # 'state',
+        # 'zipcode',
+        # 'company',
+        # 'title',
+        # 'city',
+        # 'phone_number',
+        # 'newsletter',
     ],
 
     # The list of account fields that are always public

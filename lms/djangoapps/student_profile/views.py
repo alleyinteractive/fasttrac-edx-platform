@@ -16,6 +16,7 @@ from openedx.core.djangoapps.user_api.errors import UserNotFound, UserNotAuthori
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from student.models import User
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from student.models import UserProfile
 
 
 @login_required
@@ -93,6 +94,10 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'badges_icon': staticfiles_storage.url('certificates/images/ico-mozillaopenbadges.png'),
             'backpack_ui_img': staticfiles_storage.url('certificates/images/backpack-ui.png'),
             'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
+            'state_options': UserProfile.STATE_CHOICES,
+            'newsletter_options': UserProfile.NEWSLETTER_CHOICES,
+            'gender_options': UserProfile.GENDER_CHOICES,
+            'bio_options': UserProfile.BIO_CHOICES,
         },
         'disable_courseware_js': True,
     }

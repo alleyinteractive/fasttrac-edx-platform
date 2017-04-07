@@ -116,44 +116,75 @@
             ];
 
             var sectionTwoFieldViews = [
-                new FieldsView.TextareaFieldView({
-                    model: accountSettingsModel,
-                    editable: editable,
-                    showMessages: false,
-                    title: gettext('About me'),
-                    placeholderValue: gettext("Tell other learners a little about yourself: where you live, what your interests are, why you're taking courses, or what you hope to learn."),
-                    valueAttribute: "bio",
-                    helpMessage: '',
-                    persistChanges: true,
-                    messagePosition: 'header'
-                })
+                // new FieldsView.TextareaFieldView({
+                //     model: accountSettingsModel,
+                //     editable: editable,
+                //     showMessages: false,
+                //     title: gettext('About me'),
+                //     placeholderValue: gettext("Tell other learners a little about yourself: where you live, what your interests are, why you're taking courses, or what you hope to learn."),
+                //     valueAttribute: "bio",
+                //     helpMessage: '',
+                //     persistChanges: true,
+                //     messagePosition: 'header'
+                // })
             ];
 
-            var sectionTwoFields = [
-                'name',
-                'mailing_address',
-                'city',
-                'state',
-                'zipcode',
-                'country',
-                'company',
-                'title',
-                'phone_number',
-                'newsletter',
-                'gender',
-                'year_of_birth'
-            ];
+            console.log('accountSettingsModel', accountSettingsModel);
+            var sectionTwoFreeTextFields = accountSettingsModel.attributes.account_privacy === 'private' ?
+            {
+                // TODO: define limited profile fields
+            }
+            :
+            {
+                name: 'Full Name',
+                mailing_address: 'Address',
+                city: 'City',
+                zipcode: 'Zip/Postal Code',
+                country: 'Country',
+                company: 'Company',
+                title: 'Title',
+                phone_number: 'Phone Number'
+            };
 
-            for (var i = 0; i < sectionTwoFields.length; i++) {
-                var field = sectionTwoFields[i];
+            var sectionTwoDropdownFields = accountSettingsModel.attributes.account_privacy === 'private' ?
+            {
+                // TODO: define limited profile fields
+            }
+            :
+            {
+                state: 'State',
+                newsletter: 'Would you like to receive KF newsletter?',
+                gender: 'Gender',
+                bio: 'Describe yourself'
+            };
+
+            for (var key in sectionTwoFreeTextFields) {
+                var value = sectionTwoFreeTextFields[key];
                 sectionTwoFieldViews.push(
                     new FieldsView.TextareaFieldView({
                         model: accountSettingsModel,
-                        title: field.toUpperCase(),
-                        valueAttribute: field,
                         messagePosition: 'header',
                         editable: editable,
-                        persistChanges: true
+                        persistChanges: true,
+                        valueAttribute: key,
+                        title: value
+                    })
+                );
+            }
+
+            for (var key in sectionTwoDropdownFields) {
+                var value = sectionTwoDropdownFields[key];
+                sectionTwoFieldViews.push(
+                    new FieldsView.DropdownFieldView({
+                        model: accountSettingsModel,
+                        editable: editable,
+                        showMessages: false,
+                        placeholderValue: gettext('Add ' + value),
+                        valueAttribute: key,
+                        options: options[key + '_options'],
+                        helpMessage: value,
+                        persistChanges: true,
+                        titleVisible: true
                     })
                 );
             }
