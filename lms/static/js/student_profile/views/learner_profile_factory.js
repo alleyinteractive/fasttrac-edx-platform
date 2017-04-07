@@ -129,7 +129,6 @@
                 // })
             ];
 
-            console.log('accountSettingsModel', accountSettingsModel);
             var sectionTwoFreeTextFields = accountSettingsModel.attributes.account_privacy === 'private' ?
             {
                 // TODO: define limited profile fields
