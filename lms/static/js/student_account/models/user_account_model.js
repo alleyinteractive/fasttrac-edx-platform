@@ -24,7 +24,11 @@
                 requires_parental_consent: true,
                 profile_image: null,
                 accomplishments_shared: false,
-                default_public_account_fields: []
+                default_public_account_fields: [],
+                state: '',
+                zipcode: '',
+                company: '',
+                title: ''
             },
 
             parse : function(response) {
@@ -38,7 +42,7 @@
                 var responseKeys = _.filter(_.keys(response), function (key) {
                         return key !== 'default_public_account_fields';
                 });
-                
+
                 var isPublic = _.size(_.difference(responseKeys, response.default_public_account_fields)) > 0;
                 response.profile_is_public = isPublic;
                 return response;
