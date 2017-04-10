@@ -4,14 +4,16 @@
 $prev-next-color: silver;
 $prev-next-color-light: #d6d6d6;
 
+//TODO: create file to add fasttrack colors (when we get designs)
+$ft-orange: #f76b1c;
+
 // Marin clumsy override until we get the design
 .courseware-bookmarks-button {
-    position: absolute;
-    top: 72px;
-    left: 700px;
-    width: 150px;
+  position: absolute;
+  top: 72px;
+  left: 700px;
+  width: 150px;
 }
-
 
 div.course-spinner {
   display: inline-block;
@@ -38,16 +40,31 @@ div.course-index {
   }
 }
 
-// accordion - side bar for course display
-.accordion {
-  p.chapter-description {
-    font-weight: 300;
-  }
-}
-
 body.view-in-course {
   .container {
     padding: 0;
+  }
+
+  // bookmark, search and print
+  .bookmark-button-wrapper {
+    position: absolute;
+    top: 0;
+    right: 50px;
+
+    .btn.bookmark-button,
+    .btn.bookmark-button:active {
+      border: none;
+      color: $prev-next-color;
+      outline: none;
+      font-size: 20px;
+
+
+      &.bookmarked,
+      &:hover {
+        color: $ft-orange;
+        background-color: transparent;
+      }
+    }
   }
 
   div.course-wrapper {
@@ -64,6 +81,10 @@ body.view-in-course {
       .wrapper-course-modes {
         border: none;
       }
+    }
+
+    .sequence {
+      padding: 10px 45px;
     }
 
     // previews and next arrows / buttons

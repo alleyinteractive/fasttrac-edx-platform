@@ -22,31 +22,114 @@ else:
 %>
 <a href="#${chapter['display_id']}-child" role="button" class="button-chapter chapter ${active_class}" id="${chapter['display_id']}-parent" aria-controls="${chapter['display_id']}-child" aria-expanded="false">
     <span class="group-heading ${active_class}" aria-label="${aria_label}">
-        <span class="icon fa fa-caret-right" aria-hidden="true"></span>
-        % if chapter['viewed']:
-            <i class="fa fa-circle"></i>
-        % else:
-            <i class="fa fa-circle-o"></i>
-        % endif
-        ${chapter['display_name']}
-        <p class="chapter-description">${chapter['display_description']}</p>
+        <div class="icon-container">
+            % if chapter['viewed']:
+                <i class="fa fa-check-circle"></i>
+            % endif
+        </div>
+        <span class="display-name">${chapter['display_name']}</span>
     </span>
 </a>
 <div class="chapter-content-container" id="${chapter['display_id']}-child" tabindex="-1" role="group" aria-label="${chapter['display_name']} submenu">
+## TODO: remove inline css when sidebar is finished!
+    <style type="text/css">
+
+        .icon-container {
+            display: inline-block;
+            width: 18px;
+            vertical-align: top;
+        }
+
+        .menu-item .icon-container {
+            width: 15px;
+        }
+        .display-name {
+            display: inline-block;
+            width: calc(100% - 25px);
+        }
+        .course-index .accordion .course-navigation .button-chapter .group-heading {
+            padding: 10px;
+        }
+
+        .course-index .accordion .course-navigation .button-chapter .group-heading.active {
+            padding-bottom: 0;
+        }
+
+        .course-index .accordion .course-navigation .button-chapter.active .group-heading {
+            color: #8d8d8d;
+            font-weight: 400;
+        }
+
+        .group-heading {
+            text-transform: uppercase;
+            font-weight: 500;
+            color: #8d8d8d;
+        }
+
+        .course-index .accordion .course-navigation .chapter-content-container .chapter-menu .menu-item a {
+            padding: 5px;
+        }
+
+        .course-index .accordion .course-navigation .chapter-content-container.is-open {
+            border-bottom: none;
+        }
+
+        .group-heading.active {
+            color: #f76b1c !important;
+        }
+
+        .course-index .accordion .course-navigation .chapter-content-container .chapter-menu .menu-item.graded .accordion-nav,
+        .course-index .accordion .course-navigation .chapter-content-container .chapter-menu .menu-item .accordion-nav {
+            text-transform: uppercase;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .course-index .accordion .course-navigation .chapter-content-container .chapter-menu .menu-item.active a {
+            background: transparent;
+            color: #f76b1c;
+            text-transform: uppercase;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .course-index .accordion .course-navigation .chapter-content-container {
+            border: none;
+            padding: 0 10px 0 30px;
+        }
+        .course-index .accordion .course-navigation .button-chapter {
+            box-shadow: none;
+            background-color: transparent;
+        }
+
+        .course-index .accordion .course-navigation .chapter-content-container .chapter-menu {
+            padding: 0;
+        }
+
+        a.accordion-nav {
+            padding: 0;
+        }
+        .button-chapter.chapter {
+            box-shadow: none;
+            background: none;
+        }
+    </style>
     <div class="chapter-menu">
         % for section in chapter['sections']:
         <div class="menu-item ${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
             <a class="accordion-nav" href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
                 <p class="accordion-display-name">
-                    % if section['viewed']:
-                        <i class="fa fa-circle"></i>
-                    % else:
-                        <i class="fa fa-circle-o"></i>
-                    % endif
-                    ${section['display_name']} ${Text(_('{span_start}current section{span_end}')).format(
-                        span_start=HTML('<span class="sr">'),
-                        span_end=HTML('</span>'),
-                    ) if 'active' in section and section['active'] else ''}
+                    <div class="icon-container">
+                        % if section['viewed']:
+                            <i class="fa fa-check-circle"></i>
+                        % endif
+                    </div>
+                    <span class="display-name">
+                        ${section['display_name']} ${Text(_('{span_start}current section{span_end}')).format(
+                            span_start=HTML('<span class="sr">'),
+                            span_end=HTML('</span>'),
+                        ) if 'active' in section and section['active'] else ''}
+                    </span>
                 </p>
                 <%
                 if section.get('due') is None:
@@ -93,21 +176,14 @@ else:
                 <ol class="accordion-units">
                     % for unit in section['units']:
                         <li id="accordion-unit-${unit['idx']}" onclick='handleUnitClick("${str(unit)}")'>
-                            % if unit['viewed'] == 'True':
-                                <i class="fa fa-circle"></i>
-                            % else:
-                                <i class="fa fa-circle-o"></i>
-                            % endif
-
-                            % if unit['grade'] != 'None':
-                                <i class="fa fa-graduation-cap"></i>
-                            % endif
-
-                            %if unit['is_bookmarked']:
-                                <i class="fa fa-bookmark"></i>
-                            %endif
-
-                            ${unit['display_name']}
+                            <div class="icon-container">
+                                %if unit['is_bookmarked'] == 'True':
+                                    <i class="fa fa-bookmark"></i>
+                                %elif unit['viewed'] == 'True':
+                                    <i class="fa fa-check-circle"></i>
+                                % endif
+                            </div>
+                            <span class="display-name">${unit['display_name']}</span>
                         </li>
                     % endfor
                 </ol>

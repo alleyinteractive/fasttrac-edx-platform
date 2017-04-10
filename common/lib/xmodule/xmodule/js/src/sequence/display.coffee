@@ -231,7 +231,7 @@ class @Sequence
       sequence_links = @content_container.find('a.seqnav')
       sequence_links.click @goto
 
-      @el.find('.path span.path-content').text(@el.find('.nav-item.active').data('path') + ' > ')
+      @el.find('.path span.path-content').text(@el.find('.nav-item.active').data('path'))
 
       @sr_container.focus()
 

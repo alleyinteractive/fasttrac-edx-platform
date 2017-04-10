@@ -13,6 +13,15 @@ html, body {
   }
 }
 
+// Fix dancing footer. Glue it to the bottom
+body,
+body .window-wrap {
+  height: 100%;
+}
+.content-wrapper {
+  min-height: calc(100% - 147px);
+}
+
 /**
 *   HEADER ADJUSTMENT
 **/
@@ -37,6 +46,7 @@ $link-color: #6f6f6f;
 
 .wrapper-footer {
   padding: 0 !important; // otherwise will be overwritten with course style
+  margin-top: 20px !important;
 
   footer#footer-openedx {
     text-align: center;

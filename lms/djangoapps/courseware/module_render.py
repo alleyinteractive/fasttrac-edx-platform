@@ -234,7 +234,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                             'location': unicode(child.location),
                             'viewed': unicode(viewed),
                             'grade': unicode(grade),
-                            'is_bookmarked': is_bookmarked
+                            'is_bookmarked': unicode(is_bookmarked)
                         })
 
                 section_context = {

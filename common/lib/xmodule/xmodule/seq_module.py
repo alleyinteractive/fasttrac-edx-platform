@@ -245,7 +245,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'type': child.get_icon_class(),
                 'id': child.scope_ids.usage_id.to_deprecated_string(),
                 'bookmarked': is_bookmarked,
-                'path': " > ".join(display_names + [child.display_name_with_default]),
+                'path': unicode(child.display_name_with_default),
             }
 
             contents.append(childinfo)
