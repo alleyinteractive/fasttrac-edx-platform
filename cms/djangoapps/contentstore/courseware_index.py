@@ -636,7 +636,7 @@ class CourseAboutSearchIndexer(object):
             ccx_course_id = unicode(CCXLocator.from_course_locator(course.id, ccx.original_ccx_id))
             ccx_info = {
                 "modes": [mode.slug for mode in CourseMode.modes_for_course(course.id)],
-                "language": course.language,
+                "language": "en",
                 "start": course.start,
                 "number": course.number,
                 "content": {
