@@ -18,6 +18,8 @@ from search.search_engine_base import SearchEngine
 from xmodule.annotator_mixin import html_to_text
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.library_tools import normalize_key_for_search
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+from ccx_keys.locator import CCXLocator
 
 # REINDEX_AGE is the default amount of time that we look back for changes
 # that might have happened. If we are provided with a time at which the
@@ -626,9 +628,45 @@ class CourseAboutSearchIndexer(object):
                 if about_information.index_flags & AboutInfo.PROPERTY:
                     course_info[about_information.property_name] = section_content
 
-        # Broad exception handler to protect around and report problems with indexing
+        courses_to_index = [course_info]
+
+        # TODO: index CCX
+        ccxs = CustomCourseForEdX.objects.filter(course_id=course.id)
+        for ccx in ccxs:
+            ccx_course_id = unicode(CCXLocator.from_course_locator(course.id, ccx.original_ccx_id))
+            ccx_info = {
+                "modes": [
+                    "audit"
+                ],
+                "language": "en",
+                "start": course.start,
+                "number": course.number,
+                "content": {
+                "overview": "Custom index test",
+                    "display_name": ccx.display_name,
+                    "number": course.number
+                },
+                "course": ccx_course_id,
+                "image_url": "/asset-v1:ProjectX+A1+2014_T3+type@asset+block@images_course_image.jpg",
+                "org": course.org,
+                "id": ccx_course_id,
+                # TODO: mdojkic@extensionengine.com: uncomment this in your PR
+                # "delivery_mode": ccx.delivery_mode,
+                # "location_city": ccx.location_city,
+                # "location_postal_code": ccx.location_postal_code,
+                # "location_state": ccx.location_state
+                # "time": ccx.time,
+                # "fee": ccx.fee,
+                # "course_description": ccx.course_description
+            }
+
+            # import pdb; pdb.set_trace()
+
+            courses_to_index.append(ccx_info)
+
+            # Broad exception handler to protect around and report problems with indexing
         try:
-            searcher.index(cls.DISCOVERY_DOCUMENT_TYPE, [course_info])
+            searcher.index(cls.DISCOVERY_DOCUMENT_TYPE, courses_to_index)
         except:  # pylint: disable=bare-except
             log.exception(
                 "Course discovery indexing error encountered, course discovery index may be out of date %s",
