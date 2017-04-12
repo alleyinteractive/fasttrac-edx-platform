@@ -661,7 +661,7 @@ class CourseAboutSearchIndexer(object):
 
             courses_to_index.append(ccx_info)
 
-            # Broad exception handler to protect around and report problems with indexing
+        # Broad exception handler to protect around and report problems with indexing
         try:
             searcher.index(cls.DISCOVERY_DOCUMENT_TYPE, courses_to_index)
         except:  # pylint: disable=bare-except
