@@ -630,22 +630,23 @@ class CourseAboutSearchIndexer(object):
 
         courses_to_index = [course_info]
 
-        # TODO: index CCX
+        # index CCX courses of this course
         ccxs = CustomCourseForEdX.objects.filter(course_id=course.id)
         for ccx in ccxs:
             ccx_course_id = unicode(CCXLocator.from_course_locator(course.id, ccx.original_ccx_id))
             ccx_info = {
-                "modes": course.modes,
+                "modes": [mode.slug for mode in CourseMode.modes_for_course(course.id)],
                 "language": course.language,
                 "start": course.start,
                 "number": course.number,
                 "content": {
-                    "overview": strip_html_content_to_text(ccx.get(course_description)),
+                    # mdojkic
+                    # "overview": strip_html_content_to_text(ccx.course_description),
                     "display_name": ccx.display_name,
                     "number": course.number
                 },
                 "course": ccx_course_id,
-                "image_url": course.image_url,
+                "image_url": course_info['image_url'],
                 "org": course.org,
                 "id": ccx_course_id,
                 # TODO: mdojkic@extensionengine.com: uncomment this in your PR
