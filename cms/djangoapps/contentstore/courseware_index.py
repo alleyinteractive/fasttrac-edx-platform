@@ -640,8 +640,7 @@ class CourseAboutSearchIndexer(object):
                 "start": course.start,
                 "number": course.number,
                 "content": {
-                    # mdojkic
-                    # "overview": strip_html_content_to_text(ccx.course_description),
+                    "overview": strip_html_content_to_text(ccx.course_description),
                     "display_name": ccx.display_name,
                     "number": course.number
                 },
@@ -649,14 +648,13 @@ class CourseAboutSearchIndexer(object):
                 "image_url": course_info['image_url'],
                 "org": course.org,
                 "id": ccx_course_id,
-                # TODO: mdojkic@extensionengine.com: uncomment this in your PR
-                # "delivery_mode": ccx.delivery_mode,
-                # "location_city": ccx.location_city,
-                # "location_postal_code": ccx.location_postal_code,
-                # "location_state": ccx.location_state
-                # "time": ccx.time,
-                # "fee": ccx.fee,
-                # "course_description": ccx.course_description
+                "delivery_mode": ccx.delivery_mode,
+                "location_city": ccx.location_city,
+                "location_postal_code": ccx.location_postal_code,
+                "location_state": ccx.location_state,
+                "time": ccx.time,
+                "fee": ccx.fee,
+                "course_description": ccx.course_description
             }
 
             courses_to_index.append(ccx_info)

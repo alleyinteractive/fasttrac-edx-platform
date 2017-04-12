@@ -3,6 +3,7 @@ Models for the custom course feature
 """
 import json
 import logging
+import decimal
 from datetime import datetime
 
 from django.contrib.auth.models import User
@@ -23,6 +24,15 @@ class CustomCourseForEdX(models.Model):
     """
     A Custom Course.
     """
+    IN_PERSON_REQUIRED = 'IN_PERSON_REQUIRED'
+    IN_PERSON_OPTIONAL = 'IN_PERSON_OPTIONAL'
+    ONLINE_ONLY = 'ONLINE_ONLY'
+    DELIVERY_MODE_CHOICES = (
+        (IN_PERSON_REQUIRED, 'In Person - Required'),
+        (IN_PERSON_OPTIONAL, 'In Person - Optional'),
+        (ONLINE_ONLY, 'Online Only'),
+    )
+
     course_id = CourseKeyField(max_length=255, db_index=True)
     display_name = models.CharField(max_length=255)
     coach = models.ForeignKey(User, db_index=True)
@@ -30,6 +40,29 @@ class CustomCourseForEdX(models.Model):
     # the master course modules
     structure_json = models.TextField(verbose_name='Structure JSON', blank=True, null=True)
     original_ccx_id = models.IntegerField(verbose_name='ID of original CCX course entry', blank=True, null=True)
+    delivery_mode = models.CharField(
+        default=IN_PERSON_REQUIRED,
+        max_length=255,
+        choices=DELIVERY_MODE_CHOICES,
+    )
+    location_city = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    location_state = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    location_postal_code = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    time = models.DateTimeField(default=datetime.now())
+    fee = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    course_description = models.TextField(default='Course description...')
 
     class Meta(object):
         app_label = 'ccx'
