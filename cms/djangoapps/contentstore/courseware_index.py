@@ -635,19 +635,17 @@ class CourseAboutSearchIndexer(object):
         for ccx in ccxs:
             ccx_course_id = unicode(CCXLocator.from_course_locator(course.id, ccx.original_ccx_id))
             ccx_info = {
-                "modes": [
-                    "audit"
-                ],
-                "language": "en",
+                "modes": course.modes,
+                "language": course.language,
                 "start": course.start,
                 "number": course.number,
                 "content": {
-                "overview": "Custom index test",
+                    "overview": strip_html_content_to_text(ccx.get(course_description)),
                     "display_name": ccx.display_name,
                     "number": course.number
                 },
                 "course": ccx_course_id,
-                "image_url": "/asset-v1:ProjectX+A1+2014_T3+type@asset+block@images_course_image.jpg",
+                "image_url": course.image_url,
                 "org": course.org,
                 "id": ccx_course_id,
                 # TODO: mdojkic@extensionengine.com: uncomment this in your PR
@@ -659,8 +657,6 @@ class CourseAboutSearchIndexer(object):
                 # "fee": ccx.fee,
                 # "course_description": ccx.course_description
             }
-
-            # import pdb; pdb.set_trace()
 
             courses_to_index.append(ccx_info)
 
