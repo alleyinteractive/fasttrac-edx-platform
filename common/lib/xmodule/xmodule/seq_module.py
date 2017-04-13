@@ -200,10 +200,6 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         context["username"] = self.runtime.service(self, "user").get_current_user().opt_attrs['edx-platform.username']
 
         parent_module = self.get_parent()
-        display_names = [
-            parent_module.display_name_with_default,
-            self.display_name_with_default
-        ]
 
         # We do this up here because proctored exam functionality could bypass
         # rendering after this section.

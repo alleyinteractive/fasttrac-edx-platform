@@ -119,6 +119,16 @@ ${HTML(fragment.foot_html())}
                 $('body.view-in-course .course-wrapper').toggleClass('extended');
             }
         }
+
+        $(document).ready(function() {
+            $('.dropbtn-value').click(function() {
+                $('#accordion-dropdown').toggleClass('show');
+            });
+
+            $('.chapter-item, .toggle-sidebar').click(function(){
+                $('#accordion-dropdown').removeClass('show');
+            });
+        });
     </script>
     <div class="course-index">
       <div class="wrapper-course-modes">
@@ -144,16 +154,35 @@ ${HTML(fragment.foot_html())}
               </form>
             </div>
           % endif
-          <i id="toggle-sidebar-icon" class="fa fa-bars" aria-hidden="true" onclick="toggleSidebar()"></i>
       </div>
 
       <div class="accordion">
         <nav class="course-navigation" aria-label="${_('Course')}">
-          % if accordion.strip():
-            ${HTML(accordion)}
-          % else:
-            <div class="chapter">${_("No content has been added to this course")}</div>
-          % endif
+            <div class="sidebar-navigation-wrapper">
+                <div class="dropdown-wrapper">
+                    <div class="dropbtn-value">
+                        <span class="active-section">Rendering content...</span>
+                        <i class="fa fa-caret-down"></i>
+                    </div>
+                    <div id="accordion-dropdown" class="dropdown-content">
+                        %for section in section_list:
+                            <a href="#${section['display_id']}-child" role="button" class="chapter chapter-item button-chapter" id="${section['display_id']}-parent"
+                                aria-controls="${section['display_id']}-child" data-child-id="${section['display_id']}-child">
+                                    <span class="display-name">${section['display_name']}</span>
+                            </a>
+                        %endfor
+                    </div>
+                </div>
+                <div class="toggle-sidebar" onclick="toggleSidebar()">
+                    <span>close</span>
+                </div>
+            </div>
+
+            % if accordion.strip():
+                ${HTML(accordion)}
+            % else:
+                <div class="chapter">${_("No content has been added to this course")}</div>
+            % endif
         </nav>
       </div>
 

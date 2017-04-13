@@ -14,106 +14,16 @@
 <%def name="make_chapter(chapter)">
 <%
 if chapter.get('active'):
-    aria_label = _('{chapter} current chapter').format(chapter=chapter['display_name'])
     active_class = 'active'
 else:
-    aria_label = chapter['display_name']
     active_class = ''
 %>
-<a href="#${chapter['display_id']}-child" role="button" class="button-chapter chapter ${active_class}" id="${chapter['display_id']}-parent" aria-controls="${chapter['display_id']}-child" aria-expanded="false">
-    <span class="group-heading ${active_class}" aria-label="${aria_label}">
-        <div class="icon-container">
-            % if chapter['viewed']:
-                <i class="fa fa-check-circle"></i>
-            % endif
-        </div>
-        <span class="display-name">${chapter['display_name']}</span>
-    </span>
-</a>
+
+##     Leave this anchor, we need it for the data.
+<a href="#${chapter['display_id']}-child" role="button" class="hidden-button-chapter chapter ${active_class}" data-id="${chapter['display_id']}-parent"
+   data-controls="${chapter['display_id']}-child">
+
 <div class="chapter-content-container" id="${chapter['display_id']}-child" tabindex="-1" role="group" aria-label="${chapter['display_name']} submenu">
-## TODO: remove inline css when sidebar is finished!
-    <style type="text/css">
-
-        .icon-container {
-            display: inline-block;
-            width: 18px;
-            vertical-align: top;
-        }
-
-        .menu-item .icon-container {
-            width: 15px;
-        }
-        .display-name {
-            display: inline-block;
-            width: calc(100% - 25px);
-        }
-        .course-index .accordion .course-navigation .button-chapter .group-heading {
-            padding: 10px;
-        }
-
-        .course-index .accordion .course-navigation .button-chapter .group-heading.active {
-            padding-bottom: 0;
-        }
-
-        .course-index .accordion .course-navigation .button-chapter.active .group-heading {
-            color: #8d8d8d;
-            font-weight: 400;
-        }
-
-        .group-heading {
-            text-transform: uppercase;
-            font-weight: 500;
-            color: #8d8d8d;
-        }
-
-        .course-index .accordion .course-navigation .chapter-content-container .chapter-menu .menu-item a {
-            padding: 5px;
-        }
-
-        .course-index .accordion .course-navigation .chapter-content-container.is-open {
-            border-bottom: none;
-        }
-
-        .group-heading.active {
-            color: #f76b1c !important;
-        }
-
-        .course-index .accordion .course-navigation .chapter-content-container .chapter-menu .menu-item.graded .accordion-nav,
-        .course-index .accordion .course-navigation .chapter-content-container .chapter-menu .menu-item .accordion-nav {
-            text-transform: uppercase;
-            font-size: 16px;
-            font-weight: 400;
-        }
-
-        .course-index .accordion .course-navigation .chapter-content-container .chapter-menu .menu-item.active a {
-            background: transparent;
-            color: #f76b1c;
-            text-transform: uppercase;
-            font-size: 16px;
-            font-weight: 400;
-        }
-
-        .course-index .accordion .course-navigation .chapter-content-container {
-            border: none;
-            padding: 0 10px 0 30px;
-        }
-        .course-index .accordion .course-navigation .button-chapter {
-            box-shadow: none;
-            background-color: transparent;
-        }
-
-        .course-index .accordion .course-navigation .chapter-content-container .chapter-menu {
-            padding: 0;
-        }
-
-        a.accordion-nav {
-            padding: 0;
-        }
-        .button-chapter.chapter {
-            box-shadow: none;
-            background: none;
-        }
-    </style>
     <div class="chapter-menu">
         % for section in chapter['sections']:
         <div class="menu-item ${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">

@@ -2,14 +2,112 @@
 * courseware.html
 **/
 
+$ft-dark-orange: #f76b1c;
+$ft-light-orange: #FF965D;
+
+$ft-dropdown-menu-height: 65px;
+$toggle-sidebar-width: $ft-dropdown-menu-height - 15px;
+
 div.wrapper-course-modes {
-  height: 30px;
+  display: none;
+}
 
+.accordion .course-navigation {
 
-  .fa-bars {
-    float: right;
-    font-size: 30px;
+  .sidebar-navigation-wrapper {
+    position: relative;
+    height: $ft-dropdown-menu-height;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: white;
+  }
+
+  .toggle-sidebar {
+    position: absolute;
+    height: inherit;
+    width: $toggle-sidebar-width;
+    top: 0;
+    right: -$toggle-sidebar-width;
+    z-index: 1;
+    background: linear-gradient(to right bottom, $ft-dark-orange 49%, transparent 50%);
+    font-size: 9px;
     cursor: pointer;
+  }
+
+  .toggle-sidebar span {
+    padding-left: 4px;
+  }
+
+  .dropbtn-value {
+    background-color: $ft-light-orange;
+    color: white;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+
+    padding-left: 20px;
+    height: inherit;
+
+    line-height: $ft-dropdown-menu-height;
+
+    .fa-caret-down {
+      padding-left: 15px;
+      font-size: 18px;
+    }
+    &:hover, &:focus {
+      outline: none;
+    }
+  }
+
+  .dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+
+    height: inherit;
+
+    .active-section {
+      display: inline-block;
+      vertical-align: middle;
+      line-height: normal;
+
+      /* strech text to make it look taller. no font provided */
+      -webkit-transform: scale(1, 1.4);
+      -moz-transform: scale(1, 1.4);
+      -ms-transform: scale(1, 1.4);
+      -o-transform: scale(1, 1.4);
+      transform: scale(1, 1.4);
+    }
+
+    a:hover {
+      background-color: #f1f1f1
+    }
+
+    .dropdown-content {
+      display: none;
+
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 100%;
+      overflow: auto;
+      z-index: 1;
+    }
+  }
+
+  .show {
+    display: block !important;
+  }
+}
+
+.course-index .accordion .course-navigation .dropdown-content .button-chapter { /* override */
+  color: #8d8d8d;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+
+  &.active {
+    color: $ft-dark-orange;
   }
 }
 
@@ -17,20 +115,65 @@ div.wrapper-course-modes {
 * accordion.html
 **/
 
-div.accordion {
+.course-index div.accordion {
   width: 100%;
 
   &.retracted {
-    margin-left: -100%;
+    margin-left: 0;
+  }
+
+  .course-navigation .chapter-content-container .chapter-menu .menu-item {
+    .icon-container {
+      display: inline-block;
+      vertical-align: top;
+      width: 15px;
+
+      .fa-check-circle {
+        color: #f76b1c;
+      }
+    }
+
+    .display-name {
+      display: inline-block;
+      width: calc(100% - 25px);
+    }
+
+    a {
+      padding: 5px;
+
+      &:hover {
+        background-color: transparent;
+      }
+    }
+
+    &.active a {
+      background: transparent;
+      color: #f76b1c;
+      text-transform: uppercase;
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    &.graded .accordion-nav,
+    .accordion-nav {
+      text-transform: uppercase;
+      font-size: 16px;
+      font-weight: 400;
+      color: #8d8d8d;
+    }
   }
 
   .accordion-units li {
     cursor: pointer;
-    font-weight: 300;
-    padding-left: 30px;
+    padding: 5px;
+    font-size: 15px;
+    color: #a0a0a0;
 
     &.active {
       font-weight: 600;
+      color: #696969;
     }
   }
 }
+
+

@@ -11,6 +11,17 @@ html, body {
   *:not(.fa) {
     font-family: Roboto, sans-serif !important;
   }
+
+  height: calc(100% - 25px);
+}
+
+// Fix dancing footer. Glue it to the bottom
+body,
+body .window-wrap {
+  height: 100%;
+}
+.content-wrapper {
+  min-height: calc(100% - 147px);
 }
 
 // Fix dancing footer. Glue it to the bottom

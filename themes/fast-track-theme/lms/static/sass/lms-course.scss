@@ -28,19 +28,24 @@ div.course-spinner {
   }
 }
 
+$course-index-width: 17%;
 div.course-index {
   display: inline-block;
   vertical-align: top;
-  width: 17%;
+  width: $course-index-width;
+  border: none;
+  box-shadow: none;
 
   &.retracted {
-    margin-left: -15%;
+    margin-left: -$course-index-width;
     border: none;
     box-shadow: none;
   }
 }
 
 body.view-in-course {
+  background-color: white;
+
   .container {
     padding: 0;
   }
@@ -58,7 +63,6 @@ body.view-in-course {
       outline: none;
       font-size: 20px;
 
-
       &.bookmarked,
       &:hover {
         color: $ft-orange;
@@ -68,13 +72,15 @@ body.view-in-course {
   }
 
   div.course-wrapper {
-    margin: 0 0 0 10px;
     display: inline-block;
-    max-width: 95%;
-    width: 80%;
+    max-width: 100%;
+    width: 82%;
+    border: none;
+    box-shadow: none;
+    background: white;
 
     &.extended {
-      width: 95%;
+      width: 99%;
       -webkit-transition: width 0.5s;
       transition: width 0.5s;
 

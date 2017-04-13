@@ -36,6 +36,7 @@ from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
 from survey.utils import must_answer_survey
+from util.model_utils import slugify
 
 from ..access import has_access, _adjust_start_date_for_beta_testers
 from ..access_utils import in_preview_mode
@@ -444,6 +445,16 @@ class CoursewareIndex(View):
                 table_of_contents['next_of_active_section'],
             )
             courseware_context['fragment'] = self.section.render(STUDENT_VIEW, section_context)
+
+        # fasttrack addition: dropdown menu for sections
+        section_list = [
+            {
+                "display_id": slugify(section.display_name_with_default_escaped),
+                "display_name": str(section.display_name)
+            } for section in self.course.get_display_items()
+        ]
+
+        courseware_context['section_list'] = section_list
 
         return courseware_context
 

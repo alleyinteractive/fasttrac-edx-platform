@@ -16,24 +16,29 @@ var edx = edx || {},
                 navigation.listenForKeypress();
             },
 
-            getActiveIndex: function() {
-                var index = $('.accordion .button-chapter:has(.active)').index('.accordion .button-chapter'),
-                    button = null;
+            getActiveSection: function() {
+                return $('.accordion .hidden-button-chapter.active');
+            },
 
-                if (index > -1) {
-                    button = $('.accordion .button-chapter:eq(' + index + ')');
-                }
-
-                return button;
+            sendActiveIndexToDropdown: function(id) {
+                var $item = $('#' + id);
+                // update dropdown display value
+                $('.accordion .dropbtn-value span.active-section').text($item.find('.display-name').text());
+                // remove any other active class
+                $item.addClass('active');
             },
 
             checkForCurrent: function() {
-                var button = navigation.getActiveIndex();
+                var activeSection = navigation.getActiveSection();
+                var sectionId = activeSection.attr('data-id');
 
-                navigation.closeAccordions();
+                var $subsections = $('.accordion').find('#' + activeSection.attr('data-controls'));
 
-                if (button !== null) {
-                    navigation.setupCurrentAccordionSection(button);
+                navigation.removeCurrentlyActiveItem();
+                navigation.sendActiveIndexToDropdown(sectionId);
+
+                if ($subsections !== null) {
+                    navigation.openAccordion($subsections)
                 }
             },
 
@@ -41,12 +46,17 @@ var edx = edx || {},
                 $('.accordion').on('click', '.button-chapter', function(event) {
                     event.preventDefault();
 
-                    var button = $(event.currentTarget),
-                        section = button.next('.chapter-content-container');
+                    var section = $('#' + $(this).attr('data-child-id'));
 
-                    navigation.closeAccordions(button, section);
-                    navigation.openAccordion(button, section);
+                    navigation.closeAccordions();
+                    navigation.openAccordion(section);
                 });
+            },
+
+            removeCurrentlyActiveItem: function() {
+                $('.accordion .chapter-item').each(function() {
+                    $(this).removeClass('active');
+                })
             },
 
             listenForKeypress: function() {
@@ -63,59 +73,20 @@ var edx = edx || {},
                 });
             },
 
-            closeAccordions: function(button, section) {
-                var menu = $(section).find('.chapter-menu'), toggle;
-
-                $('.accordion .button-chapter').each(function(index, element) {
-                    toggle = $(element);
-
-                    toggle
+            closeAccordions: function() {
+                $('.accordion .chapter-content-container').each(function() {
+                    $(this).find('.chapter-menu')
                         .removeClass('is-open')
-                        .attr('aria-expanded', 'false');
-
-                    toggle
-                        .children('.group-heading')
-                        .removeClass('active')
-                        .find('.icon')
-                            .addClass('fa-caret-right')
-                            .removeClass('fa-caret-down');
-
-                    toggle
-                        .next('.chapter-content-container')
-                        .removeClass('is-open')
-                        .find('.chapter-menu').not(menu)
-                            .removeClass('is-open')
-                            .slideUp();
+                        .removeAttr('style'); //remove inline style from slideDown()
                 });
             },
 
-            setupCurrentAccordionSection: function(button) {
-                var section = $(button).next('.chapter-content-container');
+            openAccordion: function(section) {
+                var $sectionEl = $(section);
 
-                navigation.openAccordion(button, section);
-            },
-
-            openAccordion: function(button, section) {
-                var sectionEl = $(section),
-                    firstLink = sectionEl.find('.menu-item').first(),
-                    buttonEl = $(button);
-
-                buttonEl
+                $sectionEl.find('.chapter-menu')
                     .addClass('is-open')
-                    .attr('aria-expanded', 'true');
-
-                buttonEl
-                    .children('.group-heading')
-                    .addClass('active')
-                    .find('.icon')
-                        .removeClass('fa-caret-right')
-                        .addClass('fa-caret-down');
-
-                sectionEl
-                    .addClass('is-open')
-                    .find('.chapter-menu')
-                        .addClass('is-open')
-                        .slideDown();
+                    .slideDown();
             }
         };
 
