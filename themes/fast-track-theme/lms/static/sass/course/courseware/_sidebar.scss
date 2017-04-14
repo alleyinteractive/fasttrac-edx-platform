@@ -38,6 +38,14 @@ div.wrapper-course-modes {
     padding-left: 4px;
   }
 
+  .loading-sidebar-content {
+    width: calc(100% - $toggle-sidebar-width);
+    text-align: center;
+    font-size: 20px;
+    color: $ft-light-orange;
+    padding: 20px;
+  }
+
   .dropbtn-value {
     background-color: $ft-light-orange;
     color: white;

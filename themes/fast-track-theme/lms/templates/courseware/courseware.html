@@ -108,28 +108,6 @@ ${HTML(fragment.foot_html())}
 
 <div class="container">
 % if disable_accordion is UNDEFINED or not disable_accordion:
-    <script>
-        function toggleSidebar() {
-            $('div.course-index, div.accordion').toggleClass('retracted');
-            if($('div.course-index').hasClass('retracted')) {
-                setTimeout(function() {
-                $('body.view-in-course .course-wrapper').toggleClass('extended');
-                }, 400);
-            } else {
-                $('body.view-in-course .course-wrapper').toggleClass('extended');
-            }
-        }
-
-        $(document).ready(function() {
-            $('.dropbtn-value').click(function() {
-                $('#accordion-dropdown').toggleClass('show');
-            });
-
-            $('.chapter-item, .toggle-sidebar').click(function(){
-                $('#accordion-dropdown').removeClass('show');
-            });
-        });
-    </script>
     <div class="course-index">
       <div class="wrapper-course-modes">
         <div class="courseware-bookmarks-button" data-bookmarks-api-url="${bookmarks_api_url}">
@@ -161,7 +139,7 @@ ${HTML(fragment.foot_html())}
             <div class="sidebar-navigation-wrapper">
                 <div class="dropdown-wrapper">
                     <div class="dropbtn-value">
-                        <span class="active-section">Rendering content...</span>
+                        <span class="active-section">Loading content...</span>
                         <i class="fa fa-caret-down"></i>
                     </div>
                     <div id="accordion-dropdown" class="dropdown-content">
@@ -192,13 +170,6 @@ ${HTML(fragment.foot_html())}
     <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
 </div>
 <div class="course-wrapper" role="presentation">
-        <script>
-            $('.course-wrapper').css('visibility', 'hidden');
-            $(document).ready(function(){
-                $('.course-wrapper').css('visibility', 'visible');
-                $('.course-spinner').css('display', 'none');
-            });
-        </script>
     <section class="course-content" id="course-content">
         <main id="main" aria-label="Content" tabindex="-1">
         % if getattr(course, 'entrance_exam_enabled') and \
@@ -242,18 +213,46 @@ ${HTML(fragment.foot_html())}
     </section>
 
   </div>
-</div>
-<div class="container-footer">
-  % if settings.FEATURES.get("LICENSING", False):
-    <div class="course-license">
-    % if getattr(course, "license", None):
-      <%include file="../license.html" args="license=course.license" />
-    % else:
-      ## Default course license: All Rights Reserved, if none is explicitly set.
-      <%include file="../license.html" args="license='all-rights-reserved'" />
-    % endif
-    </div>
-  % endif
+    <script>
+        // loading spinner for course content
+        $('.course-wrapper').css('visibility', 'hidden');
+            $(document).ready(function(){
+                $('.course-wrapper').css('visibility', 'visible');
+                $('.course-spinner').css('display', 'none');
+        });
+
+        // sidebar click events
+        $('.dropbtn-value').click(function() {
+            $('#accordion-dropdown').toggleClass('show');
+        });
+        $('.chapter-item, .toggle-sidebar').click(function(){
+            $('#accordion-dropdown').removeClass('show');
+        });
+
+        $('.chapter-item').click(function() {
+            var childId = $(this).attr('data-child-id');
+
+            $('.chapter-content-container#' + childId)
+                    .find('.menu-item').first()
+                    .find('.accordion-display-name')
+                    .trigger("click");
+            // hide old menu content before new is loaded
+            $('.chapter-content-container').hide();
+            $('.course-navigation')
+                    .append('<div class="loading-sidebar-content"><i class="fa fa-spinner fa-spin"></i></div>');
+        });
+
+        function toggleSidebar() {
+            $('div.course-index, div.accordion').toggleClass('retracted');
+            if($('div.course-index').hasClass('retracted')) {
+                setTimeout(function() {
+                $('body.view-in-course .course-wrapper').toggleClass('extended');
+                }, 400);
+            } else {
+                $('body.view-in-course .course-wrapper').toggleClass('extended');
+            }
+        }
+    </script>
 </div>
 
 <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
