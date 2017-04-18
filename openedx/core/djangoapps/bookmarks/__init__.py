@@ -10,11 +10,11 @@ DEFAULT_FIELDS = [
     'usage_id',
     'block_type',
     'created',
+    'path',
 ]
 
 OPTIONAL_FIELDS = [
     'display_name',
-    'path',
 ]
 
 PathItem = namedtuple('PathItem', ['usage_key', 'display_name'])
