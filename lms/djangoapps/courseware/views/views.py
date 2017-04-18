@@ -323,6 +323,16 @@ def course_info(request, course_id):
 
         bookmarks = BookmarksService(user=user).bookmarks(course_key=course_key)
 
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT module_id, course_id, modified from courseware_studentmodule where student_id=%s ORDER BY modified DESC LIMIT 1;", [user.id])
+            row = cursor.fetchone()
+            last_viewed_item = {
+                'module_id': row[0],
+                'course_id': row[1],
+                'modified': row[2],
+            }
+
         context = {
             'request': request,
             'masquerade_user': user,
@@ -334,7 +344,8 @@ def course_info(request, course_id):
             'studio_url': studio_url,
             'show_enroll_banner': show_enroll_banner,
             'url_to_enroll': url_to_enroll,
-            'bookmarks': bookmarks
+            'bookmarks': bookmarks,
+            'last_viewed_item': last_viewed_item
         }
 
         # Get the URL of the user's last position in order to display the 'where you were last' message

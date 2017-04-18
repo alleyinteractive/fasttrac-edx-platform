@@ -107,6 +107,11 @@ from openedx.core.djangolib.markup import HTML, Text
               </li>
             % endfor
           </ul>
+
+          <h1>Last Viewed Item</h1>
+          <a href=${'/courses/' + last_viewed_item['course_id'] + '/jump_to/' + last_viewed_item['module_id']}>
+            ${last_viewed_item['modified']}
+          </a>
         </section>
         % else:
         <section class="updates">
