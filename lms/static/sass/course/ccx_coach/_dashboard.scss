@@ -96,7 +96,20 @@ form.ccx-form {
         }
     }
     .field {
+        width: 232px;
         margin: 5px 0 5px 0;
+
+        * {
+            width: 232px;
+        }
+
+        .inline {
+            display: inline-block;
+        }
+    }
+
+    .field .submit {
+        display: block;
     }
 }
 
