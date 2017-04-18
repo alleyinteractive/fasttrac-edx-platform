@@ -323,6 +323,7 @@ def course_info(request, course_id):
 
         bookmarks = BookmarksService(user=user).bookmarks(course_key=course_key)
 
+        # from xmodule.modulestore.django import modulestore
         from django.db import connection
         with connection.cursor() as cursor:
             cursor.execute("SELECT module_id, course_id, modified from courseware_studentmodule where student_id=%s ORDER BY modified DESC LIMIT 1;", [user.id])
@@ -331,6 +332,7 @@ def course_info(request, course_id):
                 'module_id': row[0],
                 'course_id': row[1],
                 'modified': row[2],
+                'object': modulestore().get_item(UsageKey.from_string(row[0]))
             }
 
         context = {
