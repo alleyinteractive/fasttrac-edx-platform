@@ -324,14 +324,17 @@ def course_info(request, course_id):
         bookmarks = BookmarksService(user=user).bookmarks(course_key=course_key)
 
         with connection.cursor() as cursor:
-            cursor.execute("SELECT module_id, course_id, modified from courseware_studentmodule where student_id=%s ORDER BY modified DESC LIMIT 1;", [user.id])
+            cursor.execute("SELECT module_id, course_id, modified from courseware_studentmodule WHERE student_id=%s AND course_id=%s ORDER BY modified DESC LIMIT 1;", [user.id, course_id])
             row = cursor.fetchone()
-            last_viewed_item = {
-                'module_id': row[0],
-                'course_id': row[1],
-                'modified': row[2],
-                'object': modulestore().get_item(UsageKey.from_string(row[0]))
-            }
+            if row:
+                last_viewed_item = {
+                    'module_id': row[0],
+                    'course_id': row[1],
+                    'modified': row[2],
+                    'object': modulestore().get_item(UsageKey.from_string(row[0]))
+                }
+            else:
+                last_viewed_item = None
 
         context = {
             'request': request,
