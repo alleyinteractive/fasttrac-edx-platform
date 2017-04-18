@@ -15,7 +15,7 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.core.context_processors import csrf
-from django.db import transaction
+from django.db import transaction, connection
 from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
@@ -323,8 +323,6 @@ def course_info(request, course_id):
 
         bookmarks = BookmarksService(user=user).bookmarks(course_key=course_key)
 
-        # from xmodule.modulestore.django import modulestore
-        from django.db import connection
         with connection.cursor() as cursor:
             cursor.execute("SELECT module_id, course_id, modified from courseware_studentmodule where student_id=%s ORDER BY modified DESC LIMIT 1;", [user.id])
             row = cursor.fetchone()
