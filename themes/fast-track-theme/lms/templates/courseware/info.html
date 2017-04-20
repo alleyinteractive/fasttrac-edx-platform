@@ -116,6 +116,9 @@ from openedx.core.djangolib.markup import HTML, Text
             </a>
           % endif
         </section>
+        <section class="deliverables">
+          <iframe src="http://localhost:3000/lti/deliverables/" frameborder="0"></iframe>
+        </section>
         % else:
         <section class="updates">
           <h1 class="handouts-header">${_("Course Updates and News")}</h1>

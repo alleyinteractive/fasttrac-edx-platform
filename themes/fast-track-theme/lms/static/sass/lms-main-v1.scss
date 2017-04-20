@@ -33,8 +33,20 @@ body .window-wrap {
 
 .content-wrapper {
   min-height: calc(100% - 127px);
+
 }
 
+.deliverables {
+  display: table-row;
+
+  iframe {
+    height: 265px;
+    height: 27vh;
+
+    width: 1170px;
+    width: 61vw;
+  }
+}
 /**
 *   HEADER ADJUSTMENT
 **/
