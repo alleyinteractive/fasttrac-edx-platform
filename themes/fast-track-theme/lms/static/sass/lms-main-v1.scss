@@ -20,6 +20,7 @@ body,
 body .window-wrap {
   height: 100%;
 }
+
 .content-wrapper {
   min-height: calc(100% - 147px);
 }
@@ -29,8 +30,9 @@ body,
 body .window-wrap {
   height: 100%;
 }
+
 .content-wrapper {
-  min-height: calc(100% - 147px);
+  min-height: calc(100% - 127px);
 }
 
 /**
@@ -57,7 +59,8 @@ $link-color: #6f6f6f;
 
 .wrapper-footer {
   padding: 0 !important; // otherwise will be overwritten with course style
-  margin-top: 20px !important;
+  margin-top: 0 !important;
+  box-shadow: none;
 
   footer#footer-openedx {
     text-align: center;
@@ -94,5 +97,13 @@ $link-color: #6f6f6f;
       background-repeat: repeat-x;
       height: 7px;
     }
+  }
+
+  // when viewing course we want footer to behave like it's in course-wrapper
+  &.in-course {
+    margin-left: 17%;
+    border-left: 1px solid $ft-temp-light-gray;
+    -webkit-transition: width 0.5s;
+    transition: width 0.5s;
   }
 }

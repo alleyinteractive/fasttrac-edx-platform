@@ -190,7 +190,15 @@ class @Sequence
     # KAUFFMAN - this is here and not in accordian.html because of unbinding the click events at the top of this f.
     activeNavUnitId = @position - 1;
     $('.accordion-units li').removeClass('active');
-    $('#accordion-unit-' + activeNavUnitId).addClass('active');
+    activeUnit = $('#accordion-unit-' + activeNavUnitId);
+    activeUnit.addClass('active');
+
+    nextUnit = activeUnit.next()
+    if nextUnit.length > 0
+      nextUnitDisplayName = nextUnit.find('.display-name').text()
+      $('.next-unit-footer .unit-name').text('NEXT: ' + nextUnitDisplayName);
+    else
+      $('.next-unit-footer .unit-name').text('CONTINUE TO THE NEXT TOPIC');
 
     populateDropdownMenu()
 

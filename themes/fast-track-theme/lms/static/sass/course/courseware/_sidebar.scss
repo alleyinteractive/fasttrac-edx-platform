@@ -4,12 +4,18 @@
 
 $ft-dark-orange: #f76b1c;
 $ft-light-orange: #FF965D;
+$ft-temp-dark-gray: #8d8d8d;
+$ft-temp-light-gray: #efeded;
 
 $ft-dropdown-menu-height: 65px;
 $toggle-sidebar-width: $ft-dropdown-menu-height - 15px;
 
 div.wrapper-course-modes {
   display: none;
+}
+
+.accordion {
+  border-bottom: 1px solid $ft-temp-light-gray;
 }
 
 .accordion .course-navigation {
@@ -109,7 +115,7 @@ div.wrapper-course-modes {
 }
 
 .course-index .accordion .course-navigation .dropdown-content .button-chapter { /* override */
-  color: #8d8d8d;
+  color: $ft-temp-dark-gray;
   padding: 12px 16px;
   text-decoration: none;
   display: block;
@@ -167,7 +173,7 @@ div.wrapper-course-modes {
       text-transform: uppercase;
       font-size: 16px;
       font-weight: 400;
-      color: #8d8d8d;
+      color: $ft-temp-dark-gray;
     }
   }
 

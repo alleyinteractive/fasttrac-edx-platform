@@ -3,6 +3,7 @@
 
 $prev-next-color: silver;
 $prev-next-color-light: #d6d6d6;
+$ft-temp-gray: #efeded;
 
 //TODO: create file to add fasttrack colors (when we get designs)
 $ft-orange: #f76b1c;
@@ -48,6 +49,8 @@ body.view-in-course {
 
   .container {
     padding: 0;
+    display: table;
+    width: 100%;
   }
 
   // bookmark, search and print
@@ -74,13 +77,17 @@ body.view-in-course {
   div.course-wrapper {
     display: inline-block;
     max-width: 100%;
-    width: 82%;
+    width: calc(83% - 1px); // border is 1px
+    padding-bottom: 56px; // height of footer-wrapper
     border: none;
+    border-left: 1px solid $ft-temp-gray;
+
     box-shadow: none;
     background: white;
 
     &.extended {
-      width: 99%;
+      width: 100%;
+      border-left: none;
       -webkit-transition: width 0.5s;
       transition: width 0.5s;
 
@@ -91,15 +98,16 @@ body.view-in-course {
 
     .sequence {
       padding: 10px 45px;
+      position: relative; // later on we are going to attach arrows on this div with absolute pos.
     }
 
     // previews and next arrows / buttons
     .xmodule_display.xmodule_SequenceModule nav.sequence-bottom {
       position: absolute;
+      left: -20px;
+      right: -20px;
+      top: 45%;
       width: inherit;
-      left: 0;
-      right: 0;
-      top: 50%;
       cursor: pointer;
 
       color: $prev-next-color;
@@ -127,3 +135,38 @@ body.view-in-course {
     }
   }
 }
+
+// COURSE main display
+.course-wrapper {
+  .courseware-results-wrapper {
+    padding: 0;
+  }
+
+  .xblock-student_view.xblock-student_view-sequential.xblock-initialized {
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+}
+
+// NEXT footer inside of the course
+.next-unit-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  background-color: #ebebeb;
+  text-align: center;
+  color: #969696;
+  font-size: 14px;
+  border: 1px solid #dddddd
+}
+
+.next-unit-footer .fa {
+  padding-left: 10px;
+  font-size: 18px;
+}
+

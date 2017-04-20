@@ -169,7 +169,7 @@ ${HTML(fragment.foot_html())}
 <div class="course-spinner">
     <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
 </div>
-<div class="course-wrapper" role="presentation">
+  <div class="course-wrapper" role="presentation">
     <section class="course-content" id="course-content">
         <main id="main" aria-label="Content" tabindex="-1">
         % if getattr(course, 'entrance_exam_enabled') and \
@@ -211,7 +211,9 @@ ${HTML(fragment.foot_html())}
       <div id="error-message" aria-live="polite"></div>
       <div class="courseware-results search-results" data-course-id="${course.id}" data-lang-code="${language_preference}"></div>
     </section>
-
+    <div class="next-unit-footer">
+        <p class="unit-name"></p><span><i class="fa fa-chevron-circle-right"></i></span>
+    </div>
   </div>
     <script>
         // loading spinner for course content
@@ -219,6 +221,7 @@ ${HTML(fragment.foot_html())}
             $(document).ready(function(){
                 $('.course-wrapper').css('visibility', 'visible');
                 $('.course-spinner').css('display', 'none');
+                $('.wrapper-footer').addClass('in-course');
         });
 
         // sidebar click events
@@ -242,8 +245,15 @@ ${HTML(fragment.foot_html())}
                     .append('<div class="loading-sidebar-content"><i class="fa fa-spinner fa-spin"></i></div>');
         });
 
+        // trigger next button on topic footer
+        $('.next-unit-footer').on('click', function() {
+            $('.sequence-bottom .button-next').trigger('click');
+        });
+
+
         function toggleSidebar() {
             $('div.course-index, div.accordion').toggleClass('retracted');
+            $('.wrapper-footer').toggleClass('in-course');
             if($('div.course-index').hasClass('retracted')) {
                 setTimeout(function() {
                 $('body.view-in-course .course-wrapper').toggleClass('extended');
