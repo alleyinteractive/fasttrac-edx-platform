@@ -51,6 +51,11 @@ body.view-in-course {
     padding: 0;
     display: table;
     width: 100%;
+
+    visibility: hidden; // hidden until loaded
+    &.loaded {
+      visibility: visible;
+    }
   }
 
   // bookmark, search and print
@@ -142,9 +147,31 @@ body.view-in-course {
     padding: 0;
   }
 
+  .course-content {
+    display: block;
+    width: 100%;
+
+    padding: 20px 3% 40px 3%;
+  }
+
   .xblock-student_view.xblock-student_view-sequential.xblock-initialized {
     margin: 0 auto;
     padding: 0 20px;
+  }
+}
+
+// menu will be placed like it's part of the course display
+.course-material {
+  margin: 0;
+  width: 100%;
+  position: absolute;
+  z-index: 20;
+  left: 3%;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+
+  &.with-sidebar {
+    left: 20%;
   }
 }
 

@@ -15,14 +15,12 @@ html, body {
   height: calc(100% - 25px);
 }
 
-// Fix dancing footer. Glue it to the bottom
-body,
-body .window-wrap {
-  height: 100%;
+.loaded {
+  visibility: visible;
 }
 
-.content-wrapper {
-  min-height: calc(100% - 147px);
+#main {
+  padding-top: 60px; // we want to save place for absolute positioning of the course menu
 }
 
 // Fix dancing footer. Glue it to the bottom
@@ -61,6 +59,9 @@ $link-color: #6f6f6f;
   padding: 0 !important; // otherwise will be overwritten with course style
   margin-top: 0 !important;
   box-shadow: none;
+
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
 
   footer#footer-openedx {
     text-align: center;
@@ -103,7 +104,5 @@ $link-color: #6f6f6f;
   &.in-course {
     margin-left: 17%;
     border-left: 1px solid $ft-temp-light-gray;
-    -webkit-transition: width 0.5s;
-    transition: width 0.5s;
   }
 }
