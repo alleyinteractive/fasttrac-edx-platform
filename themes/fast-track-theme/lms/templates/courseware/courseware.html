@@ -106,6 +106,14 @@ ${HTML(fragment.foot_html())}
   <%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
 % endif
 
+<script>
+    $(document).ready(function(){
+        $('.course-wrapper, .container').addClass('loaded');
+        $('.course-spinner').css('display', 'none');
+        $('.wrapper-footer').addClass('in-course');
+    });
+</script>
+
 <div class="container">
 % if disable_accordion is UNDEFINED or not disable_accordion:
     <div class="course-index">
@@ -166,9 +174,6 @@ ${HTML(fragment.foot_html())}
 
     </div>
 % endif
-<div class="course-spinner">
-    <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
-</div>
   <div class="course-wrapper" role="presentation">
     <section class="course-content" id="course-content">
         <main id="main" aria-label="Content" tabindex="-1">
@@ -216,13 +221,7 @@ ${HTML(fragment.foot_html())}
     </div>
   </div>
     <script>
-        // loading spinner for course content
-        $('.course-wrapper').css('visibility', 'hidden');
-            $(document).ready(function(){
-                $('.course-wrapper').css('visibility', 'visible');
-                $('.course-spinner').css('display', 'none');
-                $('.wrapper-footer').addClass('in-course');
-        });
+        $('.course-material').addClass('with-sidebar');
 
         // sidebar click events
         $('.dropbtn-value').click(function() {
@@ -250,10 +249,10 @@ ${HTML(fragment.foot_html())}
             $('.sequence-bottom .button-next').trigger('click');
         });
 
-
         function toggleSidebar() {
             $('div.course-index, div.accordion').toggleClass('retracted');
             $('.wrapper-footer').toggleClass('in-course');
+            $('.course-material').toggleClass('with-sidebar');
             if($('div.course-index').hasClass('retracted')) {
                 setTimeout(function() {
                 $('body.view-in-course .course-wrapper').toggleClass('extended');
