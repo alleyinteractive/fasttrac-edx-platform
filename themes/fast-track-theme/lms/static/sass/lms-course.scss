@@ -163,15 +163,16 @@ body.view-in-course {
   }
 }
 
+// TODO: explore why this is being overwritten
 nav.wrapper-course-material .course-tabs li a {
   text-transform: uppercase;
   font-weight: 600;
   color: $ft-font-menu-color !important; // I really had to.
+  border-bottom: none !important;
 
   &.active,
   &:hover {
     color: $ft-font-menu-active-color !important; // I really had to.
-    border-bottom: none;
   }
 }
 
