@@ -31,8 +31,21 @@ body .window-wrap {
 
 .content-wrapper {
   min-height: calc(100% - 127px);
+
 }
 
+.deliverables {
+  display: table-row;
+
+  iframe {
+    height: 265px;
+    width: 1170px;
+  }
+}
+
+.deliverables h1 {
+  margin-left: 20px;
+}
 /**
 *   HEADER ADJUSTMENT
 **/
