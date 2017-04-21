@@ -5,6 +5,9 @@ $prev-next-color: silver;
 $prev-next-color-light: #d6d6d6;
 $ft-temp-gray: #efeded;
 
+$ft-font-menu-color: #b5b5b5;
+$ft-font-menu-active-color: #949494;
+
 //TODO: create file to add fasttrack colors (when we get designs)
 $ft-orange: #f76b1c;
 
@@ -157,6 +160,18 @@ body.view-in-course {
   .xblock-student_view.xblock-student_view-sequential.xblock-initialized {
     margin: 0 auto;
     padding: 0 20px;
+  }
+}
+
+nav.wrapper-course-material .course-tabs li a {
+  text-transform: uppercase;
+  font-weight: 600;
+  color: $ft-font-menu-color !important; // I really had to.
+
+  &.active,
+  &:hover {
+    color: $ft-font-menu-active-color !important; // I really had to.
+    border-bottom: none;
   }
 }
 
