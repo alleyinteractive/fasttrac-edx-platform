@@ -11,6 +11,13 @@ from openedx.core.lib.course_tabs import CourseTabPluginManager
 from student.models import CourseEnrollment
 from xmodule.tabs import CourseTab, CourseTabList, key_checker
 
+FASTTRACK_DISABLED_TAB_TYPES = ['progress', 'wiki']
+
+FASTTRACK_TAB_NAMES_OVERRIDES = {
+    'ccx_coach': 'Affiliate',
+    'course_info': 'Dashboard'
+}
+
 
 class EnrolledTab(CourseTab):
     """
@@ -302,6 +309,11 @@ def get_course_tab_list(request, course):
             if tab.type is not 'courseware':
                 continue
             tab.name = _("Entrance Exam")
+
+        if tab.type in set(FASTTRACK_DISABLED_TAB_TYPES):
+            continue
+
+        tab.name = _get_name_for_tab(tab)
         course_tab_list.append(tab)
 
     # Add in any dynamic tabs, i.e. those that are not persisted
@@ -320,7 +332,21 @@ def _get_dynamic_tabs(course, user):
     for tab_type in CourseTabPluginManager.get_tab_types():
         if getattr(tab_type, "is_dynamic", False):
             tab = tab_type(dict())
+
+            tab.name = _get_name_for_tab(tab)
+
             if tab.is_enabled(course, user=user):
                 dynamic_tabs.append(tab)
     dynamic_tabs.sort(key=lambda dynamic_tab: dynamic_tab.name)
     return dynamic_tabs
+
+
+def _get_name_for_tab(tab):
+    """
+    Returns:
+        If there is need for Kauffman override names, return new name.
+        Else -  return old one.
+    """
+    if tab.type in FASTTRACK_TAB_NAMES_OVERRIDES:
+        return FASTTRACK_TAB_NAMES_OVERRIDES[tab.type]
+    return tab.name
