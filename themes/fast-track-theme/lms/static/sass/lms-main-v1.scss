@@ -19,16 +19,6 @@ html, body {
   visibility: visible;
 }
 
-#main {
-  padding-top: 60px; // we want to save place for absolute positioning of the course menu
-}
-
-// Fix dancing footer. Glue it to the bottom
-body,
-body .window-wrap {
-  height: 100%;
-}
-
 .content-wrapper {
   min-height: calc(100% - 127px);
 
@@ -46,6 +36,7 @@ body .window-wrap {
 .deliverables h1 {
   margin-left: 20px;
 }
+
 /**
 *   HEADER ADJUSTMENT
 **/
@@ -59,8 +50,19 @@ body .window-wrap {
 }
 
 /**
-*   COURSE DISPLAY --> see lms-course.scss
+*   COURSE DISPLAY --> the rest of it see lms-course.scss
 **/
+
+.view-in-course {
+  // Fix dancing footer. Glue it to the bottom even when there is no enough course content
+  .window-wrap {
+    height: 100%;
+  }
+
+  #main {
+    padding-top: 60px; // we want to save place for absolute positioning of the course menu
+  }
+}
 
 /**
 *   FOOTER
