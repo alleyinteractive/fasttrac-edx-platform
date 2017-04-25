@@ -1,0 +1,93 @@
+/* NOTE:
+Header with "slim" class is inside COURSE.scss, otherwise it would be overwritten by it. */
+
+.header-global {
+  width: auto;
+
+  .wrapper-header {
+    max-width: none;
+    width: inherit;
+    padding-top: 0;
+
+    .primary, .dropdown {
+      height: inherit;
+    }
+  }
+
+  .user {
+    position: absolute;
+    right: 10px;
+    top: 0;
+    height: inherit;
+
+    .image-wrapper {
+      height: 100%;
+
+      &.active {
+        border-bottom: 5px solid orange;
+        padding-bottom: 3px;
+        z-index: 5;
+        position: relative;
+      }
+    }
+
+    button.dropdown {
+      outline: none;
+      img {
+        height: inherit;
+        border-radius: 50%;
+        max-width: none;
+      }
+    }
+
+    .dropdown-menu {
+      border-radius: 0;
+      box-shadow: none;
+      top: 45px;
+      right: 9px;
+      padding: 0 10px;
+      min-width: 140px;
+
+      li {
+        &:first-child {
+          padding-top: 10px;
+        }
+
+        padding: 0 10px 10px 10px;
+        border: none;
+        a {
+          outline: none;
+          color: #949494;
+        }
+      }
+
+      &::before {
+        display: none;
+      }
+    }
+  }
+
+  .right {
+    position: absolute;
+    right: 50px;
+    top: calc(50% - 8px);
+
+    .ft-header-item {
+      display: inline-block;
+      padding-right: 30px;
+      text-transform: uppercase;
+      font-size: 14px;
+
+      a, a:active, a:visited {
+        color: #b5b5b5;
+        font-weight: 500;
+      }
+
+      a:hover {
+        color: #949494;
+      }
+    }
+  }
+}
+
+
