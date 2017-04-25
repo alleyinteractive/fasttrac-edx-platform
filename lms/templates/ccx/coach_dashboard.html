@@ -26,7 +26,7 @@ from openedx.core.djangolib.js_utils import (
         <section class="instructor-dashboard-content-2" id="ccx-coach-dashboard-content" aria-labelledby="header-ccx-dashboard">
           <h2 class="hd hd-2" id="header-ccx-dashboard">${_("CCX Coach Dashboard")}</h2>
 
-          %if not ccx or True:
+          % if not ccx:
             % if messages:
               <ul class="messages">
                 % for message in messages:
@@ -37,7 +37,7 @@ from openedx.core.djangolib.js_utils import (
                   % endif
                 % endfor
               </ul>
-            % endif
+            %endif
             <div>
               <p class="request-response-error" id="ccx-create-message"></p>
               <form action="${create_ccx_url}" class="ccx-form" method="POST" onsubmit="return validateForm(this)">
@@ -84,7 +84,55 @@ from openedx.core.djangolib.js_utils import (
                   <button id="create-ccx" type="submit">${_('Create a new Custom Course for edX')}</button>
                 </div>
               </form>
-          </div>
+            </div>
+          %else:
+            <div>
+                <p class="request-response-error" id="ccx-create-message"></p>
+                <form action="${edit_ccx_url}" class="ccx-form" method="POST" onsubmit="return validateForm(this)">
+                  <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+                  <div class="field">
+                    <label class="sr" for="ccx_name">${_('Name your CCX')}</label>
+                    <input name="name" id="ccx_name" placeholder="${_('Name your CCX')}" value="${ccx.display_name}"/><br/>
+                  </div>
+                  <div class="field inline">
+                    <label class="sr" for="ccx_delivery_mode">${_('Delivery Mode')}</label>
+                    <select name="delivery_mode" id="ccx_delivery_mode">
+                      <option value="In Person - Required" {{ (ccx.delivery_mode == "In Person - Required")|yesno:"selected" }}>In Person - Required</option>
+                      <option value="In Person - Optional" {{ (ccx.delivery_mode == "In Person - Optional")|yesno:"selected" }}>In Person - Optional</option>
+                      <option value="Online Only" {{ (ccx.delivery_mode == "Online Only")|yesno:"selected" }}>Online Only</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label class="sr" for="ccx_city">${_('City')}</label>
+                    <input name="city" id="ccx_city" placeholder="${_('City')}" value=${ccx.location_city}/><br/>
+                  </div>
+                  <div class="field inline">
+                    <label class="sr" for="ccx_state">${_('State')}</label>
+                    <input name="state" id="ccx_state" placeholder="${_('State')}" value=${ccx.location_state}/><br/>
+                  </div>
+                  <div class="field">
+                    <label class="sr" for="ccx_postal_code">${_('Postal Code')}</label>
+                    <input name="postal_code" id="ccx_postal_code" placeholder="${_('Postal Code')}" value=${unicode(ccx.location_postal_code)}/><br/>
+                  </div>
+                  <div class="field inline datepair">
+                    <label class="sr form-label" for="ccx_dialog_date">${_('Date format four digit year dash two digit month dash two digit day')}</label>
+                    <input placeholder="${_('Date')}" class="date" type="text" name="date" id="ccx_dialog_date" size="10" />
+                    <label class="sr form-label" for="ccx_dialog_time">${_('Time format two digit hours colon two digit minutes')}</label>
+                    <input placeholder="${_('Time')}" class="time" type="text" name="time" id="ccx_dialog_time" size=10 /></br>
+                  </div>
+                  <div class="field">
+                    <label class="sr" for="ccx_fee">${_('Fee')}</label>
+                    <input name="fee" id="ccx_fee" placeholder="${_('Fee')}" value=${ccx.fee}/><br/>
+                  </div>
+                  <div class="field">
+                    <label class="sr" for="ccx_course_description">${_('Course description')}</label>
+                    <textarea name="course_description" id="ccx_course_description" placeholder="${_('Course description')}">${ccx.course_description}</textarea><br/>
+                  </div>
+                  <div class="field submit">
+                    <button id="create-ccx" type="submit">${_('Create a new Custom Course for edX')}</button>
+                  </div>
+                </form>
+            </div>
           %endif
 
           %if ccx:

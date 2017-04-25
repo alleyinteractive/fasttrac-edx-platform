@@ -170,6 +170,8 @@ def dashboard(request, course, ccx=None):
         with ccx_course(ccx_locator) as course:
             context['course'] = course
 
+        context['edit_ccx_url'] = reverse(
+            'edit_ccx', kwargs={'course_id': ccx_locator})
     else:
         context['create_ccx_url'] = reverse(
             'create_ccx', kwargs={'course_id': course.id})
@@ -179,11 +181,43 @@ def dashboard(request, course, ccx=None):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
+def edit_ccx(request, course, ccx=None):
+    if not ccx:
+        raise Http404
+
+    name = request.POST.get('name')
+    delivery_mode = request.POST.get('delivery_mode')
+    location_city = request.POST.get('city')
+    location_state = request.POST.get('state')
+    location_postal_code = request.POST.get('postal_code')
+    dateField = request.POST.get('date')
+    timeField = request.POST.get('time')
+    time = dateField + ' ' + timeField
+    fee = request.POST.get('fee')
+    course_description = request.POST.get('course_description')
+
+    ccx.display_name = name
+    ccx.delivery_mode = delivery_mode
+    ccx.location_city = location_city
+    ccx.location_state = location_state
+    ccx.location_postal_code = location_postal_code
+    if dateField and timeField:
+        ccx.time = time
+    ccx.fee = fee
+    ccx.course_description = ccx.course_description
+
+    ccx.save()
+    url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx.id})
+    return redirect(url)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@coach_dashboard
 def create_ccx(request, course, ccx=None):
     """
     Create a new CCX
     """
-
     name = request.POST.get('name')
     delivery_mode = request.POST.get('delivery_mode')
     location_city = request.POST.get('city')
@@ -263,7 +297,6 @@ def create_ccx(request, course, ccx=None):
     assign_instructor_role_to_ccx(ccx_id, request.user, course.id)
     add_master_course_staff_to_ccx(course, ccx_id, ccx.display_name)
     return redirect(url)
-
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
