@@ -1,5 +1,6 @@
 @import 'lms/static/sass/lms-course';
 @import './course/navigation';
+@import 'course/role_dashboards';
 
 $prev-next-color: silver;
 $prev-next-color-light: #d6d6d6;
@@ -169,6 +170,8 @@ body.view-in-course {
 
 // COURSE main display
 .course-wrapper {
+  background-color: #fff;
+
   .courseware-results-wrapper {
     padding: 0;
   }

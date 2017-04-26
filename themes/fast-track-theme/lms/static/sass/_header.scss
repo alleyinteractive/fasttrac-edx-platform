@@ -1,6 +1,11 @@
 /* NOTE:
 Header with "slim" class is inside COURSE.scss, otherwise it would be overwritten by it. */
 
+$ft-font-menu-color: #b5b5b5;
+$ft-font-menu-active-color: #949494;
+
+$ft-orange: #f76b1c;
+
 .header-global {
   width: auto;
 
@@ -24,7 +29,7 @@ Header with "slim" class is inside COURSE.scss, otherwise it would be overwritte
       height: 100%;
 
       &.active {
-        border-bottom: 5px solid orange;
+        border-bottom: 5px solid $ft-orange;
         padding-bottom: 3px;
         z-index: 5;
         position: relative;
@@ -57,7 +62,7 @@ Header with "slim" class is inside COURSE.scss, otherwise it would be overwritte
         border: none;
         a {
           outline: none;
-          color: #949494;
+          color: $ft-font-menu-active-color;
         }
       }
 
@@ -79,12 +84,12 @@ Header with "slim" class is inside COURSE.scss, otherwise it would be overwritte
       font-size: 14px;
 
       a, a:active, a:visited {
-        color: #b5b5b5;
+        color: $ft-font-menu-color;
         font-weight: 500;
       }
 
       a:hover {
-        color: #949494;
+        color: $ft-font-menu-active-color;
       }
     }
   }
