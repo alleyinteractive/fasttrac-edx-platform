@@ -147,22 +147,22 @@ $(function() {
     });
     view.render();
     //ccx_schedule.render();
-    $('.datepair .time').timepicker({
-        'showDuration': true,
-        'timeFormat': 'G:i',
-        'autoclose': true
-    });
-    $('.datepair .date').datepicker({
-        'dateFormat': 'yy-mm-dd',
-        'autoclose': true
-    });
-    $('.datepair .date').change(function() {
-       var date = $(this).datepicker( "getDate" );
-       if (date) {
-           $(this).val(date.getFullYear() + "-" +
-                   ('0' + (date.getMonth() + 1)).slice(-2) + "-" +
-                   ('0' + date.getDate()).slice(-2));
-       }
-    });
+    // $('.datepair .time').timepicker({
+    //     'showDuration': true,
+    //     'timeFormat': 'G:i',
+    //     'autoclose': true
+    // });
+    // $('.datepair .date').datepicker({
+    //     'dateFormat': 'yy-mm-dd',
+    //     'autoclose': true
+    // });
+    // $('.datepair .date').change(function() {
+    //    var date = $(this).datepicker( "getDate" );
+    //    if (date) {
+    //        $(this).val(date.getFullYear() + "-" +
+    //                ('0' + (date.getMonth() + 1)).slice(-2) + "-" +
+    //                ('0' + date.getDate()).slice(-2));
+    //    }
+    // });
 });
 </script>
