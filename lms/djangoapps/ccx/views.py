@@ -175,6 +175,7 @@ def dashboard(request, course, ccx=None):
     else:
         context['create_ccx_url'] = reverse(
             'create_ccx', kwargs={'course_id': course.id})
+
     return render_to_response('ccx/coach_dashboard.html', context)
 
 
