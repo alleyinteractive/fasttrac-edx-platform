@@ -131,15 +131,15 @@ def dashboard(request, course, ccx=None):
     """
     # right now, we can only have one ccx per user and course
     # so, if no ccx is passed in, we can sefely redirect to that
-    if ccx is None:
-        ccx = get_ccx_for_coach(course, request.user)
-        if ccx:
-            url = reverse(
-                'ccx_coach_dashboard',
-                kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.original_ccx_id)}
-            )
+    # if ccx is None:
+    #     ccx = get_ccx_for_coach(course, request.user)
+    #     if ccx:
+    #         url = reverse(
+    #             'ccx_coach_dashboard',
+    #             kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.original_ccx_id)}
+    #         )
 
-            return redirect(url)
+    #         return redirect(url)
 
     context = {
         'course': course,
