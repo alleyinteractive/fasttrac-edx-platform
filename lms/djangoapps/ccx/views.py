@@ -205,9 +205,10 @@ def edit_ccx(request, course, ccx=None):
         ccx.time = time
     ccx.fee = fee
     ccx.course_description = ccx.course_description
-
     ccx.save()
-    url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx.id})
+
+    ccx_id = CCXLocator.from_course_locator(course.id, ccx.original_ccx_id)
+    url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_id})
     return redirect(url)
 
 
