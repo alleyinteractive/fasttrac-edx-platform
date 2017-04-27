@@ -446,7 +446,7 @@ class CoursewareIndex(View):
             )
             courseware_context['fragment'] = self.section.render(STUDENT_VIEW, section_context)
 
-        # fasttrack addition: dropdown menu for sections
+        # fasttrac addition: dropdown menu for sections
         section_list = [
             {
                 "display_id": slugify(section.display_name_with_default_escaped),
