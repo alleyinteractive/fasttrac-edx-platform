@@ -544,12 +544,14 @@ def course_about(request, course_id):
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
-    if hasattr(course_key, 'ccx'):
+
+    # This is commented because we want to treat CCX same way as the original course
+    # if hasattr(course_key, 'ccx'):
         # if un-enrolled/non-registered user try to access CCX (direct for registration)
         # then do not show him about page to avoid self registration.
-        # Note: About page will only be shown to user who is not register. So that he can register. But for
-        # CCX only CCX coach can enroll students.
-        return redirect(reverse('dashboard'))
+        # Note: About page will only be shown to user who is not register. So that he can register.
+        #But for CCX only CCX coach can enroll students.
+        # return redirect(reverse('dashboard'))
 
     with modulestore().bulk_operations(course_key):
         permission = get_permission_for_course_about()
@@ -620,8 +622,13 @@ def course_about(request, course_id):
         can_add_course_to_cart = _is_shopping_cart_enabled and registration_price and not ecommerce_checkout_link
 
         # Used to provide context to message to student if enrollment not allowed
-        can_enroll = bool(has_access(request.user, 'enroll', course))
-        invitation_only = course.invitation_only
+        if not hasattr(course_key, 'ccx'):
+            can_enroll = bool(has_access(request.user, 'enroll', course))
+            invitation_only = course.invitation_only
+        else:
+            can_enroll = False
+            invitation_only = True
+
         is_course_full = CourseEnrollment.objects.is_course_full(course)
 
         # Register button should be disabled if one of the following is true:
