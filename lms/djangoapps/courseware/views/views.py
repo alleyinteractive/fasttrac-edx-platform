@@ -95,6 +95,7 @@ from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from ..entrance_exams import user_must_complete_entrance_exam
 from ..module_render import get_module_for_descriptor, get_module, get_module_by_usage_id
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 
 
 log = logging.getLogger("edx.courseware")
@@ -336,6 +337,13 @@ def course_info(request, course_id):
             else:
                 last_viewed_item = None
 
+        # import pdb; pdb.set_trace()
+
+        if hasattr(course.id, 'ccx'):
+            ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
+        else:
+            ccx = None
+
         context = {
             'request': request,
             'masquerade_user': user,
@@ -348,7 +356,8 @@ def course_info(request, course_id):
             'show_enroll_banner': show_enroll_banner,
             'url_to_enroll': url_to_enroll,
             'bookmarks': bookmarks,
-            'last_viewed_item': last_viewed_item
+            'last_viewed_item': last_viewed_item,
+            'ccx': ccx
         }
 
         # Get the URL of the user's last position in order to display the 'where you were last' message
