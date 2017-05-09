@@ -132,7 +132,7 @@ class @Sequence
   handleOnClickDropdownItem = ->
     $('#xblocks-dropdown-items a').click ->
       id = $(this).attr('id')
-      $title_div = $('#' + id + '.ft-element-title')
+      $title_div = $('#' + id + '.element-title')
       $('html, body').animate { scrollTop: $title_div.offset().top }, 1200
 
   # populate dropdown menu with xblocks for active unit (display_name and id).
@@ -141,9 +141,9 @@ class @Sequence
     $active_tab = $('[aria-labelledby="' + active_tab_id + '"]')
     $dropdown_items = $('#xblocks-dropdown-items').empty()
 
-    titles = $active_tab.find('.ft-element-title')
+    titles = $active_tab.find('.element-title')
     titles.each (index) ->
-      $dropdown_items.append '<a id="' + titles[index].id + '">' + titles[index].textContent + '</a>'
+      $dropdown_items.append '<a id="' + titles[index].id + '">' + $(titles[index]).find('span').text() + '</a>'
     handleOnClickDropdownItem()
 
   toggleArrows: =>
