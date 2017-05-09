@@ -383,7 +383,7 @@ def bookmarks(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key, depth=2)
 
-    bookmarks = Bookmark.objects.all()
+    bookmarks = Bookmark.objects.filter(user=request.user, course_key=course.id)
 
     context = {
         'bookmarks': bookmarks,
