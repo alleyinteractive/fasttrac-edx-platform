@@ -128,38 +128,22 @@ class @Sequence
       @setButtonLabel(button_class, button_label)
       @enableButton(button_class, button_action)
 
-  # close the dropdown if the user clicks outside of it
-  window.onclick = (event) ->
-    if !event.target.matches('.dropbtn')
-      $dropdowns = $('.dropbtn .dropdown-content')
-      i = 0
-      while i < $dropdowns.length
-        $openDropdown = $dropdowns[i]
-        if $openDropdown.hasClass('show')
-          $openDropdown.removeClass('show')
-        i++
-
   # scroll to every xblock when selected in dropdown and change the label on button
   handleOnClickDropdownItem = ->
     $('#xblocks-dropdown-items a').click ->
-      # update dropdown button text
-      display_name = $(this).text()
-      $('.dropbtn span.xblock-name').text(display_name)
-
       id = $(this).attr('id')
-      $xblock_div = $('[data-usage-id="' + id + '"]')
-      $('html, body').animate { scrollTop: $xblock_div.offset().top }, 1200
+      $title_div = $('#' + id + '.ft-element-title')
+      $('html, body').animate { scrollTop: $title_div.offset().top }, 1200
 
   # populate dropdown menu with xblocks for active unit (display_name and id).
   populateDropdownMenu = ->
     active_tab_id = $('#sequence-list button.active').attr('id')
-    xblocks = $('[aria-labelledby="' + active_tab_id + '"]').data('xblocks')
-    $dropdownItems = $('#xblocks-dropdown-items').empty()
+    $active_tab = $('[aria-labelledby="' + active_tab_id + '"]')
+    $dropdown_items = $('#xblocks-dropdown-items').empty()
 
-    $('.dropbtn span.xblock-name').text(xblocks[0]['display_name']) # show first xblock's display name on dropdown button
-
-    $.each xblocks, (index, xblock_obj) ->
-      $dropdownItems.append '<a id="' + xblock_obj['id'] + '">' + xblock_obj['display_name'] + '</a>'
+    titles = $active_tab.find('.ft-element-title')
+    titles.each (index) ->
+      $dropdown_items.append '<a id="' + titles[index].id + '">' + titles[index].textContent + '</a>'
     handleOnClickDropdownItem()
 
   toggleArrows: =>
