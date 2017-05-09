@@ -466,7 +466,7 @@ $link-color: #6f6f6f;
     border-bottom: 1px solid #ddd;
 
     &:hover a {
-      color: orangered;
+      color: $ft-orange;
     }
 
     a {
@@ -477,7 +477,7 @@ $link-color: #6f6f6f;
     }
 
     .fa {
-      color: orangered;
+      color: $ft-orange;
       vertical-align: top;
     }
     .path {
