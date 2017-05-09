@@ -377,6 +377,21 @@ def course_info(request, course_id):
         return render_to_response('courseware/info.html', context)
 
 
+@ensure_csrf_cookie
+@ensure_valid_course_key
+def bookmarks(request, course_id):
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_by_id(course_key, depth=2)
+
+    bookmarks = Bookmark.objects.filter(user=request.user, course_key=course.id)
+
+    context = {
+        'bookmarks': bookmarks,
+        'course': course
+    }
+
+    return render_to_response('courseware/bookmarks.html', context)
+
 def get_last_accessed_courseware(course, request, user):
     """
     Return the courseware module URL that the user last accessed,

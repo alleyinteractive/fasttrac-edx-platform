@@ -433,3 +433,68 @@ $link-color: #6f6f6f;
     height: 100%;
   }
 }
+
+
+// BOOKMARKS PAGE - bookmarks.html
+
+.bookmarks {
+  text-align: center;
+
+  & > * {
+    text-align: left;
+  }
+
+  h1 {
+    color: #aaa;
+    font-size: 4rem;
+    font-weight: bold;
+    font-style: italic;
+    width: 70%;
+    margin: 2rem auto;
+  }
+
+  h2 {
+    color: #555;
+    width: 70%;
+    font-weight: bold;
+    margin: 4rem auto;
+  }
+
+  .bookmark-item {
+    width: 60%;
+    margin: 1rem auto;
+    border-bottom: 1px solid #ddd;
+
+    &:hover a {
+      color: $ft-orange;
+    }
+
+    a {
+      color: #555;
+      font-size: 1.6rem;
+      font-weight: bold;
+      transition: color .4s;
+    }
+
+    .fa {
+      color: $ft-orange;
+      vertical-align: top;
+    }
+    .path {
+      color: #999;
+      text-transform: uppercase;
+      font-style: italic;
+      display: block;
+      margin: 1rem 0;
+      font-size: .8rem;
+    }
+
+    .date {
+      color: #aaa;
+      font-style: italic;
+      display: block;
+      margin: 1rem 0;
+      font-size: .8rem;
+    }
+  }
+}
