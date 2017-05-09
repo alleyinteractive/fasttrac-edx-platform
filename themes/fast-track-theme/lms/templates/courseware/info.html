@@ -81,13 +81,14 @@ from openedx.core.djangolib.markup import HTML, Text
   }
 
   .course-info-ft {
-    padding: 1rem 10px;
+    padding: 1rem 10px 0;
     border: 1px solid #ddd;
     border-radius: 2px;
     margin-bottom: 30px;
     background: #fff;
     max-height: 256px;
     overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .course-info-ft .fa {
@@ -232,6 +233,36 @@ from openedx.core.djangolib.markup import HTML, Text
     padding-left: 0;
   }
 
+  .course-info-body.bookmarks {
+    padding: 0;
+    margin: 0 -1rem;
+  }
+
+  .course-info-body.bookmarks a {
+    color: #999;
+    text-transform: uppercase;
+    font-style: italic;
+    font-weight: bold;
+    max-width: 100px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .course-info-body.bookmarks span::before {
+    content: "•";
+    display: inline-block;
+    color: orangered;
+  }
+
+  .course-info-body.bookmarks > div {
+    border-bottom: 1px solid #ddd;
+    margin: 0;
+    padding: 2rem;
+  }
+
   .uppercase {
     text-transform: uppercase;
   }
@@ -290,14 +321,26 @@ from openedx.core.djangolib.markup import HTML, Text
           BOOKMARKS
           <a href="#">VIEW ALL</a>
         </div>
-        <div class="course-info-body">
+        <div class="course-info-body bookmarks">
           % for bookmark in bookmarks:
             <div>
-              <a href=${'/courses/' + bookmark['course_id'] + '/jump_to/' + bookmark['usage_id']}>
-                ${' > '.join([path_item.get('display_name') for path_item in bookmark['path']])}
+              <a
+                href=${"/courses/{}/jump_to/{}".format(bookmark.course_key, bookmark.usage_key)}
+                title="${' - '.join([path_item.display_name for path_item in bookmark.path])} - ${bookmark.display_name}"
+              >
+                ${' - '.join([path_item.display_name for path_item in bookmark.path])}
+                -
+                ${bookmark.display_name}
               </a>
+              <span>
+                ${bookmark.modified.strftime("%B %d, %Y")}
+              </span>
             </div>
           % endfor
+
+          % if len(bookmarks) == 0:
+            You have no bookmarks yet...
+          % endif
         </div>
       </div>
     </div>
@@ -375,10 +418,14 @@ from openedx.core.djangolib.markup import HTML, Text
               display: none;
             }
 
+            #tab-course {
+              text-align: justify;
+            }
+
             .ft-card {
-              width: 256px;
-              height: 256px;
-              margin-right: 2rem;
+              width: 31%;
+              height: 300px;
+              margin-bottom: 2rem;
               display: inline-block;
               background: white;
               border: 1px solid #ddd;
@@ -393,6 +440,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
             .ft-card h3 {
               margin: 2rem 1rem;
+              min-height: 3.2rem;
             }
 
             .ft-card h3 a {
@@ -401,6 +449,7 @@ from openedx.core.djangolib.markup import HTML, Text
               color: #555;
               font-size: 1.4rem;
               transition: color .4s;
+              line-height: 1.6rem;
             }
 
             .ft-card p {
