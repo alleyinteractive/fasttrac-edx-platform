@@ -322,7 +322,6 @@ def course_info(request, course_id):
         if settings.FEATURES.get('ENABLE_MKTG_SITE'):
             url_to_enroll = marketing_link('COURSES')
 
-        # import pdb; pdb.set_trace()
         bookmarks = Bookmark.objects.filter(user=user, course_key=course.id)
 
         with connection.cursor() as cursor:
