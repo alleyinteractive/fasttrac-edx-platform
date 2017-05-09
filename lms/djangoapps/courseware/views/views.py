@@ -94,7 +94,8 @@ from xmodule.x_module import STUDENT_VIEW
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from ..entrance_exams import user_must_complete_entrance_exam
 from ..module_render import get_module_for_descriptor, get_module, get_module_by_usage_id
-from openedx.core.djangoapps.bookmarks.services import BookmarksService
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+from openedx.core.djangoapps.bookmarks.models import Bookmark
 
 
 log = logging.getLogger("edx.courseware")
@@ -321,7 +322,7 @@ def course_info(request, course_id):
         if settings.FEATURES.get('ENABLE_MKTG_SITE'):
             url_to_enroll = marketing_link('COURSES')
 
-        bookmarks = BookmarksService(user=user).bookmarks(course_key=course_key)
+        bookmarks = Bookmark.objects.filter(user=user, course_key=course.id)
 
         with connection.cursor() as cursor:
             cursor.execute("SELECT module_id, course_id, modified from courseware_studentmodule WHERE student_id=%s AND course_id=%s ORDER BY modified DESC LIMIT 1;", [user.id, course_id])
@@ -336,6 +337,12 @@ def course_info(request, course_id):
             else:
                 last_viewed_item = None
 
+
+        if hasattr(course.id, 'ccx'):
+            ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
+        else:
+            ccx = None
+
         context = {
             'request': request,
             'masquerade_user': user,
@@ -348,7 +355,8 @@ def course_info(request, course_id):
             'show_enroll_banner': show_enroll_banner,
             'url_to_enroll': url_to_enroll,
             'bookmarks': bookmarks,
-            'last_viewed_item': last_viewed_item
+            'last_viewed_item': last_viewed_item,
+            'ccx': ccx
         }
 
         # Get the URL of the user's last position in order to display the 'where you were last' message
