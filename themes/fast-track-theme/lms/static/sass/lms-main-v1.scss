@@ -11,7 +11,7 @@ $ft-orange: #f76b1c;
 **/
 
 html, body {
-  *:not(.fa) {
+  *:not(.fa):not(.mce-ico) {
     font-family: Roboto, sans-serif !important;
   }
 
