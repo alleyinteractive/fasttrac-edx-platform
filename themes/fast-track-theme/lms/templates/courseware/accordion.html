@@ -40,6 +40,11 @@ else:
                             span_end=HTML('</span>'),
                         ) if 'active' in section and section['active'] else ''}
                     </span>
+                    % if section['active']:
+                        <i class="fa fa-angle-up"></i>
+                    % else:
+                        <i class="fa fa-angle-down"></i>
+                    % endif
                 </p>
                 <%
                 if section.get('due') is None:

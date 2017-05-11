@@ -91,6 +91,24 @@ include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
             <ol class="tabs course-tabs">
                 <%include file="${tabs_tmpl}" args="tab_list=tab_list,active_page=active_page,default_tab=default_tab,tab_image=tab_image" />
                 <%block name="extratabs" />
+                % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+                    <li class="course-search">
+                        <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
+                          <form>
+                            <label for="course-search-input" class="sr">${_('Course Search')}</label>
+                            <div class="search-field-wrapper">
+                              <input id="course-search-input" type="text" class="search-field" placeholder="SEARCH"/>
+                              <button type="submit" class="search-button">
+                                  <span class="icon fa fa-search" aria-hidden="true"></span>
+                              </button>
+                              <button type="button" class="cancel-button" title="${_('Clear search')}">
+                                <span class="icon fa fa-remove" aria-hidden="true"></span>
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                    </li>
+                % endif
             </ol>
         </div>
     </nav>
