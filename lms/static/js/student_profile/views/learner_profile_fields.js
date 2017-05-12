@@ -41,7 +41,7 @@
                 }
                 else {
                     this._super('');
-                } 
+                }
             },
 
             updateFieldValue: function() {
@@ -57,6 +57,7 @@
             screenReaderTitle: gettext('Profile Image'),
 
             imageUrl: function () {
+                console.log(this.model);
                 return this.model.profileImageUrl();
             },
 

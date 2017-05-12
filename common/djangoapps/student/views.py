@@ -302,6 +302,27 @@ def get_course_enrollments(user, org_to_include, orgs_to_exclude):
             yield enrollment
 
 
+def affiliates(request):
+    from django.db import connection
+    import json
+
+    data = []
+    with connection.cursor() as cursor:
+        query = request.GET.get('query', '')
+        cursor.execute("select distinct au.username, aup.name, aup.state from ccx_customcourseforedx as ccx left join auth_user as au on ccx.coach_id = au.id left join auth_userprofile aup on aup.user_id = au.id where ccx.original_ccx_id = ccx.id and aup.name LIKE %s;", ['%'+query+'%'])
+        rows = cursor.fetchall()
+        for row in rows:
+            data.append({
+                'username': row[0],
+                'name': row[1],
+                'state': row[2],
+            })
+
+
+
+    return render_to_response('affiliates.html', {'affiliates': data})
+
+
 def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disable=unused-argument
     """
     Implements the logic for cert_info -- split out for testing.

@@ -1,0 +1,224 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">CCX Coach Dashboard</%block>
+
+<section class="container explore-affiliates">
+
+  <script>
+    function searchAffiliates(event, target) {
+      if (event.keyCode === 13) {
+        window.location.search = 'query=' + target.value;
+      }
+    }
+  </script>
+
+  <style>
+    .affiliate-sidebar {
+      position: absolute;
+      left: 0;
+      top: 3rem;
+      height: calc(100% - 60px);
+      width: 20%;
+      border-right: 1px solid #ddd;
+      background-image: url(http://localhost:8000/static/fast-track-theme/images/newSearchBg.jpg);
+    }
+
+    .affiliate-sidebar .header {
+      text-transform: uppercase;
+      font-weight: bold;
+      color: #999;
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-right: 0 none;
+      background: #eee;
+    }
+
+    .affiliate-sidebar .sidebar-body {
+      background: white;
+      min-height: 50%;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .affiliate-sidebar .sidebar-filter {
+      padding: 1rem;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .affiliate-sidebar #submit-search {
+      float: right;
+      color: orangered;
+      text-transform: uppercase;
+      font-weight: bold;
+      margin-right: 1rem;
+      margin-top: 1rem;
+    }
+
+    .affiliate-sidebar .sidebar-filter input[type=text] {
+      border-radius: 0;
+      padding: .3rem;
+      margin: .5rem 1rem;
+      width: 80%;
+    }
+
+    .affiliate-sidebar .sidebar-filter .filter-label {
+      display: inline-block;
+      margin: 1rem 0;
+    }
+
+    .affiliate-content {
+      position: absolute;
+      left: 25%;
+      top: 4rem;
+      width: 65%;
+    }
+
+    .affiliate-content ul {
+      padding-left: 0;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    .explore-affiliates h1 {
+      font-weight: bold;
+      color: #555;
+      letter-spacing: 0;
+      text-align: left;
+      border-bottom: 1px solid #aaa;
+      padding-bottom: .5rem;
+    }
+
+    .explore-affiliates .fa-caret-down {
+      color: orangered;
+      font-size: 1rem;
+      vertical-align: middle;
+      margin-left: 1rem;
+    }
+
+    .affiliate-card {
+      position: relative;
+      display: inline-block;
+      width: 20rem;
+      height: 20rem;
+      max-height: 20rem;
+      min-height: 20rem;
+      overflow: hidden;
+      border: 1px solid #ddd;
+      margin-bottom: 3rem;
+    }
+
+    .affiliate-card .image {
+      height: 8rem;
+      border-bottom: 1px solid #aaa;
+      width: 20rem;
+      background-repeat: no-repeat;
+      background-size: cover;
+      display: block;
+    }
+
+    .affiliate-card .name {
+      text-transform: uppercase;
+      font-weight: bold;
+      color: #999;
+      margin: 1rem 1rem 0;
+      min-height: 3rem;
+    }
+  </style>
+
+
+  <div class="affiliate-sidebar">
+    <div class="header">
+      Refine List
+    </div>
+
+    <div class="sidebar-body">
+      <div class="sidebar-filter">
+        <div class="fa fa-user"></div>
+        <span class="filter-label">Affiliate Name</span>
+        <input type="text" placeholder="Search Affiliate" onkeyup="searchAffiliates(event, this)">
+      </div>
+
+      <div class="sidebar-filter">
+        <div class="fa fa-map-marker"></div>
+        <span class="filter-label">Location</span>
+        <input type="text" placeholder="City" onkeyup="searchAffiliates(event, this)">
+        <input type="text" placeholder="State" onkeyup="searchAffiliates(event, this)">
+      </div>
+
+      <a href="#" id="submit-search">Submit <span class="fa fa-arrow-right"></span> </a>
+    </div>
+  </div>
+
+  <div class="affiliate-content">
+    <h1>
+      Explore Affiliates
+      <div class="fa fa-caret-down"></div>
+    </h1>
+    <ul>
+      <style>
+        .affiliate-card .card-footer {
+          position: absolute;
+          bottom: 0;
+          right: 1rem;
+          width: 100%;
+          text-align: right;
+        }
+
+        .affiliate-card .card-footer > span {
+          width: 30%;
+          display: inline-block;
+          text-align: center;
+          padding: .5rem 0;
+          text-transform: uppercase;
+          color: #777;
+        }
+
+        .affiliate-card .card-footer > span .fa-arrow-circle-o-right {
+          color: orangered;
+        }
+
+        .affiliate-card .card-footer .skewed-footer-item {
+          transform: skewX(-24deg);
+          border-right: 1px solid #ddd;
+        }
+
+        .affiliate-card .card-footer .skewed-footer-item > span {
+          display: inline-block;
+          transform: skewX(24deg);
+        }
+
+        .affiliate-card .description {
+          padding: 1rem;
+          color: #555;
+          font-size: .9rem;
+        }
+      </style>
+      % for affiliate in affiliates:
+        <li class="affiliate-card">
+          <div class="image" style="background-image: url(http://i.imgur.com/EkZzVq0.jpg);"></div>
+          <div class="name">
+            ${affiliate['name']}
+          </div>
+          <div class="description">
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry...
+          </div>
+          <div class="card-footer">
+            <span class="skewed-footer-item">
+              <span>
+                <span class="fa fa-map-marker"></span>
+                ${affiliate['state']}
+              </span>
+            </span>
+            <span>
+              View
+              <span class="fa fa-arrow-circle-o-right"></span>
+            </span>
+          </div>
+        </li>
+      %endfor
+    </ul>
+  </div>
+</section>

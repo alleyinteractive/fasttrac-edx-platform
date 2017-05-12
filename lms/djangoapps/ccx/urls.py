@@ -8,8 +8,6 @@ urlpatterns = patterns(
     '',
     url(r'^ccx_coach$',
         'ccx.views.dashboard', name='ccx_coach_dashboard'),
-    url(r'^ccx_coaches$',
-        'ccx.views.coaches', name='ccx_coaches'),
     url(r'^create_ccx$',
         'ccx.views.create_ccx', name='create_ccx'),
     url(r'^edit_ccx$',

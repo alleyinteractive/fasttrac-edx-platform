@@ -182,32 +182,6 @@ def dashboard(request, course, ccx=None):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
-def coaches(request, course, ccx=None):
-    from django.db import connection
-    import json
-
-    data = []
-    with connection.cursor() as cursor:
-        query = request.GET.get('query')
-        cursor.execute("select ccx.id, ccx.course_id, ccx.original_ccx_id, ccx.coach_id, au.username, aup.name, aup.state, ccx.display_name from ccx_customcourseforedx as ccx left join auth_user as au on ccx.coach_id = au.id left join auth_userprofile aup on aup.user_id = au.id where aup.name LIKE %s;", ['%'+query+'%'])
-        rows = cursor.fetchall()
-        for row in rows:
-            data.append({
-                'id': row[0],
-                'course_id': row[1],
-                'original_ccx_id': row[2],
-                'coach_id': row[3],
-                'username': row[4],
-                'name': row[5],
-                'state': row[6],
-                'display_name': row[7]
-            })
-
-    return render_to_response('ccx/coaches.html', {'coaches': data})
-
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@coach_dashboard
 def edit_ccx(request, course, ccx=None):
     if not ccx:
         raise Http404
