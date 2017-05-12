@@ -28,36 +28,21 @@
 
 <%block name="pagetitle">${_("Courses")}</%block>
 
-<main id="main" aria-label="Content" tabindex="-1">
+<main id="main" class="explore-courses" aria-label="Content" tabindex="-1">
   % if course_discovery_enabled:
-  <aside aria-label="${_('Refine Your Search')}" class="search-facets phone-menu">
-    <h2 class="header-search-facets">${_('Refine Course List')}</h2>
-    <section class="search-facets-lists">
-    </section>
-  </aside>
+  <div aria-label="${_('Refine Your Search')}" class="search-facets">
+    <div class="header-search-facets-wrapper">
+      <h2 class="header-search-facets">${_('Refine Course List')}</h2>
+    </div>
+    <div class="search-facets-lists">
+    </div>
+  </div>
   % endif
 
-  <section class="find-courses">
-    <section class="courses-container">
+  <div class="find-courses">
+    <div class="courses-container">
 
       % if course_discovery_enabled:
-      <div id="discovery-form" role="search" aria-label="course" class="wrapper-search-context">
-        <div id="discovery-message" class="search-status-label"></div>
-        <form class="wrapper-search-input">
-          <label for="discovery-input" class="sr">${_('Search for a course')}</label>
-          <input id="discovery-input" class="discovery-input" placeholder="${_('Search for a course')}" type="text"/>
-          <button type="submit" class="button postfix discovery-submit" title="${_('Search')}">
-            <span class="icon fa fa-search" aria-hidden="true"></span>
-            <div aria-live="polite" aria-relevant="all">
-              <div id="loading-indicator" class="loading-spinner hidden">
-                <span class="icon fa fa-spinner fa-spin" aria-hidden="true"></span>
-                <span class="sr">${_('Loading')}</span>
-              </div>
-            </div>
-          </button>
-        </form>
-      </div>
-
       <div id="filter-bar" class="filters hide-phone is-collapsed">
       </div>
       % endif
@@ -72,6 +57,6 @@
         </ul>
       </div>
 
-    </section>
-  </section>
+    </div>
+  </div>
 </main>

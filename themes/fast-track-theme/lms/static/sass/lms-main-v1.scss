@@ -4,26 +4,36 @@
 @import 'header';
 @import 'course/courseware/sidebar';
 
+$ft-temp-darkgray: #272A2F;
 $ft-orange: #f76b1c;
 
 /**
 *   GLOBAL
 **/
 
-html, body {
+html, body, .window-wrap {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+
   *:not(.fa):not(.mce-ico) {
     font-family: Roboto, sans-serif !important;
   }
-
-  height: 100%;
 }
 
 .loaded {
   visibility: visible;
 }
 
+#global-navigation {
+  ol.right.nav-courseware.list-inline {
+    position: static;
+  }
+}
+
 .content-wrapper {
-  min-height: calc(100% - 112px);
+  height: calc(100% - 114px);
 }
 
 .deliverables {
@@ -44,9 +54,25 @@ html, body {
 **/
 
 .header-global {
+  height: 47px;
+  border: 0.5px solid $ft-temp-light-gray;
+  box-shadow: none;
+
+  .nav-global {
+
+    li a, div a {
+      color: $ft-font-menu-color;
+    }
+
+    li a:hover {
+      color: $ft-font-menu-active-color;
+    }
+
+  }
+
   h1.logo {
     img {
-      max-height: 50px;
+      max-height: 34px;
     }
   }
 }
@@ -59,11 +85,8 @@ $break-smaller: 1366px;
 
 .view-in-course {
   // Fix dancing footer. Glue it to the bottom even when there is no enough course content
-  .window-wrap {
-    height: 100%;
-  }
 
-  #main {
+  #main:not(.explore-courses) {
     padding-top: 60px; // we want to save place for absolute positioning of the course menu
   }
 
@@ -84,6 +107,11 @@ $break-smaller: 1366px;
 $link-color: #6f6f6f;
 
 .wrapper-footer {
+  position: fixed;
+  bottom: 0;
+  height: 65px;
+  width: 100%;
+
   padding: 0 !important; // otherwise will be overwritten with course style
   margin-top: 0 !important;
   box-shadow: none;
@@ -133,6 +161,137 @@ $link-color: #6f6f6f;
     margin-left: 17%;
     border-left: 1px solid $ft-temp-light-gray;
   }
+}
+
+/**
+* Explore courses page
+**/
+
+#main.explore-courses {
+  display: table;
+  height: 100%;
+  width: 100%;
+}
+
+.find-courses {
+  display: table-cell;
+  margin: 0;
+  padding: 0;
+
+  background: white;
+}
+
+.search-facets {
+  display: table-cell;
+  vertical-align: top;
+  width: 248px;
+  background: white;
+
+  border-right: 0.5px solid $ft-temp-light-gray;
+
+  .header-search-facets-wrapper {
+    height: 47px;
+    background: #f5f5f5;
+    border: 0.5px solid $ft-temp-light-gray;
+    border-top: 0;
+    border-right: 0;
+
+    h2.header-search-facets {
+      color: $ft-font-menu-color;
+
+      margin: 0;
+      padding-top: 12px;
+      padding-left: 15px;
+
+      font-size: 1em;
+      font-weight: 600;
+      letter-spacing: 0 !important;
+      text-transform: uppercase;
+    }
+  }
+}
+
+
+.courses-container .courses .courses-listing-item {
+  width: 300px !important;
+  height: 340px;
+  margin-right: 6.35765% !important;
+}
+
+.courses-container .courses .course {
+  font-size: 1em;
+  font-weight: 600;
+  letter-spacing: 0 !important;
+  background: white;
+
+  .course-date-wrapper {
+    display: table-cell;
+    vertical-align: middle;
+    position: relative;
+    top: -35px;
+    height: 22px;
+
+    background: $ft-temp-darkgray;
+    color: white;
+
+    .course-date {
+      margin-left: 8px;
+      margin-right: 8px;
+
+      font-size: 1em;
+      font-weight: 600;
+      letter-spacing: 0 !important;
+    }
+  }
+
+  .course-info {
+    height: 156px;
+
+    .course-name {
+      font-size: 1.2em;
+      font-weight: 400;
+      letter-spacing: 0 !important;
+      margin-left: 12px;
+      text-transform: none;
+    }
+
+    .course-overview {
+      color: #777777;
+      font-size: 0.8em;
+      font-weight: 400;
+      letter-spacing: 0 !important;
+      margin-left: 12px;
+    }
+  }
+  .course-image {
+    .cover-image {
+      border-bottom: 6px solid $ft-temp-darkgray;
+      height: 135px;
+      width: 298px;
+    }
+  }
+
+  &:hover {
+    * {
+      background: white;
+    }
+
+    .course-date-wrapper, .course-date {
+      background: $ft-orange;
+
+    }
+
+    .cover-image {
+      border-bottom: 6px solid $ft-orange;
+    }
+  }
+}
+
+.courses-container .courses .course,
+.find-courses .courses .course,
+.find-courses .courses .course:hover {
+  border: 0.5px solid $ft-temp-light-gray;
+  box-shadow: none;
 }
 
 /* COURSE DASHBOARD - info.html */
