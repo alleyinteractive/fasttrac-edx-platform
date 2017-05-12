@@ -4,7 +4,7 @@
 @import 'header';
 @import 'course/courseware/sidebar';
 
-$ft-temp-darkgray: #272A2F;
+$ft-temp-darkgray: #555;
 $ft-orange: #f76b1c;
 
 /**
@@ -211,78 +211,136 @@ $link-color: #6f6f6f;
   }
 }
 
-
-.courses-container .courses .courses-listing-item {
-  width: 300px !important;
-  height: 340px;
-  margin-right: 6.35765% !important;
+.courses-container .courses:not(.no-course-discovery) {
+  width: 100% !important;
+  margin-bottom: 20px;
 }
 
-.courses-container .courses .course {
-  font-size: 1em;
-  font-weight: 600;
-  letter-spacing: 0 !important;
-  background: white;
+.courses-container .courses {
+  .courses-listing-item {
+    width: 300px !important;
+    height: 340px;
+    margin-right: 6.35765% !important;
+  }
 
-  .course-date-wrapper {
-    display: table-cell;
-    vertical-align: middle;
-    position: relative;
-    top: -35px;
-    height: 22px;
+  .course {
+    font-size: 1em;
+    font-weight: 600;
+    letter-spacing: 0 !important;
+    background: white;
 
-    background: $ft-temp-darkgray;
-    color: white;
+    .course-date-wrapper {
+      display: table-cell;
+      vertical-align: middle;
+      position: relative;
+      top: -35px;
+      height: 22px;
 
-    .course-date {
-      margin-left: 8px;
-      margin-right: 8px;
+      background: $ft-temp-darkgray;
+      color: white;
 
+      .course-date {
+        margin-left: 8px;
+        margin-right: 8px;
+
+        font-size: 1em;
+        font-weight: 600;
+        letter-spacing: 0 !important;
+      }
+    }
+
+    .course-info {
+      height: 156px;
+
+      .affiliate-name {
+        margin-left: 12px;
+        margin-bottom: 8px;
+        color: $ft-font-menu-color;
+      }
+
+      .course-name {
+        font-size: 1.2em;
+        font-weight: 400;
+        letter-spacing: 0 !important;
+        margin-left: 12px;
+        text-transform: none;
+      }
+
+      .course-overview {
+        color: #777777;
+        font-size: 0.8em;
+        font-weight: 400;
+        letter-spacing: 0 !important;
+        margin-left: 12px;
+      }
+    }
+
+    .course-image {
+      .cover-image {
+        border-bottom: 6px solid $ft-temp-darkgray;
+        height: 135px;
+        width: 298px;
+      }
+    }
+
+    .course-footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+
+      text-align: center;
+      color: $ft-temp-darkgray;
       font-size: 1em;
-      font-weight: 600;
-      letter-spacing: 0 !important;
-    }
-  }
-
-  .course-info {
-    height: 156px;
-
-    .course-name {
-      font-size: 1.2em;
       font-weight: 400;
       letter-spacing: 0 !important;
-      margin-left: 12px;
-      text-transform: none;
+
+      .course-delivery {
+        display: inline-block;
+        width: 36%;
+        text-align: center;
+      }
+
+      .course-state-wrapper {
+        display: inline-block;
+        width: 20%;
+        text-align: center;
+        transform: skew(-24deg);
+        padding: 0.5rem;
+        border-left: 1px solid $ft-temp-light-gray;
+        border-right: 1px solid $ft-temp-light-gray;
+
+        .course-state {
+          text-transform: uppercase;
+          transform: skew(24deg);
+        }
+      }
+
+      .course-view-action {
+        display: inline-block;
+        width: 35%;
+        text-align: center;
+        text-transform: uppercase;
+
+        i {
+          color: $ft-orange;
+          font-size: 22px;
+        }
+      }
     }
 
-    .course-overview {
-      color: #777777;
-      font-size: 0.8em;
-      font-weight: 400;
-      letter-spacing: 0 !important;
-      margin-left: 12px;
-    }
-  }
-  .course-image {
-    .cover-image {
-      border-bottom: 6px solid $ft-temp-darkgray;
-      height: 135px;
-      width: 298px;
-    }
-  }
+    &:hover {
+      * {
+        background: white;
+      }
 
-  &:hover {
-    * {
-      background: white;
-    }
+      .course-date-wrapper, .course-date {
+        background: $ft-orange;
 
-    .course-date-wrapper, .course-date {
-      background: $ft-orange;
+      }
 
-    }
-
-    .cover-image {
-      border-bottom: 6px solid $ft-orange;
+      .cover-image {
+        border-bottom: 6px solid $ft-orange;
+      }
     }
   }
 }

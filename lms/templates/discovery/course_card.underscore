@@ -12,6 +12,11 @@
             </div>
         </header>
         <section class="course-info" aria-hidden="true">
+            <% if (course.slice(0,3) === 'ccx' && affiliate_name) { %>
+            <h3 class="affiliate-name">
+                <%= affiliate_name %>
+            </h3>
+            <% } %>
             <h2 class="course-name">
                 <%- content.display_name %>
             </h2>
@@ -22,6 +27,29 @@
                     <span><%= content.overview %></span>
                 <%}%>
             </p>
+            <div class="course-footer">
+                <div class="course-delivery">
+                <% if (course.slice(0,3) === 'ccx' && delivery_mode && delivery_mode.match('\\bIn Person\\b')) { %>
+                    <i class="fa fa-users"></i>
+                    In-Person
+                <% } else { %>
+                    <i class="fa fa-globe"></i>
+                    Online
+                <% } %>
+                </div>
+                <div class="course-state-wrapper">
+                    <div class="course-state"><i class="fa fa-map-marker"></i>
+                    <% if (course.slice(0,3) === 'ccx' && location_state) { %>
+                        <%= location_state.slice(0,2) %>
+                    <% } else { %>
+                        --
+                    <% } %>
+                    </div>
+                </div>
+                <div class="course-view-action">View
+                    <i class="fa fa-arrow-circle-o-right"></i>
+                </div>
+            </div>
         </section>
     </a>
 </article>

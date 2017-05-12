@@ -654,7 +654,8 @@ class CourseAboutSearchIndexer(object):
                 "location_state": ccx.location_state,
                 "time": ccx.time,
                 "fee": ccx.fee,
-                "course_description": ccx.course_description
+                "course_description": ccx.course_description,
+                "affiliate_name": ccx.coach.profile.name
             }
 
             courses_to_index.append(ccx_info)
