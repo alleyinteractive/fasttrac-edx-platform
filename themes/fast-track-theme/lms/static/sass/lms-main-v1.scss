@@ -51,6 +51,8 @@ html, body {
   }
 }
 
+$break-smaller: 1366px;
+
 /**
 *   COURSE DISPLAY --> the rest of it see lms-course.scss
 **/
@@ -63,6 +65,15 @@ html, body {
 
   #main {
     padding-top: 60px; // we want to save place for absolute positioning of the course menu
+  }
+
+  .course-wrapper.extended #main {
+    width: 72%;
+    margin: 0 auto;
+
+    @media screen and (max-width: $break-smaller) {
+      width: 100%;
+    }
   }
 }
 
@@ -124,10 +135,9 @@ $link-color: #6f6f6f;
   }
 }
 
-
 /* COURSE DASHBOARD - info.html */
 
-#main {
+.view-course-info #main {
   background: #eee;
 
   .container {
@@ -250,7 +260,6 @@ $link-color: #6f6f6f;
     font-size: 1.6rem;
   }
 }
-
 
 .last-viewed-item {
   margin: 1rem 6rem;
@@ -433,7 +442,6 @@ $link-color: #6f6f6f;
   }
 }
 
-
 // BOOKMARKS PAGE - bookmarks.html
 
 .bookmarks {
@@ -497,3 +505,4 @@ $link-color: #6f6f6f;
     }
   }
 }
+
