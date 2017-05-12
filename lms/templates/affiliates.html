@@ -38,7 +38,7 @@
       padding: 1rem;
       border: 1px solid #ddd;
       border-right: 0 none;
-      background: #eee;
+      background: #f0f0f0;
     }
 
     .affiliate-sidebar .sidebar-body {
@@ -51,6 +51,16 @@
       padding: 1rem;
       text-transform: uppercase;
       font-weight: bold;
+    }
+
+    .affiliate-sidebar .sidebar-body .clear-all {
+      float: right;
+      color: #777;
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 0;
+      margin: .5rem;
+      font-size: .9rem;
     }
 
     .affiliate-sidebar #submit-search {
@@ -141,6 +151,7 @@
     </div>
 
     <div class="sidebar-body">
+      <a href="affiliates" class="clear-all"> <span class="fa fa-remove"></span> Clear All</a>
       <div class="sidebar-filter">
         <div class="fa fa-user"></div>
         <span class="filter-label">Affiliate Name</span>

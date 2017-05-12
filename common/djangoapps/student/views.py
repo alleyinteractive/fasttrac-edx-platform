@@ -306,9 +306,9 @@ def affiliates(request):
     from django.db import connection
 
     data = []
-    affiliate_name = request.GET.get('affiliate_name')
-    affiliate_city = request.GET.get('affiliate_city')
-    affiliate_state = request.GET.get('affiliate_state')
+    affiliate_name = request.GET.get('affiliate_name', '')
+    affiliate_city = request.GET.get('affiliate_city', '')
+    affiliate_state = request.GET.get('affiliate_state', '')
 
     db_query = "SELECT DISTINCT au.username, aup.name, aup.state\
         FROM ccx_customcourseforedx AS ccx\
