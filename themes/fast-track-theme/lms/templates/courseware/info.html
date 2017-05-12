@@ -53,20 +53,83 @@ from openedx.core.djangolib.markup import HTML, Text
 </%block>
 
 <%block name="bodyclass">view-in-course view-course-info ${course.css_class or ''}</%block>
-
 <main id="main" aria-label="Content" tabindex="-1">
-    <div class="container">
+    <div class="sidebar-ft">
       <div class="home">
         <div class="page-header-main">
-            <h1 class="page-title">${_("Welcome to {org}'s {course_name}!").format(org=course.display_org_with_default, course_name=course.display_number_with_default)}</h1>
-            <h2 class="page-subtitle">${course.display_name_with_default}</h2>
+          <h1>Welcome ${user.first_name}!</h1>
         </div>
-        % if last_accessed_courseware_url:
-          <div class="page-header-secondary">
-              <a href="${last_accessed_courseware_url}" class="last-accessed-link">${_("Resume Course")}</a>
-          </div>
-        % endif
       </div>
+
+      <div class="course-info-ft">
+        <div class="course-info-header">
+          <div class="fa fa-file-text"></div>
+          COURSE INFO.
+          <a href="#">VIEW PROFILE</a>
+        </div>
+        <div class="course-info-body">
+          % if ccx:
+            <div>
+              <b>Affiliate:</b>
+              ${ccx.coach.profile.name}
+            </div>
+            <div>
+              <b>Meeting Date & Time:</b>
+              ${ccx.time.strftime("%B %d, %Y @ %-I:%M%p")}
+            </div>
+            <div>
+              <b>Meeting Location:</b>
+              ${'{}, {} {}'.format(ccx.location_city, ccx.location_state, ccx.location_postal_code)}
+            </div>
+            <div>
+              <b>Contact Information:</b>
+              ${'{} / {}'.format(ccx.coach.email, ccx.coach.profile.phone_number)}
+            </div>
+          % endif
+        </div>
+      </div>
+
+      <div class="course-info-ft">
+        <div class="course-info-header">
+          <div class="fa fa-comment"></div>
+          MESSAGES
+          <a href="#">VIEW ALL</a>
+        </div>
+        <div class="course-info-body">
+          ${HTML(get_course_info_section(request, masquerade_user, course, 'updates'))}
+        </div>
+      </div>
+
+      <div class="course-info-ft">
+        <div class="course-info-header">
+          <div class="fa fa-bookmark"></div>
+          BOOKMARKS
+          <a href="bookmarks">VIEW ALL</a>
+        </div>
+        <div class="course-info-body bookmarks">
+          % for bookmark in bookmarks:
+            <div>
+              <a
+                href=${"/courses/{}/jump_to/{}".format(bookmark.course_key, bookmark.usage_key)}
+                title="${' - '.join([path_item.display_name for path_item in bookmark.path])} - ${bookmark.display_name}"
+              >
+                ${' - '.join([path_item.display_name for path_item in bookmark.path])}
+                -
+                ${bookmark.display_name}
+              </a>
+              <span>
+                ${bookmark.modified.strftime("%B %d, %Y")}
+              </span>
+            </div>
+          % endfor
+
+          % if len(bookmarks) == 0:
+            You have no bookmarks yet...
+          % endif
+        </div>
+      </div>
+    </div>
+    <div class="container">
       <div class="info-wrapper">
         % if user.is_authenticated():
         <section class="updates">
@@ -78,8 +141,77 @@ from openedx.core.djangolib.markup import HTML, Text
           </div>
           % endif
 
-          <h1>${_("Course Updates and News")}</h1>
-          ${HTML(get_course_info_section(request, masquerade_user, course, 'updates'))}
+          <div class="last-viewed">
+            <h1>Where you last left off...</h1>
+            <div class="last-viewed-item">
+              % if last_viewed_item:
+                <h3>
+                  <span class="uppercase">
+                    ${last_viewed_item['object'].get_parent().display_name if last_viewed_item['object'].get_parent() else ''}
+                  </span> -
+                  ${last_viewed_item['object'].display_name}
+                </h3>
+                <p>
+                  ${last_viewed_item['object'].display_description if last_viewed_item['object'].display_description else 'No description yet...'}
+                </p>
+                <span class="date">
+                  last viewed @ ${last_viewed_item['modified'].strftime("%B %d, %Y")}
+                </span>
+                <a href=${'/courses/' + last_viewed_item['course_id'] + '/jump_to/' + last_viewed_item['module_id']} class="btn-ft">
+                  Continue
+                  &nbsp;
+                  <span class="fa fa-arrow-right"></span>
+                </a>
+              % else:
+                This is your first time here...
+              % endif
+            </div>
+          </div>
+
+          <div class="search-box">
+            <div class="search-box-content">
+              <h1>START SOMETHING NEW</h1>
+              <input type="text" placeholder="search courseware">
+            </div>
+          </div>
+
+          <ul class="ft-tabs">
+            <li data-tab="course" class="active">COURSE OVERVIEW</li>
+            <li data-tab="tools">TOOLS OVERVIEW</li>
+          </ul>
+
+          <div id="tab-course" class="ft-tab" style="display: block;">
+            % for section in course.get_children():
+              <div class="ft-card">
+                <h3>
+                  <a href="${"/courses/{}/courseware/{}/".format(course.id, section.url_name)}">
+                    ${section.display_name}
+                  </a>
+                </h3>
+                <p>
+                  ${section.display_description if section.display_description else 'No description'}
+                </p>
+                <div class="activities">
+                  TODO: ACTIVITIES
+                </div>
+              </div>
+            % endfor
+          </div>
+
+          <div id="tab-tools" class="ft-tab">
+            <iframe src="http://localhost:3000/lti/deliverables/" frameborder="0" width="100%" height="300px"></iframe>
+          </div>
+
+          <script>
+            $('.ft-tabs li').on('click', function() {
+              $('.ft-tabs li.active').removeClass('active');
+              $(this).addClass('active');
+
+              $('.ft-tab').hide();
+              $( '#tab-' + $(this).attr('data-tab') ).fadeIn();
+            });
+          </script>
+
 
           ## CourseTalk widget
           % if show_coursetalk_widget:
@@ -87,47 +219,6 @@ from openedx.core.djangolib.markup import HTML, Text
             <div id="ct-custom-read-review-widget" data-provider="${platform_key}" data-course="${course_review_key}"></div>
           </div>
           % endif
-        </section>
-        <section aria-label="${_('Handout Navigation')}" class="handouts">
-          % if SelfPacedConfiguration.current().enable_course_home_improvements:
-            <h1 class="handouts-header">${_("Important Course Dates")}</h1>
-            ${HTML(get_course_date_summary(course, user))}
-          % endif
-
-          <h1 class="handouts-header">${_(course.info_sidebar_name)}</h1>
-          ${HTML(get_course_info_section(request, masquerade_user, course, 'handouts'))}
-
-          <h1 class="handouts-header">${_('Bookmarks')}</h1>
-          <ul>
-            % for bookmark in bookmarks:
-              <li>
-                <a href=${'/courses/' + bookmark['course_id'] + '/jump_to/' + bookmark['usage_id']}>
-                    ${' > '.join([path_item.get('display_name') for path_item in bookmark['path']])}
-                </a>
-              </li>
-            % endfor
-          </ul>
-
-          <h1>Last Viewed Item</h1>
-          % if last_viewed_item:
-            <a href=${'/courses/' + last_viewed_item['course_id'] + '/jump_to/' + last_viewed_item['module_id']}>
-              <h3>${last_viewed_item['object'].display_name}</h3>
-              ${last_viewed_item['modified'].strftime("%B %d, %Y")}
-            </a>
-          % endif
-        </section>
-        <section class="deliverables">
-          <h1>Deliverables</h1>
-          <iframe src="http://localhost:3000/lti/deliverables/" frameborder="0"></iframe>
-        </section>
-        % else:
-        <section class="updates">
-          <h1 class="handouts-header">${_("Course Updates and News")}</h1>
-          ${HTML(get_course_info_section(request, masquerade_user, course, 'guest_updates'))}
-        </section>
-        <section aria-label="${_('Handout Navigation')}" class="handouts">
-          <h1 class="handouts-header">${_("Course Handouts")}</h1>
-          ${HTML(get_course_info_section(request, masquerade_user, course, 'guest_handouts'))}
         </section>
         % endif
       </div>

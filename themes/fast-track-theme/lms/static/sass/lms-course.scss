@@ -9,7 +9,7 @@ $ft-temp-gray: #efeded;
 $ft-font-menu-color: #b5b5b5;
 $ft-font-menu-active-color: #949494;
 
-//TODO: create file to add fasttrack colors (when we get designs)
+//TODO: create file to add fasttrac colors (when we get designs)
 $ft-orange: #f76b1c;
 
 // Marin clumsy override until we get the design
@@ -138,7 +138,7 @@ body.view-in-course {
       position: absolute;
       left: -20px;
       right: -20px;
-      top: 45%;
+      top: 350px;
       width: inherit;
       cursor: pointer;
 
@@ -173,6 +173,8 @@ body.view-in-course {
   background-color: #fff;
 
   .courseware-results-wrapper {
+    display: block;
+    margin: 60px auto 0 auto;
     padding: 0;
   }
 
@@ -202,19 +204,69 @@ nav.wrapper-course-material .course-tabs li a {
   }
 }
 
+/**
+ *    TABS
+ **/
+
 // menu will be placed like it's part of the course display
+body.view-in-course .wrapper-course-material .course-material {
+  width: inherit;
+}
+
+.wrapper-course-material .course-material {
+  max-width: 97%;
+}
+
 .course-material {
-  margin: 0;
-  width: 100%;
   position: absolute;
-  z-index: 20;
+  width: 100%;
   left: 3%;
+  margin: 0;
+  z-index: 20;
   -webkit-transition: 0.4s;
   transition: 0.4s;
 
   &.with-sidebar {
+    max-width: 80%;
+    width: 100% !important;
     left: 20%;
   }
+
+  .course-search {
+    display: none; // hide everywhere except in course display
+  }
+}
+
+// search
+.view-courseware.courseware .course-search {
+  position: absolute;
+  right: 0;
+  display: block;
+
+  .fa-search {
+    color: #b5b5b5 !important;
+  }
+}
+
+#course-search-input {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+#course-search-input:focus,
+.search-button:focus {
+  outline: none;
+}
+
+#course-search-input::-webkit-input-placeholder {
+  font-weight: 600;
+  font-size: 14px;
+  color: #b5b5b5 !important;
+}
+
+#course-search-input:focus::-webkit-input-placeholder {
+  opacity: 0;
 }
 
 // NEXT footer inside of the course
@@ -231,11 +283,318 @@ nav.wrapper-course-material .course-tabs li a {
   text-align: center;
   color: #969696;
   font-size: 14px;
-  border: 1px solid #dddddd
+  border: 1px solid #dddddd;
+
+  .fa {
+    padding-left: 10px;
+    font-size: 18px;
+  }
 }
 
-.next-unit-footer .fa {
-  padding-left: 10px;
-  font-size: 18px;
+// remove line between two xblocks
+.course-wrapper .course-content .vert-mod .vert > .xblock-student_view {
+  border-bottom: none;
 }
 
+/* Courseware elements custom classes */
+.view-in-course {
+  .element-title {
+    margin: 25px 0;
+    padding: 1em;
+    line-height: 0 !important;
+    overflow: hidden;
+    /*width: 50%; can be anything*/
+    text-align: center;
+
+    span {
+      display: inline-block;
+      position: relative;
+      font-size: 24px;
+      line-height: 0 !important;
+      font-family: Roboto;
+      font-weight: bold;
+
+      &:before, &:after {
+        content: "";
+        position: absolute;
+        height: 5px;
+        border-top: 1px solid #aaa;
+        top: 0;
+        width: 600px;
+      }
+
+      &:before {
+        right: 100%;
+        margin-right: 15px;
+      }
+
+      &:after {
+        left: 100%;
+        margin-left: 15px;
+      }
+    }
+  }
+
+  .supplemental-text {
+    padding-left: 1em;
+    border-left: 2px solid #aaa;
+    font-family: Roboto;
+    font-style: italic;
+    color: #777;
+
+    a {
+      color: $ft-orange !important;
+      text-decoration: underline;
+    }
+  }
+
+  .reality-check-title {
+    line-height: 0 !important;
+    text-align: center;
+    padding: 1em;
+    overflow: hidden;
+
+    span {
+      display: inline-block;
+      position: relative;
+      font-size: 24px;
+      line-height: 0 !important;
+      font-family: Roboto;
+      font-weight: bold;
+      margin-left: -800px;
+
+      &:before, &:after {
+        content: "";
+        position: absolute;
+        height: 5px;
+        border-top: 1px solid #aaa;
+        top: 0;
+      }
+
+      &:before {
+        right: 100%;
+        margin-right: 15px;
+        width: 500px;
+      }
+
+      &:after {
+        left: 100%;
+        margin-left: 15px;
+        width: 2000px;
+      }
+
+      .fa {
+        line-height: 0 !important;
+        font-style: normal;
+        margin: 0 5px;
+        color: $ft-orange;
+      }
+    }
+  }
+
+  .reality-check-title.green .fa {
+    color: greenyellow;
+  }
+
+  ol.ft.green {
+    li {
+      &:before {
+        color: greenyellow;
+      }
+    }
+  }
+
+  ol.ft {
+    font-family: Roboto;
+    list-style: none !important;
+    counter-reset: li;
+
+    li {
+      counter-increment: li;
+
+      &:before {
+        content: "." counter(li);
+        color: $ft-orange;
+        display: inline-block;
+        width: 2em;
+        margin-left: -1.5em;
+        margin-right: 0.5em;
+        text-align: right;
+        direction: rtl
+      }
+    }
+  }
+
+  ul.ft.green {
+    li:before {
+      color: greenyellow;
+    }
+  }
+
+  ul.ft {
+    font-family: Roboto;
+    list-style: none !important;
+
+    li:before {
+      content: "⋄";
+      color: $ft-orange;
+      display: inline-block;
+      width: 2em;
+      margin-left: -1em
+    }
+  }
+
+  .definition {
+    display: inline-block;
+    background: #777;
+    color: white;
+    line-height: 27px !important;
+    vertical-align: middle;
+    padding: 0 5px 0 0;
+    font-family: Roboto;
+    margin-right: .4em;
+    overflow: hidden;
+
+    .skew {
+      display: inline-block;
+      width: 8px;
+      height: 28px;
+      margin-left: -3px;
+      background: #555;
+      margin-bottom: -9px;
+      border-right: 2px solid white;
+      transform: skewX(-6deg);
+    }
+  }
+
+  .ask-yourself {
+    font-family: Roboto;
+    padding-left: 60px;
+    line-height: 1.4em;
+    font-style: italic;
+    color: #555;
+
+    &:before {
+      content: "";
+      background-image: url('../images/AskYourselfIcon.jpg');
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      width: 45px;
+      height: 45px;
+      display: inline-block;
+      vertical-align: middle;
+      position: absolute;
+      margin-left: -60px;
+    }
+
+    .highlight {
+      display: inline;
+      color: $ft-orange;
+      text-transform: uppercase;
+      font-style: normal;
+    }
+  }
+
+  .ask-yourself.green:before {
+    background-image: url('../images/AskYourselfIcon_Green.jpg');
+  }
+
+  .ask-yourself.green .highlight {
+    color: greenyellow;
+  }
+
+  .tip {
+    background-image: url('../images/TipBackgroundPattern.jpg');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    border: 1px solid $ft-orange;
+    font-family: Roboto;
+    color: #555;
+    line-height: 80px !important;
+    height: 80px;
+
+    &:before {
+      content: "";
+      position: relative;
+      display: inline-block;
+      height: 30px;
+      border: 4px solid $ft-orange;
+      top: 15px;
+      left: -4px;
+    }
+
+    .highlight {
+      display: inline;
+      color: $ft-orange;
+      text-transform: uppercase;
+      font-style: normal;
+      margin-left: 1em;
+      font-weight: bold;
+    }
+  }
+
+  .tip.green {
+    background-image: url('../images/TipBackgroundPattern_Green.jpg');
+    border-color: greenyellow;
+
+    &:before {
+      border-color: greenyellow;
+    }
+
+    .highlight {
+      color: greenyellow;
+    }
+  }
+
+  .alt-quote {
+    font-family: Roboto;
+    vertical-align: middle;
+    color: #555;
+    padding: 20px 50px;
+    background-image: url('../images/alt-quote.png');
+    background-repeat: no-repeat;
+    background-position-x: 0;
+    background-size: 25px 100%;
+    font-style: italic;
+    line-height: 25px;
+
+    .author {
+      vertical-align: middle;
+      color: #777;
+      font-weight: bold;
+    }
+  }
+
+  // biography block
+  .biography-container .image-wrapper {
+    display: inline-block;
+    width: 20%;
+    vertical-align: top;
+  }
+
+  .biography-container .text-wrapper {
+    display: inline-block;
+    width: 77%;
+    vertical-align: top;
+    padding: 1%;
+  }
+
+  .image-container {
+    width: 140px;
+    height: 140px;
+    max-width: 100%;
+    margin: 0 auto;
+    background-size: cover;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #d9d9d9;
+  }
+
+  .xmodule_display.xmodule_HtmlModule p.long-description,
+  .xmodule_display.xmodule_HtmlModule p.short-description {
+    color: #999898;
+  }
+  .xmodule_display.xmodule_HtmlModule p.long-description {
+    font-size: 14px;
+  }
+}

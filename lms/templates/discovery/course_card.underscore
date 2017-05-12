@@ -1,30 +1,27 @@
 <article class="course" role="region" aria-label="<%- content.display_name %>">
     <a href="/courses/<%- course %>/about">
         <header class="course-image">
-            <div class="cover-image">
-                <img src="<%- image_url %>" alt="<%- content.display_name %> <%- content.number %>" />
-                <div class="learn-more" aria-hidden="true"><%- gettext("LEARN MORE") %></div>
+            <img class="cover-image" src="<%- image_url %>" alt="<%- content.display_name %> <%- content.number %>" />
+            <div class="course-date-wrapper" aria-hidden="true">
+                <p class=course-date>
+                <%- interpolate(
+                    gettext("Starts: %(start_date)s"),
+                    { start_date: start }, true
+                ) %>
+                </p>
             </div>
         </header>
         <section class="course-info" aria-hidden="true">
             <h2 class="course-name">
-                <span class="course-organization"><%- org %></span>
-                <span class="course-code"><%- content.number %></span>
-                <span class="course-title"><%- content.display_name %></span>
+                <%- content.display_name %>
             </h2>
-            <div class="course-date" aria-hidden="true">
-                <%- interpolate(
-                      gettext("Starts: %(start_date)s"),
-                      { start_date: start }, true
-                    ) %>
-            </div>
+            <p class="course-overview">
+                <% if(content.overview.length > 85) {%>
+                    <span><%= content.overview.slice(0, 85).concat('...') %></span>
+                <%} else {%>
+                    <span><%= content.overview %></span>
+                <%}%>
+            </p>
         </section>
-        <div class="sr">
-            <ul>
-                <li><%- org %></li>
-                <li><%- content.number %></li>
-                <li><%- gettext("Starts") %><time itemprop="startDate" datetime="<%- start %>"><%- start %></time></li>
-            </ul>
-        </div>
     </a>
 </article>

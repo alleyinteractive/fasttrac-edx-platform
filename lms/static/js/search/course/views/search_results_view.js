@@ -27,7 +27,7 @@ define([
 
         showResults: function () {
             SearchResultsView.prototype.showResults.call(this);
-            $(this.coursewareResultsWrapperElement).css('display', 'table-cell');
+            $(this.coursewareResultsWrapperElement).css('display', 'block');
         }
 
     });

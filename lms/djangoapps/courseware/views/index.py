@@ -16,6 +16,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
 from django.shortcuts import redirect
 
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 from courseware.url_helpers import get_redirect_url_for_global_staff
 from edxmako.shortcuts import render_to_response, render_to_string
 import logging
@@ -387,10 +388,17 @@ class CoursewareIndex(View):
         Returns and creates the rendering context for the courseware.
         Also returns the table of contents for the courseware.
         """
+        original_course_id = None
+
+        if hasattr(self.course.id, 'ccx'):
+            c = CustomCourseForEdX.objects.get(pk=self.course.id.ccx)
+            original_course_id = c.course_id
+
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
             'COURSE_TITLE': self.course.display_name_with_default_escaped,
             'course': self.course,
+            'original_course_id': original_course_id,
             'init': '',
             'fragment': Fragment(),
             'staff_access': self.is_staff,
@@ -446,7 +454,7 @@ class CoursewareIndex(View):
             )
             courseware_context['fragment'] = self.section.render(STUDENT_VIEW, section_context)
 
-        # fasttrack addition: dropdown menu for sections
+        # fasttrac addition: dropdown menu for sections
         section_list = [
             {
                 "display_id": slugify(section.display_name_with_default_escaped),
