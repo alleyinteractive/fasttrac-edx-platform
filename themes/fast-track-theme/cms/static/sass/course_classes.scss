@@ -1,14 +1,14 @@
 $ft-orange: #f76b1c;
 
 /* Courseware elements custom classes */
-.view-in-course {
+
+.xblock.xblock-student_view {
   .element-title {
-    margin: 25px 0;
-    padding: 1em;
     line-height: 0 !important;
-    overflow: hidden;
-    /*width: 50%; can be anything*/
     text-align: center;
+    padding: 1em;
+    /*width: 50%; can be anything*/
+    overflow: hidden;
 
     span {
       display: inline-block;
@@ -62,7 +62,7 @@ $ft-orange: #f76b1c;
       font-size: 24px;
       line-height: 0 !important;
       font-weight: bold;
-      margin-left: -800px;
+      margin-left: -400px;
 
       &:before, &:after {
         content: "";
@@ -260,9 +260,10 @@ $ft-orange: #f76b1c;
     }
   }
 
-  // biography block,
+  // biography block
   .biography-container {
     margin: 1.5rem 0;
+
     .image-wrapper {
       display: inline-block;
       width: 20%;
@@ -288,11 +289,12 @@ $ft-orange: #f76b1c;
     }
   }
 
-  .xmodule_display.xmodule_HtmlModule p.long-description,
-  .xmodule_display.xmodule_HtmlModule p.short-description {
+  &.xmodule_display.xmodule_HtmlModule p.long-description,
+  &.xmodule_display.xmodule_HtmlModule p.short-description {
     color: #999898;
   }
-  .xmodule_display.xmodule_HtmlModule p.long-description {
+
+  &.xmodule_display.xmodule_HtmlModule p.long-description {
     font-size: 14px;
   }
 
@@ -303,7 +305,8 @@ $ft-orange: #f76b1c;
     border: 5px solid #ebebeb;
     padding: 20px;
   }
-  .xmodule_display.xmodule_HtmlModule .block-quote p {
+
+  &.xmodule_display.xmodule_HtmlModule .block-quote p {
     font-style: italic;
     text-align: center;
     line-height: 2 !important;
