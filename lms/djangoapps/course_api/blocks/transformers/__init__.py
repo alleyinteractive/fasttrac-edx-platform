@@ -36,6 +36,7 @@ class SupportedFieldType(object):
 SUPPORTED_FIELDS = [
     SupportedFieldType('category', requested_field_name='type'),
     SupportedFieldType('display_name', default_value=''),
+    SupportedFieldType('launch_url', default_value=''),
     SupportedFieldType('graded'),
     SupportedFieldType('format'),
     # 'student_view_data'
