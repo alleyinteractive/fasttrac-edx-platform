@@ -304,7 +304,6 @@ def get_course_enrollments(user, org_to_include, orgs_to_exclude):
 
 def affiliates(request):
     from django.db import connection
-    import json
 
     data = []
     with connection.cursor() as cursor:
@@ -317,8 +316,6 @@ def affiliates(request):
                 'name': row[1],
                 'state': row[2],
             })
-
-
 
     return render_to_response('affiliates.html', {'affiliates': data})
 
