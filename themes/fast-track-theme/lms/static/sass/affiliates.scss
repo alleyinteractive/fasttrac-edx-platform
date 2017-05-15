@@ -1,0 +1,162 @@
+$ft-orange: #f76b1c;
+
+.affiliate-sidebar {
+  position: absolute;
+  left: 0;
+  top: 3rem;
+  height: calc(100% - 60px);
+  width: 20%;
+  border-right: 1px solid #ddd;
+  background-image: url('../images/newSearchBg.jpg');
+
+  .header {
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #999;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-right: 0 none;
+    background: #f0f0f0;
+  }
+
+  .sidebar-body {
+    background: white;
+    min-height: 50%;
+    border-bottom: 1px solid #ddd;
+
+    .clear-all {
+      float: right;
+      color: #777;
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 0;
+      margin: .5rem;
+      font-size: .9rem;
+    }
+  }
+
+  .sidebar-filter {
+    padding: 1rem;
+    text-transform: uppercase;
+    font-weight: bold;
+
+    .filter-label {
+      display: inline-block;
+      margin: 1rem 0;
+    }
+
+    input[type=text] {
+      border-radius: 0;
+      padding: .3rem;
+      margin: .5rem 1rem;
+      width: 80%;
+    }
+  }
+
+  #submit-search {
+    float: right;
+    color: $ft-orange;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-right: 1rem;
+    margin-top: 1rem;
+  }
+}
+
+.explore-affiliates {
+  h1 {
+    font-weight: bold;
+    color: #555;
+    letter-spacing: 0;
+    text-align: left;
+    border-bottom: 1px solid #aaa;
+    padding-bottom: .5rem;
+  }
+
+  .fa-caret-down {
+    color: $ft-orange;
+    font-size: 1rem;
+    vertical-align: middle;
+    margin-left: 1rem;
+  }
+}
+
+.affiliate-content {
+  position: absolute;
+  left: 25%;
+  top: 4rem;
+  width: 65%;
+
+  ul {
+    padding-left: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .affiliate-card {
+    position: relative;
+    display: inline-block;
+    width: 20rem;
+    height: 20rem;
+    max-height: 20rem;
+    min-height: 20rem;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    margin-bottom: 3rem;
+
+    .image {
+      height: 8rem;
+      border-bottom: 1px solid #aaa;
+      width: 20rem;
+      background-repeat: no-repeat;
+      background-size: cover;
+      display: block;
+    }
+
+    .name {
+      text-transform: uppercase;
+      font-weight: bold;
+      color: #999;
+      margin: 1rem 1rem 0;
+      min-height: 3rem;
+    }
+
+    .description {
+      padding: 1rem;
+      color: #555;
+      font-size: .9rem;
+    }
+
+    .card-footer {
+      position: absolute;
+      bottom: 0;
+      right: 1rem;
+      width: 100%;
+      text-align: right;
+
+      & > span {
+        width: 30%;
+        display: inline-block;
+        text-align: center;
+        padding: .5rem 0;
+        text-transform: uppercase;
+        color: #777;
+
+        .fa-arrow-circle-o-right {
+          color: $ft-orange;
+        }
+      }
+
+      .skewed-footer-item {
+        transform: skewX(-24deg);
+        border-right: 1px solid #ddd;
+
+        & > span {
+          display: inline-block;
+          transform: skewX(24deg);
+        }
+      }
+    }
+  }
+}
