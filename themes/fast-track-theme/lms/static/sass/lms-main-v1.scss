@@ -85,6 +85,9 @@ $break-smaller: 1366px;
 
 .view-in-course {
   // Fix dancing footer. Glue it to the bottom even when there is no enough course content
+  .window-wrap {
+    height: 100%;
+  }
 
   #main:not(.explore-courses) {
     padding-top: 60px; // we want to save place for absolute positioning of the course menu
@@ -107,10 +110,7 @@ $break-smaller: 1366px;
 $link-color: #6f6f6f;
 
 .wrapper-footer {
-  position: fixed;
-  bottom: 0;
-  height: 65px;
-  width: 100%;
+  position: absolute;
 
   padding: 0 !important; // otherwise will be overwritten with course style
   margin-top: 0 !important;
@@ -163,6 +163,12 @@ $link-color: #6f6f6f;
   }
 }
 
+.wrapper-footer.explore-courses-footer {
+  position: fixed;
+  bottom: 0;
+  height: 65px;
+  width: 100%;
+}
 /**
 * Explore courses page
 **/

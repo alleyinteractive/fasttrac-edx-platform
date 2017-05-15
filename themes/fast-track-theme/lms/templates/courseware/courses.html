@@ -26,6 +26,16 @@
 </%block>
 % endif
 
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('.wrapper-footer').addClass('explore-courses-footer')
+  })
+
+  $(window).unload(function() {
+    $('.wrapper-footer').removeClass('explore-courses-footer')
+})
+</script>
+
 <%block name="pagetitle">${_("Courses")}</%block>
 
 <main id="main" class="explore-courses" aria-label="Content" tabindex="-1">
