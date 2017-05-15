@@ -638,16 +638,17 @@
 
             /**
             * @desc Recalculates and updates the height of the container of captions.
-            *
+            * NOTE: FastTrac edit: calculation is wrong. We need fixed height all the time, so we
+            * use 30 instead of calling this.topSpacingHeight()
             */
             onResize: function () {
                 this.subtitlesEl
                     .find('.spacing').first()
-                        .height(this.topSpacingHeight());
+                        .height(30);
 
                 this.subtitlesEl
                     .find('.spacing').last()
-                        .height(this.bottomSpacingHeight());
+                        .height(30);
 
                 this.scrollCaption();
                 this.setSubtitlesHeight();
@@ -826,7 +827,7 @@
             addPaddings: function() {
                 var topSpacer = HtmlUtils.interpolateHtml(
                         HtmlUtils.HTML([
-                            '<li class="spacing" style="height: {height}px">',
+                            '<li class="spacing" style="height: 30px">',
                                 '<a href="#transcript-end-{id}" id="transcript-start-{id}" class="transcript-start"></a>', // jshint ignore:line
                             '</li>'
                         ].join('')),
@@ -838,7 +839,7 @@
 
                 var bottomSpacer = HtmlUtils.interpolateHtml(
                         HtmlUtils.HTML([
-                            '<li class="spacing" style="height: {height}px">',
+                            '<li class="spacing" style="height: 30px">',
                                 '<a href="#transcript-start-{id}" id="transcript-end-{id}" class="transcript-end"></a>', // jshint ignore:line
                             '</li>'
                         ].join('')),

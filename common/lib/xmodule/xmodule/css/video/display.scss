@@ -140,8 +140,13 @@
   }
 
   .video-wrapper {
+    // FastTrac margin edit
+    $flex-glutter: flex-gutter(9);
+    $border-space: 6px;
+    $margin-right: calc(#{$flex-glutter} - #{$border-space});
+
     @include float(left);
-    @include margin-right(flex-gutter(9));
+    @include margin-right($margin-right);
     width: flex-grid(6, 9);
     background-color: black;
     position: relative;

@@ -344,4 +344,84 @@ $ft-orange: #f76b1c;
     background-color: white;
     padding: 5px;
   }
+
+  // video xblock
+  .video-title-wrapper {
+    border-bottom: 1px solid #dedede;
+    position: relative;
+    padding: 5px 10px 15px 0;
+
+    .fa-video-camera {
+      position: absolute;
+      right: 0;
+      font-size: 34px;
+      top: -6px;
+      font-style: normal !important;
+      color: #eaeaea;
+      margin-right: 20px;
+    }
+
+    .video-title {
+      color: #505050;
+      text-transform: uppercase;
+      font-size: 24px;
+    }
+  }
+
+  .xmodule_display.xmodule_VideoModule .video {
+    background: transparent;
+
+    .subtitles {
+      .spacing {
+        text-align: right;
+        padding-right: 5px;
+
+        a {
+          color: #f7905a;
+        }
+      }
+
+      .subtitles-menu {
+        padding-right: 25px;
+
+        li {
+          color: #b3b3b3;
+          font-weight: 500;
+          padding: 5px 0;
+
+          &.current {
+            color: #8a8989;
+          }
+
+          &.spacing:last-of-type .transcript-end {
+            right: 0;
+          }
+
+          &:focus {
+            outline: none;
+          }
+        }
+      }
+    }
+
+    .video-wrapper {
+      border: 3px solid white;
+      box-shadow: 0 0 0 2px #d9d9d9;
+    }
+
+    // custom scroll
+    ::-webkit-scrollbar {
+      width: 6px;
+      padding: 0 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background-color: white;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #acacac;
+      border-radius: 10px;
+    }
+  }
 }
