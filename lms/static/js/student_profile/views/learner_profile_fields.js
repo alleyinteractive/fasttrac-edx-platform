@@ -41,7 +41,7 @@
                 }
                 else {
                     this._super('');
-                } 
+                }
             },
 
             updateFieldValue: function() {

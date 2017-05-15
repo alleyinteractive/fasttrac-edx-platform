@@ -302,6 +302,55 @@ def get_course_enrollments(user, org_to_include, orgs_to_exclude):
             yield enrollment
 
 
+def affiliates(request):
+    from django.db import connection
+
+    data = []
+    affiliate_name = request.GET.get('affiliate_name', '')
+    affiliate_city = request.GET.get('affiliate_city', '')
+    affiliate_state = request.GET.get('affiliate_state', '')
+
+    db_query = "SELECT DISTINCT au.username, aup.name, aup.state\
+        FROM ccx_customcourseforedx AS ccx\
+        LEFT JOIN auth_user AS au ON ccx.coach_id = au.id\
+        LEFT JOIN auth_userprofile aup ON aup.user_id = au.id\
+        WHERE ccx.original_ccx_id = ccx.id"
+
+    db_params = []
+
+    if affiliate_name:
+        db_query += " AND aup.name LIKE %s"
+        db_params.append('%'+affiliate_name+'%')
+
+    if affiliate_city:
+        db_query += " AND aup.city LIKE %s"
+        db_params.append('%'+affiliate_city+'%')
+
+    if affiliate_state:
+        db_query += " AND aup.state = %s"
+        db_params.append(affiliate_state)
+
+    db_query += ";"
+
+    with connection.cursor() as cursor:
+        cursor.execute(db_query, db_params)
+        rows = cursor.fetchall()
+
+    for row in rows:
+        data.append({
+            'username': row[0],
+            'name': row[1],
+            'state': row[2],
+        })
+
+    return render_to_response('affiliates.html', {
+        'affiliates': data,
+        'affiliate_name': affiliate_name,
+        'affiliate_city': affiliate_city,
+        'affiliate_state': affiliate_state
+    })
+
+
 def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disable=unused-argument
     """
     Implements the logic for cert_info -- split out for testing.
