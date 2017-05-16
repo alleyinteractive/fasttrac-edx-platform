@@ -15,7 +15,6 @@ $ft-orange: #f76b1c;
 html, body, .window-wrap {
   padding: 0;
   margin: 0;
-  height: 100%;
   width: 100%;
 
   *:not(.fa):not(.mce-ico) {
@@ -112,6 +111,8 @@ $link-color: #6f6f6f;
 
 .wrapper-footer {
   position: absolute;
+  right: 0;
+  left:0;
 
   padding: 0 !important; // otherwise will be overwritten with course style
   margin-top: 0 !important;
