@@ -349,6 +349,7 @@ $ft-orange: #f76b1c;
   .video-title-wrapper {
     border-bottom: 1px solid #dedede;
     position: relative;
+    margin-left: 20px;
     padding: 5px 10px 15px 0;
 
     .fa-video-camera {
@@ -366,10 +367,20 @@ $ft-orange: #f76b1c;
       text-transform: uppercase;
       font-size: 24px;
     }
+
+    .video-icon {
+      position: absolute;
+      top:0;
+      right:20px;
+      height: 40px;
+      width: 40px;
+      background: url('../images/VideoIcon.svg') no-repeat center center;
+    }
   }
 
   .xmodule_display.xmodule_VideoModule .video {
     background: transparent;
+    margin: 0 10px;
 
     .subtitles {
       .spacing {
