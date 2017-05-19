@@ -319,9 +319,6 @@ FEATURES = {
     # Course discovery feature
     'ENABLE_COURSE_DISCOVERY': False,
 
-    # Setting for overriding default filtering facets for Course discovery
-    # COURSE_DISCOVERY_FILTERS = ["org", "language", "modes"]
-
     # Software secure fake page feature flag
     'ENABLE_SOFTWARE_SECURE_FAKE': False,
 
@@ -2966,3 +2963,30 @@ AFFILIATE_COOKIE_NAME = 'affiliate_id'
 # The cache is cleared when Redirect models are saved/deleted
 REDIRECT_CACHE_TIMEOUT = None  # The length of time we cache Redirect model data
 REDIRECT_CACHE_KEY_PREFIX = 'redirects'
+
+LANGUAGE_MAP = {'terms': {lang: display for lang, display in ALL_LANGUAGES}, 'name': 'Language'}
+COURSE_DISCOVERY_MEANINGS = {
+    'org': {
+        'name': 'Organization',
+    },
+    'modes': {
+        'name': 'Course Type',
+        'terms': {
+            'honor': 'Honor',
+            'verified': 'Verified',
+        },
+    },
+    'language': LANGUAGE_MAP,
+    'location_state': {
+        'name': 'Location State'
+    },
+    'location_city': {
+        'name': 'Location City'
+    },
+    'affiliate_name': {
+        'name': 'Affiliate Name'
+    },
+    'delivery_mode': {
+        'name': 'Delivery Mode'
+    },
+}

@@ -1,4 +1,5 @@
 <h3 class="header-facet">
+    <span class="fa fa-filter"></span>
     <%- displayName %>
 </h3>
 <ul data-facet="<%- name %>" class="facet-list collapse">
