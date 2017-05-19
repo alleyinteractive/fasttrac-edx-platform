@@ -350,6 +350,15 @@ def affiliates(request):
         'affiliate_state': affiliate_state
     })
 
+def affiliate(request, affiliate_username):
+    affiliate = User.objects.get(username=affiliate_username)
+    courses = CustomCourseForEdX.objects.raw('SELECT * FROM ccx_customcourseforedx WHERE original_ccx_id = id AND coach_id=%s', [affiliate.id])
+
+    return render_to_response('affiliate.html', {
+        'affiliate': affiliate,
+        'courses': courses
+    })
+
 
 def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disable=unused-argument
     """

@@ -30,10 +30,6 @@
   $(document).ready(function() {
     $('.wrapper-footer').addClass('explore-courses-footer')
   })
-
-  $(window).unload(function() {
-    $('.wrapper-footer').removeClass('explore-courses-footer')
-})
 </script>
 
 <%block name="pagetitle">${_("Courses")}</%block>
@@ -66,7 +62,6 @@
           %endfor
         </ul>
       </div>
-
     </div>
   </div>
 </main>

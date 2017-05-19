@@ -86,12 +86,15 @@ $ft-orange: #f76b1c;
   left: 25%;
   top: 4rem;
   width: 65%;
+}
 
+.affiliate-content, .affiliate-courses {
   ul {
     padding-left: 0;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    flex-flow: row wrap;
   }
 
   .affiliate-card {
@@ -148,6 +151,10 @@ $ft-orange: #f76b1c;
         }
       }
 
+      a {
+        color: $ft-orange;
+      }
+
       .skewed-footer-item {
         transform: skewX(-24deg);
         border-right: 1px solid #ddd;
@@ -156,6 +163,90 @@ $ft-orange: #f76b1c;
           display: inline-block;
           transform: skewX(24deg);
         }
+      }
+
+      .delivery-mode-item {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: bottom;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+.course-info {
+  header.course-profile {
+    padding-top: 80px !important;
+    border-bottom: 0 none !important;
+    background: url('../images/newSearchBg.jpg') !important;
+  }
+
+  .intro-inner-wrapper {
+    border: 0 none !important;
+  }
+
+  .skewed-footer-item {
+    border-left: 1px solid #ddd;
+  }
+
+  .media {
+    width: 25% !important;
+  }
+
+  .intro .fa-map-marker {
+    color: $ft-orange;
+    margin-right: .5rem;
+  }
+
+  .intro, .media {
+    border-bottom: 5px solid #555;
+  }
+
+  .container .details {
+    width: 60% !important;
+
+    h4 {
+      text-transform: uppercase;
+      color: #aaa;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 1.2rem;
+    }
+
+    p {
+      color: #555;
+    }
+  }
+}
+
+.course-sidebar .course-summary {
+  h4 {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: .9rem;
+    color: #777;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: .8rem;
+  }
+
+  .contact-info {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      padding: 1rem;
+      border-bottom: 1px solid #ddd;
+
+      .fa {
+        color: #777;
+        margin-right: .5rem;
+      }
+
+      a {
+        color: $ft-orange;
+        font-weight: bold;
       }
     }
   }

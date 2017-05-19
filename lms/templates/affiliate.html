@@ -1,0 +1,95 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">Affiliate Name</%block>
+
+<section class="course-info">
+  <header class="course-profile">
+    <div class="intro-inner-wrapper">
+      <div class="table">
+        <section class="intro">
+          <div class="heading-group">
+            <h1>
+              ${affiliate.profile.name}
+            </h1>
+          </div>
+
+          <div class="main-cta">
+            <div class="fa fa-map-marker"></div>
+            ${affiliate.profile.city}
+            , ${affiliate.profile.state}
+          </div>
+        </section>
+
+        <div class="media">
+          <div class="hero">
+            <img src="http://i.imgur.com/PxyiByD.png" alt="" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="details">
+
+      <div class="inner-wrapper">
+        <h4>Description</h4>
+        <p>${affiliate.profile.bio}</p>
+
+        <br><br>
+        <h4>Affiliate Courses</h4>
+        <div class="affiliate-courses">
+          <ul>
+            % for course in courses:
+              <li class="affiliate-card">
+                <div class="image" style="background-image: url(http://i.imgur.com/EkZzVq0.jpg);"></div>
+                <div class="name">
+                  ${course.display_name}
+                </div>
+                <div class="description">
+                  ${course.course_description}
+                </div>
+                <div class="card-footer">
+                  <span class="delivery-mode-item">
+                      ${course.delivery_mode}
+                  </span>
+                  <span class="skewed-footer-item">
+                    <span>
+                      <span class="fa fa-map-marker"></span>
+                      ${course.location_state}
+                    </span>
+                  </span>
+                  <span>
+                    <a href="/courses/${course.course_id}/about">
+                      View
+                      <span class="fa fa-arrow-circle-o-right"></span>
+                    </a>
+                  </span>
+                </div>
+              </li>
+            % endfor
+          </ul>
+        </div>
+      </div>
+  </div>
+    <div class="course-sidebar">
+      <div class="course-summary">
+        <h4>Contact Info.</h4>
+
+        <ul class="contact-info">
+          <li>
+            <div class="fa fa-envelope"></div>
+            <a href="mailto:${affiliate.email}">${affiliate.email}</a>
+          </li>
+
+          <li>
+            <div class="fa fa-phone-square"></div>
+            <a href="tel:${affiliate.profile.phone_number}">${affiliate.profile.phone_number}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

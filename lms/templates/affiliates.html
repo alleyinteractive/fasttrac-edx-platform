@@ -6,7 +6,7 @@
 
 <section class="container explore-affiliates">
 
-  <script>
+  <script type="text/javascript">
     function searchAffiliates() {
       var affiliateName = $('#affiliateName').val()
       var affiliateCity = $('#affiliateCity').val()
@@ -19,6 +19,14 @@
       window.location.search = search;
     }
   </script>
+
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.wrapper-footer').addClass('explore-courses-footer')
+    })
+  </script>
+
   <div class="affiliate-sidebar">
     <div class="header">
       Refine List
@@ -66,8 +74,10 @@
               </span>
             </span>
             <span>
-              View
-              <span class="fa fa-arrow-circle-o-right"></span>
+              <a href="/affiliates/${affiliate['username']}">
+                View
+                <span class="fa fa-arrow-circle-o-right"></span>
+              </a>
             </span>
           </div>
         </li>
