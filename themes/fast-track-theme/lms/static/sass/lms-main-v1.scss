@@ -406,6 +406,7 @@ $link-color: #6f6f6f;
 
   .course-info-header a {
     float: right;
+    cursor: pointer;
 
     &:hover {
       color: $ft-orange;
@@ -423,9 +424,6 @@ $link-color: #6f6f6f;
   border-radius: 2px;
   margin-bottom: 30px;
   background: #fff;
-  max-height: 256px;
-  overflow-y: auto;
-  overflow-x: hidden;
 
   .fa {
     margin: 0 5px;
@@ -440,6 +438,10 @@ $link-color: #6f6f6f;
 
 .course-info-body {
   padding: 20px 10px;
+  max-height: 16rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin: 10px -10px 0px;
 
   & > div {
     margin: 1rem 0;
@@ -618,13 +620,16 @@ $link-color: #6f6f6f;
 }
 
 #tab-course {
-  text-align: justify;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
 }
 
 .ft-card {
   width: 31%;
   height: 300px;
   margin-bottom: 2rem;
+  margin-right: 1rem;
   display: inline-block;
   background: white;
   border: 1px solid #ddd;

@@ -64,7 +64,7 @@ site_status_msg = get_site_status_msg(course_id)
             </li>
           % endif
           <li class="item nav-global-05">
-            <a class="btn-neutral" href="/users/auth" onclick="javascript:event.target.port=3000">${_("Portfolio")}</a>
+            <a class="btn" href="/affiliates">${_("Explore Affiliates")}</a>
           </li>
           % if show_program_listing:
             <li class="tab-nav-item">
@@ -89,7 +89,7 @@ site_status_msg = get_site_status_msg(course_id)
       <%include file="user_dropdown.html"/>
       <ol class="right">
           <li class="ft-header-item">
-              <a href="#">Workspace</a>
+              <a href="/users/auth" onclick="javascript:event.target.port=3000">Workspace</a>
           </li>
           <li class="ft-header-item">
               <a href="${marketing_link('ROOT')}">FastTrac HOME</a>
