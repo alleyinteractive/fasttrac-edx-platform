@@ -4,7 +4,7 @@ class @HTMLModule
     @el = $(@element)
     JavascriptLoader.executeModuleScripts(@el)
     Collapsible.setCollapsibles(@el)
-    if MathJax?
+    if MathJax? and MathJax.Hub?
 	    MathJax.Hub.Queue ["Typeset", MathJax.Hub, @el[0]]
     if setupFullScreenModal?
       setupFullScreenModal()
