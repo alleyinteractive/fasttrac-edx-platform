@@ -1,0 +1,133 @@
+<%page expression_filter="h"/>
+
+<%!
+    from django.utils.translation import ugettext as _
+    from django.core.urlresolvers import reverse
+    from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+%>
+
+<div class="custom-course-details-wrapper">
+    <div class="course-information">
+        <h2 class="hd hd-2" id="header-ccx-dashboard">${_("COURSE INFORMATION")}</h2>
+            <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+            <div class="field-wrapper">
+                <p class="field-name">${_('COURSE NAME')}</p>
+                <p class="field-info">${ccx.display_name}</p>
+            </div>
+            <div class="field-wrapper">
+                <p class="field-name">${_('COURSE DESCRIPTION')}</p>
+                <p class="field-info">
+                    <span class="description-text">${ccx.course_description}</span>
+                    <span class="read-more hidden">...<span>READ MORE</span></span>
+                    <span class="read-less hidden">READ LESS</span>
+                </p>
+            </div>
+
+            <div class="field-wrapper">
+                <p class="field-name">${_('DELIVERY')}</p>
+                <p class="field-info">${ccx.delivery_mode}</p>
+            </div>
+
+            <div class="field-row">
+                <div class="field-wrapper">
+                    <p class="field-name">${_('START DATE')}</p>
+                    <p class="field-info">${ccx.time.date()}</p>
+                </div>
+                <div class="field-wrapper">
+                    <p class="field-name">${_('START TIME')}</p>
+                    <p class="field-info">${ccx.time.time()}</p>
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-wrapper">
+                    <p class="field-name">${_('CITY')}</p>
+                    <p class="field-info">${ccx.location_city}</p>
+                </div>
+                <div class="field-wrapper">
+                    <p class="field-name">${_('STATE')}</p>
+                    <p class="field-info">${ccx.location_state}</p>
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-wrapper">
+                    <p class="field-name">${_('FEE')}</p>
+                    <p class="field-info">
+                        % if ccx.fee:
+                            Yes
+                        % else:
+                            None
+                        % endif
+                    </p>
+                </div>
+                <div class="field-wrapper">
+                    <p class="field-name">${_('ENROLLMENT TYPE')}</p>
+                    <p class="field-info">TODO</p>
+                </div>
+            </div>
+
+            <div class="field submit">
+                <a href="${edit_ccx_dasboard_url}">
+                    <button id="create-ccx" class="ft-button-action" type="submit">Update course</button>
+                </a>
+            </div>
+    </div>
+    <div class="instructor-nav-wrapper">
+        <ul class="instructor-nav">
+            <li class="nav-item">
+                <a href="#" data-section="schedule">${_("COURSE STRUCTURE")}</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" data-section="team_management">${_("TEAM MANAGEMENT")}</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" data-section="membership">${_("ENROLLMENT")}</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" data-section="student_admin">${_("STUDENT ADMIN")}</a>
+            </li>
+        </ul>
+        <section id="schedule" class="idash-section" aria-label="${_('Schedule')}">
+                <%include file="schedule.html" args="" />
+        </section>
+        <section id="team_management" class="idash-section" aria-label="${_('Team management')}">
+                <%include file="team_management.html" args="" />
+        </section>
+        <section id="membership" class="idash-section" aria-label="${_('Batch Enrollment')}">
+                <%include file="enrollment.html" args="" />
+        </section>
+        <section id="student_admin" class="idash-section" aria-label="${_('Student Grades')}">
+                <%include file="student_admin.html" args="" />
+        </section>
+    </div>
+</div>
+
+<script>
+    $(function() {
+        var $container = $('.course-information');
+        var $descriptionInfo = $container.find('.field-info span.description-text');
+        var descriptionInfoText = $descriptionInfo.text();
+        if(descriptionInfoText.length > 140) {
+            var first = descriptionInfoText.substring(0,140);
+            var second = descriptionInfoText.substring(140,descriptionInfoText.length);
+
+            $descriptionInfo.text(first);
+            $('.read-more').removeClass('hidden');
+        }
+
+        $('.read-more').click(function() {
+            $('.read-less').toggleClass('hidden');
+            $(this).addClass('hidden');
+            $descriptionInfo.text(first + second);
+        });
+
+        $('.read-less').click(function() {
+            $('.read-more').toggleClass('hidden');
+            $(this).addClass('hidden');
+            $descriptionInfo.text(first);
+        });
+    })
+</script>

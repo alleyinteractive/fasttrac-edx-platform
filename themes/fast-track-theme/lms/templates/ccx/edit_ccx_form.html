@@ -1,0 +1,145 @@
+<%page expression_filter="h"/>
+
+<%!
+    from django.utils.translation import ugettext as _
+    from django.core.urlresolvers import reverse
+    from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+%>
+
+<form action="${edit_ccx_url}" class="ccx-form" method="POST" onsubmit="return validateForm(this)">
+    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+    <div class="field-wrapper">
+        <p class="field-name">${_('COURSE NAME')}</p>
+        <div class="field">
+            <label class="sr" for="ccx_name">${_('Name your CCX')}</label>
+            <input name="name" id="ccx_name" class="ccx-input-field" value="${ccx.display_name}"
+                   placeholder="${_('Name of your course...')}"/><br/>
+        </div>
+    </div>
+    <div class="field-wrapper">
+        <p class="field-name">${_('COURSE DESCRIPTION')}</p>
+        <p> Quisque a dui risus. Maecenas vestibulum quam lacus, id tempus neque euismod vitae.
+            Aliquam ultrices vestibulum velit, sed elementum leo ornare at. Cras nec molestie
+            mi, eget accumsan est. Maecenas a euismod nulla, in porttitor metus. Mauris faucibus
+            sodales massa, a porttitor ex mollis vel. Maecenas blandit id sem id blandit.
+            Curabitur aliquam venenatis diam et iaculis. Fusce volutpat pretium ante, vel
+            vehicula justo egestas eget.
+            Phasellus dictum vestibulum nisl, sit amet suscipit ex rutrum at. Aliquam erat
+            volutpat. Curabitur mollis ipsum ut elit pulvinar, eget mattis nibh volutpat.</p>
+        <div class="field custom-course-description">
+            <label class="sr" for="ccx_course_description">${_('Course description')}</label>
+                                    <textarea name="course_description" id="ccx_course_description"
+                                              class="ccx-input-field" value="${ccx.course_description}"
+                                              placeholder="${_('click to start typing...')}"></textarea><br/>
+        </div>
+    </div>
+    <div class="field-wrapper">
+        <p class="field-name">${_('DELIVERY')}</p>
+        <p> Quisque a dui risus. Maecenas vestibulum quam lacus, id tempus neque euismod vitae.
+            Aliquam ultrices vestibulum velit, sed elementum leo ornare at. Cras nec molestie
+            mi, eget accumsan est. Maecenas a euismod nulla, in porttitor metus. Mauris faucibus
+            sodales massa, a porttitor ex mollis vel.
+            Maecenas blandit id sem id blandit. Curabitur aliquam venenatis diam et iaculis.
+            Fusce volutpat pretium ante, vel vehicula justo egestas eget. Phasellus dictum
+            vestibulum nisl, sit amet suscipit ex rutrum at. Aliquam erat volutpat. Curabitur
+            mollis ipsum ut elit pulvinar, eget mattis nibh volutpat.</p>
+        <div class="field inline">
+            <label class="sr" for="ccx_delivery_mode">${_('Delivery Mode')}</label>
+            <select name="delivery_mode" id="ccx_delivery_mode" data-current-value="${ccx.delivery_mode}">
+                <option value="In Person - Required">In Person - Required</option>
+                <option value="In Person - Optional">In Person - Optional</option>
+                <option value="Online Only">Online Only</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="horizontal-field-wrapper datepair">
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('START DATE')}</p>
+            <label class="sr form-label"
+                   for="ccx_dialog_date">${_('Date format four digit year dash two digit month dash two digit day')}</label>
+            <input placeholder="${_('select a start date...')}" class="date ccx-input-field"
+                   value="${ccx.time.date()}"
+                   type="text"
+                   name="date"
+                   id="ccx_dialog_date" size="10"/>
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+        </div>
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('START TIME')}</p>
+            <label class="sr form-label"
+                   for="ccx_dialog_time">${_('Time format two digit hours colon two digit minutes')}</label>
+            <input placeholder="${_('select a starting time...')}" class="time ccx-input-field"
+                   value="${ccx.time.time()}"
+                   type="text"
+                   name="time"
+                   id="ccx_dialog_time" size=10/></br>
+        </div>
+    </div>
+
+    <div class="horizontal-field-wrapper">
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('CITY')}</p>
+            <label class="sr" for="ccx_city">${_('City')}</label>
+            <input name="city" id="ccx_city" class="ccx-input-field"
+                   placeholder="${_('type in a city...')}"
+                   value="${ccx.location_city}"/><br/>
+        </div>
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('STATE')}</p>
+            <label class="sr" for="ccx_state">${_('State')}</label>
+            <input name="state" id="ccx_state" class="ccx-input-field"
+                   placeholder="${_('type in a state...')}"
+                   value="${ccx.location_state}"/><br/>
+        </div>
+    </div>
+
+    <div class="horizontal-field-wrapper">
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('FEE')}</p>
+            <label class="sr" for="ccx_fee">${_('Fee')}</label>
+            % if not ccx.fee:
+                <% fee = 'None' %>
+            % else:
+                <% fee = 'Yes' %>
+            %endif
+            <select name="fee" id="ccx_fee" class="ccx-select"
+                    data-current-value="${fee}">
+                <option value="True">Yes</option>
+                <option value="False">None</option>
+            </select>
+        </div>
+
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('ENROLLMENT TYPE')}</p>
+            <label class="sr" for="ccx_enrollment_type">${_('Enrollment type')}</label>
+            <select name="enrollment_type" id="ccx_enrollment_type" class="ccx-select"
+                    data-current-value="${ccx.enrollment_type}">
+                <option value="PRIVATE">Private</option>
+                <option value="PUBLIC">Public</option>
+            </select>
+        </div>
+    </div>
+    <div class="field submit">
+        <button id="create-ccx" class="ft-button-action" type="submit">
+            ${_('UPDATE COURSE')}
+        </button>
+    </div>
+</form>
+
+<script>
+    // select current values in dropdown menus
+    $(function () {
+        var options = $('.ccx-form').find('.ccx-select');
+        options.each(function () {
+            var value = $(this).data('current-value');
+            $(this).find('option').each(function () {
+                if ($(this).val() == value) {
+                    $(this).attr("selected","selected");
+                }
+            });
+        });
+    })
+</script>

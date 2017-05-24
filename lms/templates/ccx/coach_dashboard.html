@@ -105,11 +105,11 @@ from openedx.core.djangolib.js_utils import (
                   </div>
                   <div class="field">
                     <label class="sr" for="ccx_city">${_('City')}</label>
-                    <input name="city" id="ccx_city" placeholder="${_('City')}" value="${ccx.location_city}"/><br/>
+                    <input name="city" id="ccx_city" placeholder="${_('type in a city...')}" value="${ccx.location_city}"/><br/>
                   </div>
                   <div class="field inline">
                     <label class="sr" for="ccx_state">${_('State')}</label>
-                    <input name="state" id="ccx_state" placeholder="${_('State')}" value="${ccx.location_state}"/><br/>
+                    <input name="state" id="ccx_state" placeholder="${_('select a state...')}" value="${ccx.location_state}"/><br/>
                   </div>
                   <div class="field">
                     <label class="sr" for="ccx_postal_code">${_('Postal Code')}</label>
@@ -198,10 +198,13 @@ from openedx.core.djangolib.js_utils import (
     $(".instructor-nav a").on("click", function(event) {
         event.preventDefault();
         $(".instructor-nav a").removeClass("active-section");
+        $(this).parent().addClass("active-nav-item");
+
         var section_sel = "#" + $(this).attr("data-section");
         $("section.idash-section").hide();
         $(section_sel).show();
         $(this).addClass("active-section");
+        $(this).parent().addClass("active-nav-item")
     });
 
     var url = document.URL,

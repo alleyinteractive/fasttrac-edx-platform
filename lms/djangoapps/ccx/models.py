@@ -33,6 +33,14 @@ class CustomCourseForEdX(models.Model):
         (ONLINE_ONLY, 'Online Only'),
     )
 
+    PRIVATE = 'PRIVATE'
+    PUBLIC = 'PUBLIC'
+    ENROLLMENT_TYPE_CHOICES = (
+        (PRIVATE, 'Private'),
+        (PUBLIC, 'Public')
+    )
+
+
     course_id = CourseKeyField(max_length=255, db_index=True)
     display_name = models.CharField(max_length=255)
     coach = models.ForeignKey(User, db_index=True)
@@ -60,8 +68,13 @@ class CustomCourseForEdX(models.Model):
         null=True,
         blank=True
     )
+    enrollment_type = models.CharField(
+        default=PUBLIC,
+        max_length=255,
+        choices=ENROLLMENT_TYPE_CHOICES
+    )
     time = models.DateTimeField(default=datetime.now())
-    fee = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    fee = models.BooleanField(default=False)
     course_description = models.TextField(default='Course description...')
 
     class Meta(object):

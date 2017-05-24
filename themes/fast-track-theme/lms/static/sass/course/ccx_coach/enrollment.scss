@@ -1,0 +1,88 @@
+/* enrollment.html */
+
+.member-list .hd.hd-2 {
+  margin-bottom: 0;
+}
+
+.auth-list-container {
+  margin-bottom: 0 !important;
+}
+
+.batch-enrollment {
+  padding: 20px;
+  .text-helper {
+    line-height: 1.5;
+  }
+}
+
+.instructor-dashboard-wrapper-2 section.idash-section#membership .enroll-option {
+  margin: 10px 0;
+  position: initial;
+  display: inline-block;
+}
+
+.enroll-options {
+  margin-bottom: 20px;
+}
+
+.enroll-option.notifiy {
+  margin-left: 30px !important;
+}
+
+#student-ids.ccx-input-field {
+  width: 100% !important;
+  height: 35px !important;
+  box-shadow: none;
+}
+
+#student-ids.ccx-input-field:focus {
+  outline: none;
+}
+
+.batch-enrollment form {
+  position: relative;
+
+  .enroll-buttons-wrapper {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+.enrollment-button,
+.add.ft-button-action {
+  padding: 5px 10px !important;
+}
+
+.add-field.ccx-input-field {
+  max-width: 35%;
+  margin-right: 15px;
+}
+
+.member-lists-management .bottom-bar {
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* student list management table */
+.member-list td {
+  border-left: 0 !important;
+  border-right: 0 !important;
+}
+
+.member-list tbody tr:last-child {
+  border-bottom: 0 !important;
+}
+
+.label.revoke-td {
+  padding-right: 20px !important;
+}
+
+.revoke-td,
+.revoke-td a {
+  text-align: right;
+  padding-right: 15px;
+  color: #f76b1c !important;
+}
+

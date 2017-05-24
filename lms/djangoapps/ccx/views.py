@@ -7,6 +7,7 @@ import functools
 import json
 import logging
 import pytz
+import ast
 
 from copy import deepcopy
 from cStringIO import StringIO
@@ -103,7 +104,6 @@ def coach_dashboard(view):
         if not course.enable_ccx:
             raise Http404
         elif is_staff or is_instructor:
-            # if user is staff or instructor then he can view ccx coach dashboard.
             return view(request, course, ccx)
         else:
             role = CourseCcxCoachRole(course_key)
@@ -117,7 +117,6 @@ def coach_dashboard(view):
                     return HttpResponseForbidden(
                         _('You must be the coach for this ccx to access this view')
                     )
-
         return view(request, course, ccx)
     return wrapper
 
@@ -125,9 +124,57 @@ def coach_dashboard(view):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
+def edit_course_view(request, course, ccx):
+    context = {
+        'course': course,
+        'ccx': ccx
+    }
+
+    context.update(get_ccx_creation_dict(course))
+    context.update(edit_ccx_context(course, ccx, request.user))
+    context['edit_current'] = True
+
+    return render_to_response('ccx/coach_dashboard.html', context)
+
+
+def edit_ccx_context(course, ccx, user):
+    ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.original_ccx_id))
+    assign_coach_role_to_ccx(ccx_locator, user, course.id)
+
+    schedule = get_ccx_schedule(course, ccx)
+    grading_policy = get_override_for_ccx(
+        ccx, course, 'grading_policy', course.grading_policy)
+
+    context = {} # TODO:
+    context['ccx_team'] = CustomCourseForEdX.objects.filter(course_id=ccx_locator)
+    context['schedule'] = json.dumps(schedule, indent=4)
+    context['save_url'] = reverse(
+        'save_ccx', kwargs={'course_id': ccx_locator})
+    context['ccx_members'] = CourseEnrollment.objects.filter(course_id=ccx_locator, is_active=True)
+    context['gradebook_url'] = reverse(
+        'ccx_gradebook', kwargs={'course_id': ccx_locator})
+    context['grades_csv_url'] = reverse(
+        'ccx_grades_csv', kwargs={'course_id': ccx_locator})
+    context['grading_policy'] = json.dumps(grading_policy, indent=4)
+    context['grading_policy_url'] = reverse(
+        'ccx_set_grading_policy', kwargs={'course_id': ccx_locator})
+
+    with ccx_course(ccx_locator) as course:
+        context['course'] = course
+
+    context['edit_ccx_url'] = reverse(
+            'edit_ccx', kwargs={'course_id': ccx_locator})
+    context['edit_ccx_dasboard_url'] = reverse(
+            'ccx_edit_course_view', kwargs={'course_id': ccx_locator})
+    return context
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@coach_dashboard
 def dashboard(request, course, ccx=None):
     """
-    Display the CCX Coach Dashboard.
+    Display the CCX Coach Dashboard
     """
     # right now, we can only have one ccx per user and course
     # so, if no ccx is passed in, we can sefely redirect to that
@@ -143,35 +190,12 @@ def dashboard(request, course, ccx=None):
 
     context = {
         'course': course,
-        'ccx': ccx,
+        'ccx': ccx
     }
     context.update(get_ccx_creation_dict(course))
-
     if ccx:
-        ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.original_ccx_id))
-        # At this point we are done with verification that current user is ccx coach.
-        assign_coach_role_to_ccx(ccx_locator, request.user, course.id)
-
-        schedule = get_ccx_schedule(course, ccx)
-        grading_policy = get_override_for_ccx(
-            ccx, course, 'grading_policy', course.grading_policy)
-        context['schedule'] = json.dumps(schedule, indent=4)
-        context['save_url'] = reverse(
-            'save_ccx', kwargs={'course_id': ccx_locator})
-        context['ccx_members'] = CourseEnrollment.objects.filter(course_id=ccx_locator, is_active=True)
-        context['gradebook_url'] = reverse(
-            'ccx_gradebook', kwargs={'course_id': ccx_locator})
-        context['grades_csv_url'] = reverse(
-            'ccx_grades_csv', kwargs={'course_id': ccx_locator})
-        context['grading_policy'] = json.dumps(grading_policy, indent=4)
-        context['grading_policy_url'] = reverse(
-            'ccx_set_grading_policy', kwargs={'course_id': ccx_locator})
-
-        with ccx_course(ccx_locator) as course:
-            context['course'] = course
-
-        context['edit_ccx_url'] = reverse(
-            'edit_ccx', kwargs={'course_id': ccx_locator})
+        context.update(edit_ccx_context(course, ccx, request.user))
+        context['edit_current'] = False
     else:
         context['create_ccx_url'] = reverse(
             'create_ccx', kwargs={'course_id': course.id})
@@ -196,16 +220,18 @@ def edit_ccx(request, course, ccx=None):
     time = dateField + ' ' + timeField
     fee = request.POST.get('fee')
     course_description = request.POST.get('course_description')
+    enrollment_type = request.POST.get('enrollment_type')
 
     ccx.display_name = name
     ccx.delivery_mode = delivery_mode
     ccx.location_city = location_city
     ccx.location_state = location_state
     ccx.location_postal_code = location_postal_code
+    ccx.enrollment_type = enrollment_type
     if dateField and timeField:
         ccx.time = time
-    ccx.fee = fee
-    ccx.course_description = ccx.course_description
+    ccx.fee = ast.literal_eval(fee)
+    ccx.course_description = course_description
     ccx.save()
 
     ccx_id = CCXLocator.from_course_locator(course.id, ccx.original_ccx_id)
@@ -230,6 +256,7 @@ def create_ccx(request, course, ccx=None):
     time = dateField + ' ' + timeField
     fee = request.POST.get('fee')
     course_description = request.POST.get('course_description')
+    enrollment_type = request.POST.get('enrollment_type')
 
     if hasattr(course, 'ccx_connector') and course.ccx_connector:
         # if ccx connector url is set in course settings then inform user that he can
@@ -256,7 +283,8 @@ def create_ccx(request, course, ccx=None):
         location_state=location_state,
         location_postal_code=location_postal_code,
         time=time,
-        fee=fee,
+        fee=ast.literal_eval(fee),
+        enrollment_type=enrollment_type,
         course_description=course_description)
     ccx.save()
 
@@ -299,6 +327,7 @@ def create_ccx(request, course, ccx=None):
     assign_instructor_role_to_ccx(ccx_id, request.user, course.id)
     add_master_course_staff_to_ccx(course, ccx_id, ccx.display_name)
     return redirect(url)
+
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

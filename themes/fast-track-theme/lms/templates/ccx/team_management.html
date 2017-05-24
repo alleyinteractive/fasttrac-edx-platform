@@ -1,0 +1,20 @@
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _ %>
+
+<h2 class="hd hd-2">${_("Team management")}</h2>
+<div class="table-wrapper">
+    <table class="team-mgmt-table">
+        <tr>
+            <th class="thead">Name</th>
+            <th class="thead">Email</th>
+            <th class="thead">Remove</th>
+        </tr>
+        %for ccx in ccx_team:
+            <tr>
+                <td>${ccx.coach.profile.name}</td>
+                <td>${ccx.coach.email}</td>
+                <td>Remove TBD</td>
+            </tr>
+        %endfor
+    </table>
+</div>

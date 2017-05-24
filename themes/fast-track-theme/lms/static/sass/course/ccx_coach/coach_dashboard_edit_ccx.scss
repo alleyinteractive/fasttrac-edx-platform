@@ -1,0 +1,89 @@
+/* coach_dashboard_edit_ccx.html */
+
+.container > div.instructor-dashboard-wrapper-2 {
+  border: none;
+}
+
+.custom-course-details-wrapper {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+
+  align-items: flex-start;
+}
+
+.custom-course-details-wrapper {
+  line-height: 1.5;
+
+  .field.submit {
+    position: relative;
+    height: 40px;
+    width: 100%;
+  }
+
+  .field {
+    margin: 5px 0 5px 0;
+  }
+}
+
+.course-information {
+  margin-right: 20px;
+  border: 1px solid #c8c8c8;
+  color: #5e5e5e;
+
+  .field.submit {
+    border-top: 1px solid #c8c8c8;
+  }
+}
+
+.field-wrapper {
+  margin: 20px 15px;
+}
+
+.field-row {
+  display: flex;
+
+  .field-wrapper {
+    width: 120px;
+    margin: 20px 15px;
+
+    p.field-name {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 500;
+    }
+  }
+}
+
+.field-info {
+  margin-top: 0;
+  color: #2b2b2b;
+}
+
+.field.submit {
+  border-top: 1px solid #c8c8c8;
+  padding: 10px 0;
+}
+
+.field.submit #create-ccx {
+  right: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.read-less {
+  display: block;
+  float: right;
+}
+
+.read-more span, .read-less {
+  cursor: pointer;
+  font-size: 14px;
+  color: #f76b1c;
+  padding-left: 2px;
+}
+

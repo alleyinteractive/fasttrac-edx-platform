@@ -1,0 +1,108 @@
+/* coach_dashboard.html
+** Create course page / when there is no ccx for the current course.
+*/
+
+.edit-create-custom-course-wrapper form.ccx-form .field.custom-course-description {
+  width: 100%;
+}
+
+.edit-create-custom-course-wrapper {
+  padding: 20px 40px;
+  border: 1px solid #c8c8c8;
+
+  .create-course-header {
+    border: 1px solid #c8c8c8 !important;
+    border-bottom: none !important;
+  }
+
+  #ccx_course_description {
+    width: 100%;
+  }
+
+  #ccx_course_description,
+  #ccx_dialog_date,
+  #ccx_dialog_time {
+    box-shadow: none;
+    resize: none;
+  }
+
+  #ccx_dialog_date,
+  #ccx_dialog_time,
+  #ccx_city,
+  #ccx_state {
+    width: 250px;
+  }
+
+  .ccx-select {
+    cursor: pointer;
+  }
+
+  .field.submit {
+    border-top: none;
+  }
+}
+
+.ccx-input-field {
+  background: transparent;
+  border: none !important;
+  border-bottom: 1px solid #000000 !important;
+  padding-left: 0;
+  box-shadow: none !important;
+}
+
+.ccx-input-field:focus {
+  border-bottom: 1px solid #f76b1c !important;
+  outline: none !important;
+}
+
+.edit-create-custom-course-wrapper #ccx_course_description:focus,
+#ccx_dialog_date:focus, #ccx_dialog_time:focus {
+  outline: none;
+}
+
+.edit-create-custom-course-wrapper .ccx-form > div.field-wrapper:not(:nth-child(2)) {
+  margin: 40px 0;
+}
+
+.horizontal-field-wrapper {
+  display: flex;
+  position: relative;
+  margin-bottom: 60px;
+
+  .datepair .fa-calendar {
+    position: absolute;
+    left: 235px;
+    top: 30px;
+  }
+
+  .horizontal-field-container {
+    width: 400px;
+  }
+}
+
+form.ccx-form {
+  select.ccx-select {
+    width: 250px;
+    margin-top: 10px;
+  }
+
+  .field.submit {
+    position: relative;
+    height: 40px;
+    width: 100%;
+  }
+
+  .field-name {
+    margin-bottom: 10px;
+    color: #5e5e5e;
+  }
+}
+
+#create-ccx .fa-plus {
+  width: 20px;
+  margin-left: 10px;
+}
+
+button.ccx-button-link {
+  color: #f76b1c;
+}
