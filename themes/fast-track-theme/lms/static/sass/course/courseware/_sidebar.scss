@@ -46,6 +46,18 @@ div.wrapper-course-modes {
     padding-left: 4px;
   }
 
+  .toggle-sidebar p .fa {
+    position: absolute;
+    top: 0.8rem;
+    left: 0.2rem;
+    font-size: 1.7rem;
+
+    &.fa-long-arrow-right {
+      left:0;
+    }
+
+  }
+
   .loading-sidebar-content {
     width: calc(100% - $toggle-sidebar-width);
     text-align: center;
@@ -116,6 +128,10 @@ div.wrapper-course-modes {
   }
 }
 
+.accordion.retracted .toggle-sidebar {
+  background: linear-gradient(to right bottom, $ft-light-orange 49%, transparent 50%);
+}
+
 .course-index .accordion .course-navigation .dropdown-content .button-chapter { /* override */
   color: $ft-temp-dark-gray;
   padding: 12px 16px;
@@ -151,7 +167,7 @@ div.wrapper-course-modes {
 
     .display-name {
       display: inline-block;
-      width: calc(100% - 50px);
+      width: calc(100% - 40px);
       font-weight: 600;
     }
 
@@ -188,6 +204,9 @@ div.wrapper-course-modes {
     }
   }
 
+  .accordion-units {
+    margin-left: 1.3rem;
+  }
   .accordion-units li {
     cursor: pointer;
     padding: 5px;

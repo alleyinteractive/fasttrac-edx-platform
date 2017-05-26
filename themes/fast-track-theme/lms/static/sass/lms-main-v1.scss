@@ -160,7 +160,7 @@ $link-color: #6f6f6f;
 
   // when viewing course we want footer to behave like it's in course-wrapper
   &.in-course {
-    margin-left: 17%;
+    margin-left: 300px;
     border-left: 1px solid $ft-temp-light-gray;
   }
 }

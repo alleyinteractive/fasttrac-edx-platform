@@ -147,6 +147,11 @@ ${HTML(fragment.foot_html())}
                 </div>
                 <div class="toggle-sidebar" onclick="toggleSidebar()">
                     <span>close</span>
+                    <span class="hidden">open</span>
+                    <p>
+                        <i class="fa fa-long-arrow-left"></i>
+                        <i class="fa fa-long-arrow-right hidden"></i>
+                    </p>
                 </div>
             </div>
 
@@ -238,10 +243,14 @@ ${HTML(fragment.foot_html())}
         function toggleSidebar() {
             $('div.course-index, div.accordion').toggleClass('retracted');
             $('.wrapper-footer').toggleClass('in-course');
+
+            $('i.fa-long-arrow-left, i.fa-long-arrow-right, .toggle-sidebar span').toggleClass('hidden');
+
             $('.course-material').toggleClass('with-sidebar');
+
             if($('div.course-index').hasClass('retracted')) {
                 setTimeout(function() {
-                $('body.view-in-course .course-wrapper').toggleClass('extended');
+                    $('body.view-in-course .course-wrapper').toggleClass('extended');
                 }, 400);
             } else {
                 $('body.view-in-course .course-wrapper').toggleClass('extended');

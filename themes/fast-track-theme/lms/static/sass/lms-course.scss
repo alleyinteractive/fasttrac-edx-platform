@@ -58,7 +58,7 @@ div.course-spinner {
 
 /* end header */
 
-$course-index-width: 17%;
+$course-index-width: 300px;
 div.course-index {
   display: inline-block;
   vertical-align: top;
@@ -93,6 +93,10 @@ body.view-in-course {
     top: 0;
     right: 50px;
 
+    .btn.bookmark-button:before,
+    .btn.bookmark-button.bookmarked:before {
+      content: none;
+    }
     .btn.bookmark-button,
     .btn.bookmark-button:active {
       border: none;
@@ -111,7 +115,7 @@ body.view-in-course {
   div.course-wrapper {
     display: inline-block;
     max-width: 100%;
-    width: calc(82% - 1px); // border is 1px
+    width: calc(100% - 301px); // border is 1px
     padding-bottom: 56px; // height of footer-wrapper
     border: none;
     border-left: 1px solid $ft-temp-gray;
@@ -216,26 +220,29 @@ body.view-in-course .wrapper-course-material .course-material {
 }
 
 .wrapper-course-material .course-material {
-  max-width: 97%;
+  max-width: calc(100% - 50px);
+  left: 50px;
 }
 
 .course-material {
   position: absolute;
   width: 100%;
-  left: 3%;
   margin: 0;
   z-index: 20;
   -webkit-transition: 0.4s;
   transition: 0.4s;
 
   &.with-sidebar {
-    max-width: 80%;
-    width: 100% !important;
-    left: 20%;
+    max-width: calc(100% - 350px);
+    left: 350px;
   }
 
   .course-search {
     display: none; // hide everywhere except in course display
+  }
+
+  .tab a {
+    font-weight:400;
   }
 }
 
