@@ -2,8 +2,13 @@ $ft-orange: #f76b1c;
 
 /* Courseware elements custom classes */
 
+section.wrapper-xblock {
+  overflow: hidden;
+}
+
 .xblock.xblock-student_view {
   .element-title {
+    margin: 25px -35%;
     line-height: 0 !important;
     text-align: center;
     padding: 1em;
@@ -23,7 +28,7 @@ $ft-orange: #f76b1c;
         height: 5px;
         border-top: 1px solid #aaa;
         top: 0;
-        width: 600px;
+        width: 1200px;
       }
 
       &:before {

@@ -3,7 +3,7 @@ $ft-orange: #f76b1c;
 /* Courseware elements custom classes */
 .view-in-course {
   .element-title {
-    margin: 25px 0;
+    margin: 25px -35%;
     padding: 1em;
     line-height: 0 !important;
     overflow: hidden;
@@ -23,7 +23,7 @@ $ft-orange: #f76b1c;
         height: 5px;
         border-top: 1px solid #aaa;
         top: 0;
-        width: 600px;
+        width: 1200px;
       }
 
       &:before {
