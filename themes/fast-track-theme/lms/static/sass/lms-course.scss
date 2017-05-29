@@ -59,6 +59,7 @@ div.course-spinner {
 /* end header */
 
 $course-index-width: 300px;
+$break-smaller: 1366px;
 div.course-index {
   display: inline-block;
   vertical-align: top;
@@ -129,6 +130,17 @@ body.view-in-course {
       -webkit-transition: width 0.5s;
       transition: width 0.5s;
 
+      .xmodule_display.xmodule_SequenceModule nav.sequence-bottom {
+        left: 15%;
+        right: 15%;
+      }
+      @media screen and (max-width: $break-smaller) {
+        .xmodule_display.xmodule_SequenceModule nav.sequence-bottom {
+          left: 3%;
+          right: 3%;
+        }
+      }
+
       .wrapper-course-modes {
         border: none;
       }
@@ -141,9 +153,9 @@ body.view-in-course {
 
     // previews and next arrows / buttons
     .xmodule_display.xmodule_SequenceModule nav.sequence-bottom {
-      position: absolute;
-      left: -20px;
-      right: -20px;
+      position: fixed;
+      left: 330px;
+      right: 30px;
       top: 350px;
       width: inherit;
       cursor: pointer;
@@ -242,7 +254,7 @@ body.view-in-course .wrapper-course-material .course-material {
   }
 
   .tab a {
-    font-weight:400;
+    font-weight: 400;
   }
 }
 
