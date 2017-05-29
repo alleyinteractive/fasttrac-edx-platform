@@ -649,7 +649,6 @@ def course_about(request, course_id):
             can_enroll = bool(has_access(request.user, 'enroll', course))
             invitation_only = course.invitation_only
         else:
-            # import pdb; pdb.set_trace()
             ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
             enrollment_allowed = ccx.enrollment_type == 'Private'
             can_enroll = enrollment_allowed
