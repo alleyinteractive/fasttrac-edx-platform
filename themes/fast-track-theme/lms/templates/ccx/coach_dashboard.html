@@ -41,14 +41,14 @@
                 %endif
                     <div class="edit-create-custom-course-wrapper">
                         <p class="request-response-error" id="ccx-create-message"></p>
-                        <%include file="create_ccx_form.html" args=""/>
+                        <%include file="create_ccx_form.html" args="STATE_CHOICES='STATE_CHOICES'" />
                     </div>
                 %else:
                     % if edit_current:
                         <h2 class="hd hd-2 create-course-header" id="header-ccx-dashboard">${_("Course editing")}</h2>
                         <div class="edit-create-custom-course-wrapper">
                             <p class="request-response-error" id="ccx-create-message"></p>
-                            <%include file="edit_ccx_form.html"/>
+                            <%include file="edit_ccx_form.html" args="STATE_CHOICES='STATE_CHOICES'" />
                         </div>
                     % else:
                         <%include file="coach_dashboard_details.html" args="" />
