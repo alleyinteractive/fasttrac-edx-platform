@@ -46,6 +46,7 @@ from instructor.enrollment import (
     get_email_params,
 )
 
+from lms.envs.common import STATE_CHOICES
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import (
     get_override_for_ccx,
@@ -158,6 +159,7 @@ def edit_ccx_context(course, ccx, user):
     context['grading_policy'] = json.dumps(grading_policy, indent=4)
     context['grading_policy_url'] = reverse(
         'ccx_set_grading_policy', kwargs={'course_id': ccx_locator})
+    context['STATE_CHOICES'] = STATE_CHOICES
 
     with ccx_course(ccx_locator) as course:
         context['course'] = course
@@ -190,7 +192,8 @@ def dashboard(request, course, ccx=None):
 
     context = {
         'course': course,
-        'ccx': ccx
+        'ccx': ccx,
+        'STATE_CHOICES': STATE_CHOICES
     }
     context.update(get_ccx_creation_dict(course))
     if ccx:

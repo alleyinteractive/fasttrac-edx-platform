@@ -88,8 +88,12 @@
         <div class="horizontal-field-container">
             <p class="field-name">${_('STATE')}</p>
             <label class="sr" for="ccx_state">${_('State')}</label>
-            <input name="state" id="ccx_state" class="ccx-input-field"
-                   placeholder="${_('type in a state...')}"/><br/>
+            <select name="state" id="ccx_state" class="ccx-select">
+                <option selected disabled>select option...</option>
+                % for STATE in STATE_CHOICES:
+                    <option value="${STATE[0]}">${STATE[1]}</option>
+                % endfor
+            </select>
         </div>
     </div>
 
