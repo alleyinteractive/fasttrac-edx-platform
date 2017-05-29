@@ -85,6 +85,7 @@ body.view-in-course {
     visibility: hidden; // hidden until loaded
     &.loaded {
       visibility: visible;
+      background-image: url('../images/course_background_pattern.png');
     }
   }
 
