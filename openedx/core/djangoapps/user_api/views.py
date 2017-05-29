@@ -24,6 +24,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 import third_party_auth
 from django_comment_common.models import Role
+from lms.envs.common import STATE_CHOICES
 from edxmako.shortcuts import marketing_link
 from student.forms import get_registration_extension_form
 from student.views import create_account_with_params
@@ -772,7 +773,7 @@ class RegistrationView(APIView):
             "state",
             label=state_label,
             field_type="select",
-            options=[(name, _(label)) for name, label in UserProfile.STATE_CHOICES],
+            options=[(name, _(label)) for name, label in STATE_CHOICES],
             include_default_option=True,
             required=required
         )
