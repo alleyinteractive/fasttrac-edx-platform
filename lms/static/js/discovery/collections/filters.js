@@ -9,7 +9,7 @@ define(['backbone', 'js/discovery/models/filter'], function (Backbone, Filter) {
             return this.reduce(function (terms, filter) {
                 terms[filter.id] = filter.get('query');
                 return terms;
-            }, {});
+            }, { enrollment_type: 'PUBLIC' });
         }
     });
 
