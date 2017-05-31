@@ -61,11 +61,13 @@ from student.helpers import (
  % endif
 <article class="course${mode_class}">
   <%
+      course_target = reverse('info', args=[unicode(course_overview.id)])
+
       if not hasattr(enrollment.course_id, 'ccx'):
-          course_target = '/courses/{0}/ccx_coach'.format(enrollment.course_id)
+          button_target = '/courses/{0}/ccx_coach'.format(enrollment.course_id)
           button_label = 'Create Custom Course'
       else:
-          course_target = reverse('info', args=[unicode(course_overview.id)])
+          button_target = course_target
           button_label = 'View Course'
   %>
   <section class="details" aria-labelledby="details-heading-${course_overview.number}">
@@ -142,7 +144,7 @@ from student.helpers import (
                 % endif
               % else:
                 % if not is_course_blocked:
-                  <a href="${course_target}" class="enter-course" data-course-key="${enrollment.course_id}">${_(button_label)}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
+                  <a href="${button_target}" class="enter-course" data-course-key="${enrollment.course_id}">${_(button_label)}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
                 % else:
                   <a class="enter-course-blocked" data-course-key="${enrollment.course_id}">${_(button_label)}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
                 % endif
