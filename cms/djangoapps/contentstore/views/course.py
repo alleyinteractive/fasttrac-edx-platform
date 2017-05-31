@@ -104,7 +104,7 @@ from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 log = logging.getLogger(__name__)
 
 __all__ = ['course_info_handler', 'course_handler', 'course_listing',
-           'course_info_update_handler', 'course_search_index_handler',
+           'course_info_update_handler', 'course_search_index_handler', 'ccx_reindex_handler',
            'course_rerun_handler',
            'settings_handler',
            'grading_handler',
@@ -330,6 +330,23 @@ def course_search_index_handler(request, course_key_string):
             }), content_type=content_type, status=500)
         return HttpResponse(dump_js_escaped_json({
             "user_message": _("Course has been successfully reindexed.")
+        }), content_type=content_type, status=200)
+
+
+def ccx_reindex_handler(request, course_key_string):
+    course_key = CourseKey.from_string(course_key_string)
+    content_type = request.META.get('CONTENT_TYPE', None)
+    if content_type is None:
+        content_type = "application/json; charset=utf-8"
+    with modulestore().bulk_operations(course_key):
+        try:
+            CoursewareSearchIndexer.do_course_reindex(modulestore(), course_key)
+        except SearchIndexingError as search_err:
+            return HttpResponse(dump_js_escaped_json({
+                "user_message": search_err.error_list
+            }), content_type=content_type, status=500)
+        return HttpResponse(dump_js_escaped_json({
+            "user_message": _("Master course has been successfully reindexed.")
         }), content_type=content_type, status=200)
 
 

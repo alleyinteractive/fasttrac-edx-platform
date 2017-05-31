@@ -8,6 +8,7 @@ import json
 import logging
 import pytz
 import ast
+import requests
 
 from copy import deepcopy
 from cStringIO import StringIO
@@ -46,7 +47,7 @@ from instructor.enrollment import (
     get_email_params,
 )
 
-from lms.envs.common import STATE_CHOICES
+from lms.envs.common import STATE_CHOICES, CMS_BASE
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import (
     get_override_for_ccx,
@@ -134,7 +135,6 @@ def edit_course_view(request, course, ccx):
     context.update(get_ccx_creation_dict(course))
     context.update(edit_ccx_context(course, ccx, request.user))
     context['edit_current'] = True
-
     return render_to_response('ccx/coach_dashboard.html', context)
 
 
@@ -170,6 +170,7 @@ def edit_ccx_context(course, ccx, user):
             'edit_ccx', kwargs={'course_id': ccx_locator})
     context['edit_ccx_dasboard_url'] = reverse(
             'ccx_edit_course_view', kwargs={'course_id': ccx_locator})
+
     return context
 
 
@@ -240,6 +241,11 @@ def edit_ccx(request, course, ccx=None):
     ccx.save()
 
     ccx_id = CCXLocator.from_course_locator(course.id, ccx.original_ccx_id)
+
+    # reindex parent course in order to reindex edited ccx
+    reindex_parent_course_url = 'http://{}/course/{}/ccx_reindex'.format(CMS_BASE, course.id)
+    requests.get(reindex_parent_course_url)
+
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_id})
     return redirect(url)
 
