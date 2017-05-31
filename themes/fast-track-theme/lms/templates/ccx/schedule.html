@@ -80,61 +80,26 @@ from openedx.core.djangolib.js_utils import (
   </div>
   <div class="ccx-sidebar-panel" aria-labelledby="ccx_schedule_unit"
        id="ccx_schedule_unit_panel" role="region">
-    <h3 class="hd hd-3" id="ccx_schedule_unit">${_('Schedule a Unit')}</h3>
     <form role="form" id="add-unit" name="add-unit" class="ccx-form">
       <div class="field">
         <label for="ccx_chapter" class="form-label"><b>${_('Section')}</b></label>
         <select name="chapter" id="ccx_chapter" ></select>
       </div>
       <div class="field">
-        <label for="ccx_sequential" class="form-label"><b>${_('Subsection')}</b></label>
+        <label for="ccx_sequential" class="form-label"><b>${_('Module')}</b></label>
         <select name="sequential" id="ccx_sequential"></select>
       </div>
       <div class="field">
-        <label for="ccx_vertical" class="form-label"><b>${_('Unit')}</b></label>
-        <select name="vertical" id="ccx_vertical"></select>
-      </div>
-      <div class="ccx_start_date_time_fields">
-        <div class="field datepair">
-          <label for="ccx_start_date" class="form-label">
-              <b>${_('Start Date')}</b>
-              <span class="sr">
-                ## Translators: This explains to people using a screen reader how to interpret the format of YYYY-MM-DD
-                &nbsp;${_('format four digit year dash two digit month dash two digit day')}
-              </span>
-          </label>
-          <input placeholder="${_('yyyy-mm-dd')}" type="text" class="date" name="start_date" id="ccx_start_date" />
-          ## Translators: This explains to people using a screen reader how to interpret the format of HH:MM
-          <label for="ccx_start_time" class="sr form-label">${_('Start time format two digit hours colon two digit minutes')}</label>
-          <input placeholder="${_('time')}" type="text" class="time" name="start_time" id="ccx_start_time"/>
-        </div>
-      </div>
-      <div class="ccx_due_date_time_fields">
-        <div class="field datepair">
-          <label for="ccx_due_date" class="form-label">
-              <b>${_('Due Date')}</b> ${_('(Optional)')}
-              <span class="sr">
-                  ## Translators: This explains to people using a screen reader how to interpret the format of YYYY-MM-DD
-                  &nbsp;${_('format four digit year dash two digit month dash two digit day')}
-              </span>
-          </label>
-          <input placeholder="${_('yyyy-mm-dd')}" type="text" class="date" name="due_date" id="ccx_due_date"/>
-          ## Translators: This explains to people using a screen reader how to interpret the format of HH:MM
-          <label for="ccx_due_time" class="sr form-label">${_('Due Time format two digit hours colon two digit minutes')}</label>
-          <input placeholder="${_('time')}" type="text" class="time" name="due_time" id="ccx_due_time"/>
-        </div>
-      </div>
-      <div class="field">
         <br/>
-        <button id="add-unit-button" class="ft-button-action">${_('Add Unit')}</button>
+        <button id="add-unit-button" class="ft-button-action">${_('Add Module')}</button>
       </div>
-      <div class="field">
+      <div class="field add-all-wrapper">
         <br/>
-        <button id="add-all" class="ft-button-action">${_('Add All Units')}</button>
+        <button id="add-all" class="ft-button-action">${_('Add All Modules')}</button>
       </div>
     </form>
     <div id="all-units-added" tabindex="-1" role="region">
-      ${_("All units have been added.")}
+      ${_("All modules have been added.")}
     </div>
   </div>
 </div>
