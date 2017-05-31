@@ -885,6 +885,17 @@ def modify_access(request, course_id):
 
         # add CCX table entry
         if rolename == 'ccx_coach' and hasattr(course.id, 'ccx'):
+            existing_ccx_enrollements = CustomCourseForEdX.objects.filter(original_ccx_id=course.id.ccx, coach_id=user.id).count()
+
+            if existing_ccx_enrollements > 0:
+                response_payload = {
+                    'unique_student_identifier': user.username,
+                    'rolename': rolename,
+                    'action': action,
+                    'addingExistingCCXCoachOrInstructor': True,
+                }
+                return JsonResponse(response_payload)
+
             ccx_name = CustomCourseForEdX.objects.get(pk=course.id.ccx).display_name
             CustomCourseForEdX(
                 course_id=course.id,
@@ -898,7 +909,7 @@ def modify_access(request, course_id):
 
         # delete CCX entry
         if rolename == 'ccx_coach' and hasattr(course.id, 'ccx'):
-            CustomCourseForEdX.get(
+            CustomCourseForEdX.objects.get(
                 course_id=course.id,
                 coach_id=user.id,
                 original_ccx_id=course.id.ccx
@@ -910,6 +921,7 @@ def modify_access(request, course_id):
 
     response_payload = {
         'unique_student_identifier': user.username,
+        'email': user.email,
         'rolename': rolename,
         'action': action,
         'success': 'yes',

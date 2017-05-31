@@ -148,6 +148,8 @@ def edit_ccx_context(course, ccx, user):
 
     context = {} # TODO:
     context['ccx_team'] = CustomCourseForEdX.objects.filter(course_id=ccx_locator)
+    context['ccx_locator'] = ccx_locator
+    context['modify_access_url'] = reverse('modify_access', kwargs={'course_id': ccx_locator})
     context['schedule'] = json.dumps(schedule, indent=4)
     context['save_url'] = reverse(
         'save_ccx', kwargs={'course_id': ccx_locator})

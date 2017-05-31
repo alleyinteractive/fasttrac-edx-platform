@@ -34,4 +34,36 @@
     color: #ffffff;
     vertical-align: top
   }
+
+  .remove-coach-button {
+    cursor: pointer;
+  }
+
+  .remove-icon {
+    margin-right: 3px;
+  }
+
+  #add-coach-form {
+
+    .add-button {
+      position: relative;
+      top: 2px;
+    }
+  }
+
+  #error-modal {
+    width: 258px;
+    height: 55px;
+    margin-top: 3px;
+
+    background: #B20610;
+    color: #F9ECED;
+    font-size: 12px;
+
+    .content {
+      position: relative;
+      bottom: 5px;
+      left: -16px;
+    }
+  }
 }

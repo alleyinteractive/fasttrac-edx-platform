@@ -13,8 +13,95 @@
             <tr>
                 <td>${ccx.coach.profile.name}</td>
                 <td>${ccx.coach.email}</td>
-                <td>Remove TBD</td>
+                <td>
+                    <span class="remove-coach-button"
+                        data-remove-url="${modify_access_url}"
+                        data-unique-student-identifier="${ccx.coach.username}"
+                        data-rolename="ccx_coach"
+                        data-action="revoke">
+                            <i class="fa fa-times-circle remove-icon"></i>Remove
+                    </span>
+                </td>
             </tr>
         %endfor
     </table>
+    <br>
+    <form id="add-coach-form" action="${modify_access_url}" method="POST">
+        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+        <input type="text" name="unique_student_identifier" />
+        <input type="hidden" name="action" value="allow" />
+        <input type="hidden" name="rolename" value="ccx_coach" />
+        <button class="add-button" value="submit">Add</button>
+    </form>
+    <div id="error-modal" class="error hidden">
+        <span class="content">This affiliate already exists.</span>
+    </div>
 </div>
+
+<script>
+    $(document).ready(function() {
+        $('#add-coach-form').on('submit', addCoachEventHandler);
+        $('.team-mgmt-table').on('click', '.remove-coach-button', removeCoachEventHandler);
+
+        function addCoachEventHandler(event) {
+            event.preventDefault();
+
+            var $form = $(event.target);
+            var url = $form.attr('action');
+            var data = $form.serialize();
+
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: data,
+                success: function(responseData) {
+                    if (responseData.addingExistingCCXCoachOrInstructor === true) {
+                        showErrorModal();
+                    } else {
+                        addCoachRow(responseData, url);
+                        $form.find('input[type=text]').val('');
+                    }
+                }
+            });
+        }
+
+        function removeCoachEventHandler(event) {
+            var $button = $(event.target);
+            var url = $button.data('remove-url');
+            var action = $button.data('action');
+            var uniqueStudentIdentifier = $button.data('unique-student-identifier');
+            var rolename = $button.data('rolename');
+
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: {
+                    unique_student_identifier: uniqueStudentIdentifier,
+                    action: action,
+                    rolename: rolename
+                },
+                success: function() {
+                    $button.parent().parent().remove();
+                }
+            });
+        }
+
+        function showErrorModal() {
+            $('#error-modal').removeClass('hidden');
+            setTimeout(function(){
+                $('#error-modal').addClass('hidden');
+            }, 8000);
+        }
+
+        function addCoachRow(coachData, removeUrl) {
+            var username = coachData.unique_student_identifier;
+            var email = coachData.email;
+
+            var newRow = '<tr><td>' + username + '</td><td>' + email + '</td><td><span class="remove-coach-button" data-remove-url="' + removeUrl + '" data-unique-student-identifier="' + username + '" data-rolename="ccx_coach" data-action="revoke"><i class="fa fa-times-circle remove-icon"></i>Remove</span></td></tr>';
+
+            $('.team-mgmt-table').find('tbody').append(newRow);
+        }
+    });
+
+
+</script>
