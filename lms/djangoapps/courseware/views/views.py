@@ -437,7 +437,7 @@ def search(request, course_id):
                 if search_result['_id'] == module_id:
                     search_result['last_viewed'] = modified
 
-        search_results['results'] = sorted(search_results['results'], key=lambda result: result.get('last_viewed', timezone.datetime.min).replace(tzinfo=None), reverse=True)
+        search_results['results'] = sorted(search_results['results'], key=lambda result: result.get('last_viewed', datetime.min).replace(tzinfo=None), reverse=True)
 
 
     context = {
