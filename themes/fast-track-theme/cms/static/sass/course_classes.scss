@@ -1,5 +1,6 @@
 $ft-orange: #f76b1c;
 $ft-green: #99c221;
+$ft-light-grey: #d5d5d5;
 
 /* Courseware elements custom classes */
 
@@ -45,14 +46,16 @@ section.wrapper-xblock {
   }
 
   .supplemental-text {
-    padding-left: 1em;
-    border-left: 2px solid #aaa;
+    margin: 1.5rem 0 1.5rem 5rem;
+    padding-left: 2rem;
+    border-left: 4px solid $ft-light-grey;
     font-style: italic;
     color: #777;
 
     a {
       color: $ft-orange !important;
       text-decoration: underline;
+      font-weight: 500;
     }
   }
 
