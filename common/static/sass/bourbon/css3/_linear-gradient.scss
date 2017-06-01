@@ -25,14 +25,14 @@
   // $full: $G1, $G2, $G3, $G4, $G5, $G6, $G7, $G8, $G9, $G10;
 
   // // Set $G1 as the default fallback color
-  // $fallback-color: nth($G1, 1);
+  $fallback-color: nth($G1, 1);
 
   // // If $fallback is a color use that color as the fallback color
-  // @if (type-of($fallback) == color) or ($fallback == "transparent") {
-  //   $fallback-color: $fallback;
-  // }
+  @if (type-of($fallback) == color) or ($fallback == "transparent") {
+    $fallback-color: $fallback;
+  }
 
-  // background-color: $fallback-color;
+  background-color: $fallback-color;
   // background-image: -webkit-linear-gradient($pos-degree $full); // Safari 5.1+, Chrome
   // background-image: unquote("linear-gradient(#{$pos-spec}#{$full})");
 }
