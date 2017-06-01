@@ -399,6 +399,13 @@ urlpatterns += (
         'courseware.views.views.bookmarks',
         name='course_bookmarks',
     ),
+    url(
+        r'^courses/{}/search$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        'courseware.views.views.search',
+        name='course_search',
+    ),
     # TODO arjun remove when custom tabs in place, see courseware/courses.py
     url(
         r'^courses/{}/syllabus$'.format(

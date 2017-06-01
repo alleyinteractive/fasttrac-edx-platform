@@ -1,0 +1,72 @@
+$ft-orange: #f76b1c;
+
+.course-search-header {
+  input.course-search-input {
+    width: calc(60% - 20px);
+    background: transparent;
+    border: 0 none;
+    border-bottom: 2px solid $ft-orange;
+    box-shadow: 0 0 0;
+    padding: 1rem 0;
+    font-style: italic;
+    outline: 0 none;
+
+    &:focus {
+      box-shadow: 0 0 0;
+      border-bottom: 2px solid $ft-orange;
+    }
+  }
+
+  .fa-search {
+    border-bottom: 2px solid $ft-orange;
+    line-height: 33px;
+    margin-left: -4px;
+  }
+
+  h1 {
+    width: 60% !important;
+    margin-bottom: -2rem !important;
+    margin-top: -1rem !important;
+    font-style: normal !important;
+    color: #ccc !important;
+    font-size: 5.5rem !important;
+  }
+}
+
+.course-search-filter-bar {
+  padding: 1.5rem 20%;
+  border: 1px solid #d1d1d1;
+  background: #e1e1e1;
+  z-index: 100;
+  position: relative;
+
+  a {
+    margin-right: 2rem;
+    color: #999;
+    text-transform: uppercase;
+    font-weight: bold;
+    cursor: pointer;
+
+    &.active {
+      background: white;
+      border: 1px solid #aaa;
+      padding: 0 5px;
+    }
+  }
+}
+
+.course-search-results {
+  background: white;
+  padding: 4rem 0;
+
+  .bookmark-item {
+    .fa-bookmark {
+      font-size: .9rem;
+      margin-top: -5px;
+    }
+
+    p {
+      margin: 1rem 0;
+    }
+  }
+}

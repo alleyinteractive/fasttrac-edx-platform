@@ -173,9 +173,17 @@ from openedx.core.djangolib.markup import HTML, Text
           </div>
 
           <div class="search-box">
+            <script>
+              function handleSearchKeyup(event) {
+                if(event.keyCode === 13) {
+                  window.location = 'search?query=' + event.target.value;
+                }
+              }
+            </script>
+
             <div class="search-box-content">
               <h1>START SOMETHING NEW</h1>
-              <input type="text" placeholder="search courseware">
+              <input type="text" placeholder="search courseware" onkeyup="handleSearchKeyup(event)">
             </div>
           </div>
 

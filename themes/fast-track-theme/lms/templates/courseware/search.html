@@ -1,0 +1,109 @@
+<%page expression_filter="h"/>
+<%inherit file="../main.html" />
+<%def name="online_help_token()"><% return "courseinfo" %></%def>
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+
+from courseware.courses import get_course_info_section, get_course_date_summary
+
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<%block name="pagetitle">${_("{course_number} Search").format(course_number=course.display_number_with_default)}</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='bookmarks'" />
+
+<%static:require_module_async module_name="js/courseware/toggle_element_visibility" class_name="ToggleElementVisibility">
+        ToggleElementVisibility();
+</%static:require_module_async>
+<%static:require_module_async module_name="js/courseware/course_home_events" class_name="CourseHomeEvents">
+        CourseHomeEvents();
+</%static:require_module_async>
+
+<%block name="bodyclass">view-in-course view-course-info ${course.css_class or ''}</%block>
+
+<script type="text/javascript">
+  function handleSearch() {
+    var searchQuery = $('#searchQuery').val();
+    var recentlyViewedFilter = $('#recentlyViewedFilter').hasClass('active');
+    var bookmarkedFilter = $('#bookmarkedFilter').hasClass('active');
+
+    var search = 'query=' + searchQuery +
+      '&recentlyViewed=' + recentlyViewedFilter +
+      '&bookmarked=' + bookmarkedFilter;
+
+    window.location.search = search;
+  }
+
+  $(document).ready(function() {
+    $('.wrapper-footer').addClass('explore-courses-footer')
+
+    $('#bookmarkedFilter, #recentlyViewedFilter').on('click', function(event){
+      $(event.target).toggleClass('active');
+      setTimeout(handleSearch, 1000);
+    });
+
+    $('#searchQuery').on('keyup', function(event){
+      if (event.keyCode === 13) {
+        handleSearch();
+      }
+    });
+  })
+</script>
+
+<main id="main" aria-label="Content" tabindex="-1">
+  <div class="bookmarks course-search-header">
+    <input id="searchQuery" type="text" placeholder="SEARCH COURSE" value="${query}" class="course-search-input" />
+    <i class="fa fa-search"></i>
+    <h1>
+      % if search_results['total'] == 0:
+        NO RESULTS
+      % elif search_results['total'] == 1:
+        1 RESULT
+      % else:
+        ${search_results['total']} RESULTS
+      % endif
+    </h1>
+    <div class="course-search-filter-bar">
+      <a id="recentlyViewedFilter" class="${ 'active' if recently_viewed else '' }">
+        RECENTLY VIEWED
+      </a>
+      <a id="bookmarkedFilter" class="${ 'active' if bookmarked else '' }">
+        <i class="fa fa-bookmark"></i>
+        BOOKMARKED
+      </a>
+    </div>
+  </div>
+
+  <div class="course-search-results">
+    % for result in search_results['results']:
+      <div class="bookmark-item">
+        <a href="${result['data']['url']}">
+          ${result['data']['content']['display_name'] or 'No title'}
+
+          % if result['_id'] in bookmarks:
+            <span class="fa fa-bookmark"></span>
+          % endif
+        </a>
+        <span class="path">
+          ${' > '.join(result['data']['location'])}
+        </span>
+        <p>
+          ${result['data']['excerpt'] | n}
+        </p>
+        % if result.get('last_viewed'):
+          <span class="date">
+            Last viewed on ${result.get('last_viewed').strftime("%B %d, %Y")}
+          </span>
+        % endif
+      </div>
+    % endfor
+  </div>
+</main>
