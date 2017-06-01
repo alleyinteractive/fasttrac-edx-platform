@@ -633,7 +633,7 @@ def course_about(request, course_id):
         # if un-enrolled/non-registered user try to access CCX (direct for registration)
         # then do not show him about page to avoid self registration.
         # Note: About page will only be shown to user who is not register. So that he can register.
-        #But for CCX only CCX coach can enroll students.
+        # But for CCX only CCX coach can enroll students.
         # return redirect(reverse('dashboard'))
 
     with modulestore().bulk_operations(course_key):
@@ -708,6 +708,7 @@ def course_about(request, course_id):
         if not hasattr(course_key, 'ccx'):
             can_enroll = bool(has_access(request.user, 'enroll', course))
             invitation_only = course.invitation_only
+            ccx = None
         else:
             ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
             enrollment_allowed = ccx.enrollment_type.upper() == 'PUBLIC'
@@ -732,6 +733,7 @@ def course_about(request, course_id):
 
         context = {
             'course': course,
+            'ccx': ccx,
             'course_details': course_details,
             'staff_access': staff_access,
             'studio_url': studio_url,
