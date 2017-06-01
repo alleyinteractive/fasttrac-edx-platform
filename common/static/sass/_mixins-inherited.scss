@@ -258,7 +258,6 @@
   border-radius: 3px;
   background-color: #dfe5eb;
   color: rgb(92, 103, 122);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
 
   &:hover, &:focus {
     background-color: rgb(222, 236, 247);
@@ -347,5 +346,4 @@
   @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
   box-shadow: 0 -1px 0 $shadow inset, 0 1px 0 $white inset;
   background-color: rgba(255, 255, 255, .3);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }

@@ -107,7 +107,6 @@
       h2 {
         position: relative;
         text-align: center;
-        text-shadow: 0 1px rgba(255,255,255, 0.4);
         z-index: 2;
       }
     }
@@ -290,7 +289,6 @@
       color: $lighter-base-font-color;
       font: normal 1.2rem/1.2rem $sans-serif;
       text-align: center;
-      text-shadow: 0 1px rgba(255,255,255, 0.8);
       @include transition(all 0.15s ease-out 0s);
 
       &:hover, &:focus {
