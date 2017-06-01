@@ -436,11 +436,6 @@
         margin-bottom: 0;
       }
 
-      input[name="send_to"]:checked+label {
-        // "bolds" the text without causing a width recalculation
-        text-shadow: 1px 0px 0px;
-      }
-
       input[name="send_to"]:focus+label, input[name="send_to"]:hover:not([disabled])+label {
         background-color: #EFEFEF;
 
@@ -493,7 +488,7 @@
     &:last-child {
       margin-bottom: 0;
     }
-        
+
     legend {
         // use the same styles as H3s
         font-size: 1.2em;
@@ -564,14 +559,14 @@
         border-bottom: 8px solid transparent;
       }
     }
-    
+
     /* ***
      * Ideally we want to handle functionality with JS.
-     * This functionality should eventually be moved into CS/JS, and out of here. */ 
-    .has-hint:hover > .hint {    
+     * This functionality should eventually be moved into CS/JS, and out of here. */
+    .has-hint:hover > .hint {
         @include left($baseline*10);
     }
-    
+
     .has-hint input:focus ~ .hint {
         @include left($baseline*10);
     }

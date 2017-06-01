@@ -6,7 +6,6 @@ label {
   color: $base-font-color;
   font: italic 300 1rem/1.6rem $serif;
   margin-bottom: ($baseline/4);
-  text-shadow: 0 1px rgba(255,255,255, 0.4);
   -webkit-font-smoothing: antialiased;
 
   &.register-emails {

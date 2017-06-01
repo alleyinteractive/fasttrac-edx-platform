@@ -222,7 +222,6 @@ $link-color: rgb(26, 161, 222) !default;
           padding: 6px;
           position: absolute;
           top: 48px;
-          text-shadow: 0 -1px 0 $black;
           @include text-align(left);
           white-space: pre;
           pointer-events: none;

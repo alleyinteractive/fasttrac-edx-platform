@@ -86,7 +86,6 @@ $course-search-input-height: ($button-size);
         h1 {
           @include text-align(left);
           margin-bottom: 0;
-          text-shadow: 0 1px rgba(255,255,255, 0.6);
           text-transform: none;
         }
 
@@ -201,7 +200,6 @@ $course-search-input-height: ($button-size);
             @include margin-left(-11px);
             margin-top: -16px;
             position: absolute;
-            text-shadow: 0 -1px rgba(0,0,0, 0.8);
             top: 50%;
           }
         }
@@ -247,7 +245,6 @@ $course-search-input-height: ($button-size);
       padding: 10px 10px 8px;
       text-align: center;
       text-transform: uppercase;
-      text-shadow: 0 1px rgba(255,255,255, 0.6);
     }
   }
 
@@ -364,7 +361,6 @@ $course-search-input-height: ($button-size);
           > span {
             color: $base-font-color;
             font: 700 italic 1.4em/1.4em $sans-serif;
-            text-shadow: 0 1px rgba(255,255,255, 0.6);
             @include transition(all 0.15s ease-in-out 0s);
 
             &:hover, &:focus {
@@ -452,7 +448,6 @@ $course-search-input-height: ($button-size);
       h2 {
         @include float(left);
         margin: 0;
-        text-shadow: 0 1px rgba(255,255,255, 0.6);
       }
 
       .action.action-mediakit {
@@ -461,7 +456,6 @@ $course-search-input-height: ($button-size);
         top: 1px;
         font-family: $sans-serif;
         font-size: 14px;
-        text-shadow: 0 1px rgba(255,255,255, 0.6);
 
         &:after {
           position: relative;

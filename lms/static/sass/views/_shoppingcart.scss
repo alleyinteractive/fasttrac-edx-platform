@@ -52,7 +52,6 @@ $light-border: 1px solid $gray-l5;
   border-top: $light-border;
   background-color: $gray-l5;
   padding: ($baseline*0.75);
-  text-shadow: 0px 1px 1px $white;
 }
 
 .confirm-enrollment {
@@ -109,14 +108,12 @@ $light-border: 1px solid $gray-l5;
     border: 16px solid $gray-l1;
     background-color: $gray-l1;
     background-image: linear-gradient($gray-l1, $gray-l1);
-    text-shadow: 0 1px 0 $gray-l1;
   }
 
   a.course-link-bg-color {
     box-shadow: 0 1px 0 0 $blue2 inset;
     border: 16px solid $blue2;
     background-color: $blue2;
-    text-shadow: 0 1px 0 $blue2;
   }
 
   a.link-button {
@@ -153,7 +150,6 @@ $light-border: 1px solid $gray-l5;
     padding: ($baseline*0.35) ($baseline*0.9);
     width: ($baseline*22.5);
     height: ($baseline*3.5);
-    text-shadow: 0 1px 0 $blue2;
     text-transform: none;
     text-decoration: none;
     color: $white;
@@ -1049,7 +1045,6 @@ $light-border: 1px solid $gray-l5;
   p {
     @include text-align(center);
     @extend %t-copy-sub1;
-    text-shadow: 0 1px 1px $white;
     color: $gray-l1;
   }
 
