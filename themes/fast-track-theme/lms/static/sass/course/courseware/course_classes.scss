@@ -167,6 +167,8 @@ $ft-green: #99c221;
   }
 
   .ask-yourself {
+    display: table;
+    position: relative;
     padding-left: 60px;
     line-height: 1.4em;
     font-style: italic;
@@ -174,15 +176,22 @@ $ft-green: #99c221;
 
     &:before {
       content: "";
-      background-image: url('../images/AskYourselfIcon.jpg');
-      background-repeat: no-repeat;
-      background-size: 100% 100%;
+      position: absolute;
+      top: calc(50% - 22px);
+      left: 15px;
       width: 45px;
       height: 45px;
       display: inline-block;
       vertical-align: middle;
-      position: absolute;
-      margin-left: -60px;
+      background-image: url('../images/AskYourselfIcon.jpg');
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+    }
+
+    .ask-yourself-content {
+      display: table-cell;
+      vertical-align: middle;
+      padding: 1.5rem;
     }
 
     .highlight {
