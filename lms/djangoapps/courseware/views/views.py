@@ -437,7 +437,6 @@ def search(request, course_id):
     if recently_viewed and len(search_results['results']) > 0:
         search_results['results'] = sort_search_results_by_recently_viewed(search_results['results'], course.id, request.user.id)
 
-
     context = {
         'bookmarks': bookmarks,
         'course': course,
