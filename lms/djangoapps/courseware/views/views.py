@@ -97,6 +97,7 @@ from ..module_render import get_module_for_descriptor, get_module, get_module_by
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from openedx.core.djangoapps.bookmarks.models import Bookmark
 from search.api import perform_search
+from ccx.views import get_ccx_schedule
 
 
 log = logging.getLogger("edx.courseware")
@@ -405,7 +406,6 @@ def search(request, course_id):
     bookmarks = Bookmark.objects.filter(user=request.user, course_key=course.id).values_list('usage_key', flat=True)
 
     # CCX course has no own content so we search content from parent course
-    # TODO: filter content that is present in CCX
     if hasattr(course.id, 'ccx'):
         ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
         search_course_id = unicode(ccx.course_id)
@@ -420,29 +420,28 @@ def search(request, course_id):
         course_id=search_course_id
     )
 
+    # transform block ID from course to CCX
+    if hasattr(course.id, 'ccx') and len(search_results['results']) > 0:
+        search_results['results'] = transform_block_ids(search_results['results'], search_course_id, course_id)
+
+    # filter out content that is not in CCX
+    if hasattr(course.id, 'ccx') and len(search_results['results']) > 0:
+        ccx_blocks = get_ccx_block_ids(search_results['results'], ccx, course)
+        search_results = filter_search_results(search_results, ccx_blocks)
+
+    # if user wants, filter out content that is not bookmarked
     if bookmarked and len(search_results['results']) > 0:
-        search_results['results'] = [result for result in search_results['results'] if result['_id'] in bookmarks]
-        search_results['total'] = len(search_results['results'])
+        search_results = filter_search_results(search_results, bookmarks)
 
+    # if user wants, sort content by recently viewed date
     if recently_viewed and len(search_results['results']) > 0:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT module_id, modified FROM courseware_studentmodule WHERE student_id=%s AND course_id=%s ORDER BY modified DESC;", [request.user.id, course.id])
-            rows = cursor.fetchall()
-
-        for row in rows:
-            module_id = row[0]
-            modified = row[1]
-
-            for search_result in search_results['results']:
-                if search_result['_id'] == module_id:
-                    search_result['last_viewed'] = modified
-
-        search_results['results'] = sorted(search_results['results'], key=lambda result: result.get('last_viewed', datetime.min).replace(tzinfo=None), reverse=True)
+        search_results['results'] = sort_search_results_by_recently_viewed(search_results['results'], course.id, request.user.id)
 
 
     context = {
         'bookmarks': bookmarks,
         'course': course,
+        'course_id': course_id,
         'search_results': search_results,
         'query': query,
         'bookmarked': bookmarked,
@@ -450,6 +449,54 @@ def search(request, course_id):
     }
 
     return render_to_response('courseware/search.html', context)
+
+def transform_block_ids(blocks, original_course_id, ccx_course_id):
+    original_course_id = original_course_id.split(':')[1]
+    ccx_course_id = ccx_course_id.split(':')[1]
+
+    for result in blocks:
+        ccx_id = 'ccx-' + result['_id']
+        ccx_id = ccx_id.replace(original_course_id, ccx_course_id)
+        result['_id'] = ccx_id
+
+    return blocks
+
+def get_ccx_block_ids(blocks, ccx, course):
+    ccx_blocks = []
+    schedule = get_ccx_schedule(course, ccx)
+
+    for block in schedule:
+        ccx_blocks.append(unicode(block['location']))
+
+        for child in block['children']:
+            ccx_blocks.append(unicode(child['location']))
+
+            for grandchild in child['children']:
+                ccx_blocks.append(unicode(grandchild['location']))
+
+    return ccx_blocks
+
+def filter_search_results(search_results, filter_array):
+    search_results['results'] = [result for result in search_results['results'] if result['_id'] in filter_array]
+    search_results['total'] = len(search_results['results'])
+
+    return search_results
+
+def sort_search_results_by_recently_viewed(results, course_id, user_id):
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT module_id, modified FROM courseware_studentmodule WHERE student_id=%s AND course_id=%s ORDER BY modified DESC;", [user_id, course_id])
+        rows = cursor.fetchall()
+
+    for row in rows:
+        module_id = row[0]
+        modified = row[1]
+
+        for search_result in results:
+            if search_result['_id'] == module_id:
+                search_result['last_viewed'] = modified
+
+    return sorted(search_results['results'], key=lambda result: result.get('last_viewed', datetime.min).replace(tzinfo=None), reverse=True)
+
 
 
 def get_last_accessed_courseware(course, request, user):
