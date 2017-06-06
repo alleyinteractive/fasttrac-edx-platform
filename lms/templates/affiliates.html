@@ -51,10 +51,22 @@
     </div>
   </div>
 
+  <script>
+    $(document).ready(function(){
+      $('.explore-header').on('click', function() {
+        $('.hidden-explore-option').toggleClass('hidden');
+      })
+    })
+  </script>
+
   <div class="affiliate-content">
-    <h1>
+    <h1 class="explore-header">
       Explore Affiliates
       <div class="fa fa-caret-down"></div>
+      <br>
+      <a href="/courses" class="hidden-explore-option hidden">
+        Explore Courses
+      </a>
     </h1>
     <ul>
       % for affiliate in affiliates:

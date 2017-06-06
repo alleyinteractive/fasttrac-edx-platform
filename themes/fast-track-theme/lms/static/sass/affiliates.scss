@@ -63,21 +63,29 @@ $ft-orange: #f76b1c;
   }
 }
 
-.explore-affiliates {
-  h1 {
-    font-weight: bold;
-    color: #555;
-    letter-spacing: 0;
-    text-align: left;
-    border-bottom: 1px solid #aaa;
-    padding-bottom: .5rem;
-  }
+h1.explore-header {
+  font-weight: bold;
+  color: #555;
+  letter-spacing: 0;
+  text-align: left;
+  border-bottom: 1px solid #aaa;
+  padding-bottom: .5rem;
+  cursor: pointer;
 
   .fa-caret-down {
     color: $ft-orange;
     font-size: 1rem;
     vertical-align: middle;
     margin-left: 1rem;
+  }
+
+  a {
+    color: #aaa;
+
+    &:hover {
+      color: $ft-orange;
+      text-decoration: none;
+    }
   }
 }
 

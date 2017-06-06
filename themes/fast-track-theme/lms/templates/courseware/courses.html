@@ -45,9 +45,25 @@
   </div>
   % endif
 
-  <div class="find-courses">
-    <div class="courses-container">
 
+  <script>
+    $(document).ready(function(){
+      $('.explore-header').on('click', function() {
+        $('.hidden-explore-option').toggleClass('hidden');
+      })
+    })
+  </script>
+
+  <div class="find-courses">
+    <h1 class="explore-header">
+      Explore Courses
+      <div class="fa fa-caret-down"></div>
+      <br>
+      <a href="/affiliates" class="hidden-explore-option hidden">
+        Explore Affiliates
+      </a>
+    </h1>
+    <div class="courses-container">
       % if course_discovery_enabled:
       <div id="filter-bar" class="filters hide-phone is-collapsed">
       </div>
