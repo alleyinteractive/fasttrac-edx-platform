@@ -775,9 +775,6 @@ SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
-# CMS base
-CMS_BASE = 'localhost:8001'
-
 # Site info
 SITE_NAME = "example.com"
 HTTPS = 'on'

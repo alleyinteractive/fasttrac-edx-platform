@@ -47,7 +47,8 @@ from instructor.enrollment import (
     get_email_params,
 )
 
-from lms.envs.common import STATE_CHOICES, CMS_BASE
+from lms.envs.devstack import CMS_BASE
+from lms.envs.common import STATE_CHOICES
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import (
     get_override_for_ccx,
@@ -61,7 +62,6 @@ from lms.djangoapps.ccx.utils import (
     assign_instructor_role_to_ccx,
     ccx_course,
     ccx_students_enrolling_center,
-    get_ccx_for_coach,
     get_ccx_by_ccx_id,
     get_ccx_creation_dict,
     get_date,

@@ -19,6 +19,8 @@ PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'Devstack')
 CELERY_ALWAYS_EAGER = True
 HTTPS = 'off'
 
+CMS_BASE = 'localhost:8001'
+
 ################################ LOGGERS ######################################
 
 # Silence noisy logs
