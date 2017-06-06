@@ -98,6 +98,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
 from openedx.core.djangoapps.bookmarks.models import Bookmark
 from search.api import perform_search
 from ccx.views import get_ccx_schedule
+from openedx.core.lib.xblock_utils import get_course_update_items
 
 
 log = logging.getLogger("edx.courseware")
@@ -345,6 +346,15 @@ def course_info(request, course_id):
         else:
             ccx = None
 
+        # get course updates
+        location = course_key.make_usage_key('course_info', 'updates')
+        try:
+            course_updates = modulestore().get_item(location)
+        except ItemNotFoundError:
+            course_updates = modulestore().create_item(request.user.id, location.course_key, location.block_type, location.block_id)
+
+        update_items = get_course_update_items(course_updates)
+
         context = {
             'request': request,
             'masquerade_user': user,
@@ -358,7 +368,8 @@ def course_info(request, course_id):
             'url_to_enroll': url_to_enroll,
             'bookmarks': bookmarks,
             'last_viewed_item': last_viewed_item,
-            'ccx': ccx
+            'ccx': ccx,
+            'update_items': update_items
         }
 
         # Get the URL of the user's last position in order to display the 'where you were last' message

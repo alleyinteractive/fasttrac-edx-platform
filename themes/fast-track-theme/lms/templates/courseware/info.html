@@ -65,7 +65,9 @@ from openedx.core.djangolib.markup import HTML, Text
         <div class="course-info-header">
           <div class="fa fa-file-text"></div>
           COURSE INFO.
-          <a href="#">VIEW PROFILE</a>
+          % if ccx:
+            <a href="/affiliates/${ccx.coach.username}">VIEW PROFILE</a>
+          % endif
         </div>
         <div class="course-info-body">
           % if ccx:
@@ -96,7 +98,16 @@ from openedx.core.djangolib.markup import HTML, Text
           <a href="#">VIEW ALL</a>
         </div>
         <div class="course-info-body">
-          ${HTML(get_course_info_section(request, masquerade_user, course, 'updates'))}
+          % for update_item in update_items:
+            <div>
+              <a>
+                ${update_item['content'] | n}
+              </a>
+              <span>
+                ${update_item['date']}
+              </span>
+            </div>
+          % endfor
         </div>
       </div>
 
@@ -152,11 +163,10 @@ from openedx.core.djangolib.markup import HTML, Text
                 <h3>
                   <span class="uppercase">
                     ${last_viewed_item['object'].get_parent().display_name if last_viewed_item['object'].get_parent() else ''}
-                  </span> -
-                  ${last_viewed_item['object'].display_name}
+                  </span>
                 </h3>
                 <p>
-                  ${last_viewed_item['object'].display_description if last_viewed_item['object'].display_description else 'No description yet...'}
+                  ${last_viewed_item['object'].display_name}
                 </p>
                 <span class="date">
                   last viewed @ ${last_viewed_item['modified'].strftime("%B %d, %Y")}
