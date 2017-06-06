@@ -47,7 +47,6 @@ from instructor.enrollment import (
     get_email_params,
 )
 
-from lms.envs.devstack import CMS_BASE
 from lms.envs.common import STATE_CHOICES
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import (
@@ -243,7 +242,7 @@ def edit_ccx(request, course, ccx=None):
     ccx_id = CCXLocator.from_course_locator(course.id, ccx.original_ccx_id)
 
     # reindex parent course in order to reindex edited ccx
-    reindex_parent_course_url = 'http://{}/course/{}/ccx_reindex'.format(CMS_BASE, course.id)
+    reindex_parent_course_url = 'http://{}/course/{}/ccx_reindex'.format(settings.CMS_BASE, course.id)
     requests.get(reindex_parent_course_url)
 
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_id})
