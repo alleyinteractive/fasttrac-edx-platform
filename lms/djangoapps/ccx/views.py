@@ -146,7 +146,6 @@ def edit_ccx_context(course, ccx, user):
         ccx, course, 'grading_policy', course.grading_policy)
 
     context = {} # TODO:
-    context['ccx_team'] = CustomCourseForEdX.objects.filter(course_id=ccx_locator)
     context['ccx_locator'] = ccx_locator
     context['modify_access_url'] = reverse('modify_access', kwargs={'course_id': ccx_locator})
     context['schedule'] = json.dumps(schedule, indent=4)
@@ -195,11 +194,22 @@ def dashboard(request, course, ccx=None):
     context = {
         'course': course,
         'ccx': ccx,
-        'STATE_CHOICES': STATE_CHOICES
+        'STATE_CHOICES': STATE_CHOICES,
+        'is_instructor': False,
+        'is_ccx_coach': False
     }
     context.update(get_ccx_creation_dict(course))
     if ccx:
         context.update(edit_ccx_context(course, ccx, request.user))
+        ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.original_ccx_id))
+        custom_courses = CustomCourseForEdX.objects.filter(course_id=ccx_locator)
+
+        for ccx in custom_courses:
+            if ccx.coach.id == request.user.id:
+                context['is_ccx_coach'] = True
+                context['is_instructor'] = ccx.is_instructor(request.user)
+
+        context['ccx_courses'] = custom_courses
         context['edit_current'] = False
     else:
         context['create_ccx_url'] = reverse(

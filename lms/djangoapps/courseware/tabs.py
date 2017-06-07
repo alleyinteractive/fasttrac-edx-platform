@@ -11,7 +11,7 @@ from openedx.core.lib.course_tabs import CourseTabPluginManager
 from student.models import CourseEnrollment
 from xmodule.tabs import CourseTab, CourseTabList, key_checker
 
-FASTTRACK_DISABLED_TAB_TYPES = ['progress', 'wiki']
+FASTTRACK_DISABLED_TAB_TYPES = ['progress', 'wiki', 'discussion']
 
 FASTTRACK_TAB_NAMES_OVERRIDES = {
     'ccx_coach': 'Affiliate',

@@ -15,6 +15,7 @@ from openedx.core.lib.time_zone_utils import get_time_zone_abbr
 from xmodule_django.models import CourseKeyField, LocationKeyField
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
+from student.models import CourseAccessRole
 
 
 log = logging.getLogger("edx.ccx")
@@ -167,6 +168,9 @@ class CustomCourseForEdX(models.Model):
         if self.structure_json:
             return json.loads(self.structure_json)
         return None
+
+    def is_instructor(self, user):
+        return CourseAccessRole.objects.filter(user=user, role='instructor').count() > 0
 
 
 class CcxFieldOverride(models.Model):
