@@ -1,6 +1,12 @@
 <%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 
+<style>
+    .team-mgmt-table a {
+        color: #222;
+    }
+</style>
+
 <h2 class="hd hd-2">${_("Team management")}</h2>
 <div class="table-wrapper">
     <table class="team-mgmt-table">
@@ -8,7 +14,7 @@
             <th class="thead">Role</th>
             <th class="thead">Name</th>
             <th class="thead">Email</th>
-            <th class="thead">Remove</th>
+            <th class="thead">Actions</th>
         </tr>
         %for ccx in ccx_courses:
             <tr>
@@ -24,6 +30,14 @@
                 <td>${ccx.coach.profile.name}</td>
                 <td>${ccx.coach.email}</td>
                 <td>
+                    % if is_instructor or is_staff:
+                        <a href="/affiliates/edit/${ccx.coach.username}">
+                            <i class="fa fa-edit"></i>
+                            Edit
+                        </a>
+                        &nbsp;&nbsp;&nbsp;
+                    % endif
+
                     <span class="remove-coach-button"
                         data-remove-url="${modify_access_url}"
                         data-unique-student-identifier="${ccx.coach.username}"

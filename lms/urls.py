@@ -29,6 +29,7 @@ urlpatterns = (
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
     url(r'^affiliates$', 'student.views.affiliates', name="affiliates"),
     url(r'^affiliates/(?P<affiliate_username>[^/]*)$', 'student.views.affiliate', name="affiliate"),
+    url(r'^affiliates/edit/(?P<affiliate_username>[^/]*)$', 'student.views.affiliate_edit', name="affiliate_edit"),
     url(r'^login_ajax$', 'student.views.login_user', name="login"),
     url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),
 

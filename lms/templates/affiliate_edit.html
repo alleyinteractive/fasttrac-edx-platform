@@ -1,0 +1,186 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">Affiliate ${affiliate.profile.name}</%block>
+
+<style>
+  .edit-affiliate-container {
+    text-align: center;
+    width: 60%;
+    margin: auto;
+  }
+
+  .edit-affiliate-container * {
+    text-align: left;
+  }
+
+  .edit-affiliate-container input,
+  .edit-affiliate-container select {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    box-shadow: 0 0 0;
+    border-bottom: 1px solid orangered;
+    border-radius: 0;
+    padding: 0;
+    font-style: normal;
+    background: transparent;
+    color: #999;
+  }
+
+  .edit-affiliate-container input:focus {
+    box-shadow: 0 0 0;
+    outline: 0;
+    color: #555;
+  }
+
+  .edit-affiliate-container input[type=submit] {
+    background: orangered;
+    color: white;
+    padding: 1rem;
+    margin-bottom: 3rem;
+  }
+
+  .edit-affiliate-container input[type=submit]:hover {
+    opacity: .8;
+  }
+
+  .edit-affiliate-container label {
+    font-style: normal;
+    font-weight: bold;
+    color: #555;
+    font-size: 1.2rem;
+  }
+</style>
+
+<section class="course-info">
+  <form class="edit-affiliate-container" action="/affiliates/edit/${affiliate.username}" method="POST">
+    <br>
+    <h1 class="explore-header">Edit Affiliate Info</h1>
+
+    <h4> <b>Email:</b> ${affiliate.email}</h4>
+    <h4> <b>Username:</b> ${affiliate.username}</h4>
+
+    <br>
+    <div>
+      <label for="">Name</label>
+      <br>
+      <input type="text" value="${affiliate.profile.name}" name="name">
+    </div>
+    <br>
+
+    <br>
+    <div>
+      <label for="">Address</label>
+      <br>
+      <input type="text" value="${affiliate.profile.mailing_address}" name="mailing_address">
+    </div>
+    <br>
+
+    <br>
+    <div>
+      <label for="">City</label>
+      <br>
+      <input type="text" value="${affiliate.profile.city}" name="city">
+    </div>
+    <br>
+
+    <br>
+    <div>
+      <label for="">State</label>
+      <br>
+      <br>
+      <select name="state">
+        % for choice in state_choices:
+          <option value="${choice[0]}" ${'selected' if affiliate.profile.state == choice[0] else ''}>${choice[1]}</option>
+        % endfor
+      </select>
+    </div>
+    <br>
+
+    <br>
+    <div>
+      <label for="">Zip Code</label>
+      <br>
+      <input type="text" value="${affiliate.profile.zipcode}" name="zipcode">
+    </div>
+    <br>
+
+    <br>
+    <div>
+      <label for="">Country</label>
+      <br>
+      <br>
+      <select name="country">
+        % for country in countries:
+          <option value="${country[0]}" ${'selected' if affiliate.profile.country == country[0] else ''}>${country[1]}</option>
+        % endfor
+      </select>
+    </div>
+    <br>
+
+    <br>
+    <div>
+      <label for="">Company</label>
+      <br>
+      <input type="text" value="${affiliate.profile.company}" name="company">
+    </div>
+    <br>
+
+    <br>
+    <div>
+      <label for="">Title</label>
+      <br>
+      <input type="text" value="${affiliate.profile.title}" name="title">
+    </div>
+    <br>
+
+    <br>
+    <div>
+      <label for="">Phone Number</label>
+      <br>
+      <input type="text" value="${affiliate.profile.phone_number}" name="phone_number">
+    </div>
+    <br>
+
+    <br>
+    <div>
+      <label for="">Newsletter</label>
+      <br>
+      <br>
+      <select name="newsletter">
+        % for choice in newsletter_choices:
+          <option value="${choice[0]}" ${'selected' if affiliate.profile.newsletter == choice[0] else ''}>${choice[1]}</option>
+        % endfor
+      </select>
+    </div>
+    <br>
+
+    <br>
+    <div>
+      <label for="">Gender</label>
+      <br>
+      <br>
+      <select name="gender">
+        % for choice in gender_choices:
+          <option value="${choice[0]}" ${'selected' if affiliate.profile.gender == choice[0] else ''}>${choice[1]}</option>
+        % endfor
+      </select>
+    </div>
+    <br>
+
+    <br>
+    <div>
+      <label for="">Year of Birth</label>
+      <br>
+      <input type="number" value="${affiliate.profile.year_of_birth}" name="year_of_birth">
+    </div>
+    <br>
+
+    <br>
+    <br>
+    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+    <input type="submit" value="Save" />
+  </div>
+</section>
