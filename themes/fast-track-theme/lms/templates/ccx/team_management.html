@@ -5,12 +5,22 @@
 <div class="table-wrapper">
     <table class="team-mgmt-table">
         <tr>
+            <th class="thead">Role</th>
             <th class="thead">Name</th>
             <th class="thead">Email</th>
             <th class="thead">Remove</th>
         </tr>
         %for ccx in ccx_courses:
             <tr>
+                <td>
+                    % if ccx.is_staff(ccx.coach):
+                        Program Director
+                    % elif ccx.is_instructor(ccx.coach):
+                        Course Manager
+                    % else:
+                        Facilitator
+                    % endif
+                </td>
                 <td>${ccx.coach.profile.name}</td>
                 <td>${ccx.coach.email}</td>
                 <td>
@@ -30,7 +40,11 @@
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
         <input type="text" name="unique_student_identifier" />
         <input type="hidden" name="action" value="allow" />
-        <input type="hidden" name="rolename" value="ccx_coach" />
+        <select name="rolename">
+            <option value="ccx_coach" selected>Facilitator</option>
+            <option value="instructor">Course Manager</option>
+            <option value="staff">Program Director</option>
+        </select>
         <button class="add-button" value="submit">Add</button>
     </form>
     <div id="error-modal" class="error hidden">
@@ -96,8 +110,21 @@
         function addCoachRow(coachData, removeUrl) {
             var username = coachData.unique_student_identifier;
             var email = coachData.email;
+            var rolename = coachData.rolename;
 
-            var newRow = '<tr><td>' + username + '</td><td>' + email + '</td><td><span class="remove-coach-button" data-remove-url="' + removeUrl + '" data-unique-student-identifier="' + username + '" data-rolename="ccx_coach" data-action="revoke"><i class="fa fa-times-circle remove-icon"></i>Remove</span></td></tr>';
+            switch(rolename) {
+                case 'staff':
+                    var role = 'Program Director'
+                    break;
+                case 'instructor':
+                    var role = 'Course Manager'
+                    break;
+                case 'ccx_coach':
+                default:
+                    var role = 'Facilitator'
+            }
+
+            var newRow = '<tr><td>' + role + '</td><td>' + username + '</td><td>' + email + '</td><td><span class="remove-coach-button" data-remove-url="' + removeUrl + '" data-unique-student-identifier="' + username + '" data-rolename="ccx_coach" data-action="revoke"><i class="fa fa-times-circle remove-icon"></i>Remove</span></td></tr>';
 
             $('.team-mgmt-table').find('tbody').append(newRow);
         }

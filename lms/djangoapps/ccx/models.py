@@ -172,6 +172,9 @@ class CustomCourseForEdX(models.Model):
     def is_instructor(self, user):
         return CourseAccessRole.objects.filter(user=user, role='instructor').count() > 0
 
+    def is_staff(self, user):
+        return CourseAccessRole.objects.filter(user=user, role='staff').count() > 0
+
 
 class CcxFieldOverride(models.Model):
     """
