@@ -884,7 +884,7 @@ def modify_access(request, course_id):
         allow_access(course, user, rolename)
 
         # add CCX table entry
-        if rolename == 'ccx_coach' and hasattr(course.id, 'ccx'):
+        if hasattr(course.id, 'ccx'):
             existing_ccx_enrollements = CustomCourseForEdX.objects.filter(original_ccx_id=course.id.ccx, coach_id=user.id).count()
 
             if existing_ccx_enrollements > 0:
@@ -908,7 +908,7 @@ def modify_access(request, course_id):
         revoke_access(course, user, rolename)
 
         # delete CCX entry
-        if rolename == 'ccx_coach' and hasattr(course.id, 'ccx'):
+        if hasattr(course.id, 'ccx'):
             CustomCourseForEdX.objects.get(
                 course_id=course.id,
                 coach_id=user.id,

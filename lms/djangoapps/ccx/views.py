@@ -204,10 +204,14 @@ def dashboard(request, course, ccx=None):
         ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.original_ccx_id))
         custom_courses = CustomCourseForEdX.objects.filter(course_id=ccx_locator)
 
+        context['is_ccx_coach'] = ccx.coach == request.user
+        context['is_instructor'] = ccx.is_instructor(request.user)
+
         for ccx in custom_courses:
             if ccx.coach.id == request.user.id:
                 context['is_ccx_coach'] = True
                 context['is_instructor'] = ccx.is_instructor(request.user)
+
 
         context['ccx_courses'] = custom_courses
         context['edit_current'] = False
