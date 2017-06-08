@@ -387,7 +387,6 @@ def affiliate_edit(request, affiliate_username):
                 setattr(affiliate.profile, key, int(request.POST[key]))
             else:
                 setattr(affiliate.profile, key, request.POST[key])
-            # affiliate.profile[key] = request.POST[key]
 
         affiliate.profile.save()
 
