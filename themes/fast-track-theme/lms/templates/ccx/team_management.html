@@ -30,7 +30,7 @@
                 <td>${ccx.coach.profile.name}</td>
                 <td>${ccx.coach.email}</td>
                 <td>
-                    % if is_instructor or is_staff:
+                    % if is_staff:
                         <a href="/affiliates/edit/${ccx.coach.username}">
                             <i class="fa fa-edit"></i>
                             Edit
