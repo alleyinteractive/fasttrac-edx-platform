@@ -297,7 +297,8 @@ h1.explore-header {
 
       &:hover {
         opacity: .8;
-        color: $ft-orange;
+        background: $ft-orange;
+        color: white;
       }
     }
     label {
