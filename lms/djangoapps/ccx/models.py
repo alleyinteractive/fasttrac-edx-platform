@@ -25,13 +25,11 @@ class CustomCourseForEdX(models.Model):
     """
     A Custom Course.
     """
-    IN_PERSON_REQUIRED = 'IN_PERSON_REQUIRED'
-    IN_PERSON_OPTIONAL = 'IN_PERSON_OPTIONAL'
+    IN_PERSON = 'IN_PERSON'
     ONLINE_ONLY = 'ONLINE_ONLY'
     DELIVERY_MODE_CHOICES = (
-        (IN_PERSON_REQUIRED, 'In Person - Required'),
-        (IN_PERSON_OPTIONAL, 'In Person - Optional'),
-        (ONLINE_ONLY, 'Online Only'),
+        (IN_PERSON, 'In Person'),
+        (ONLINE_ONLY, 'Online'),
     )
 
     PRIVATE = 'PRIVATE'
@@ -50,7 +48,7 @@ class CustomCourseForEdX(models.Model):
     structure_json = models.TextField(verbose_name='Structure JSON', blank=True, null=True)
     original_ccx_id = models.IntegerField(verbose_name='ID of original CCX course entry', blank=True, null=True)
     delivery_mode = models.CharField(
-        default=IN_PERSON_REQUIRED,
+        default=IN_PERSON,
         max_length=255,
         choices=DELIVERY_MODE_CHOICES,
     )
