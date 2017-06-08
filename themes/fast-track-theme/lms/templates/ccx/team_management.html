@@ -62,6 +62,7 @@
 
 <script>
     $(document).ready(function() {
+        var isStaff = '${is_staff}';
         $('#add-coach-form').on('submit', addCoachEventHandler);
         $('.team-mgmt-table').on('click', '.remove-coach-button', removeCoachEventHandler);
 
@@ -132,11 +133,25 @@
                     var role = 'Facilitator'
             }
 
-            var newRow = '<tr><td>' + role + '</td><td>' + username + '</td><td>' + email + '</td><td><span class="remove-coach-button" data-remove-url="' + removeUrl + '" data-unique-student-identifier="' + username + '" data-rolename="ccx_coach" data-action="revoke"><i class="fa fa-times-circle remove-icon"></i>Remove</span></td></tr>';
+            if(isStaff) {
+               var newRow = '<tr><td>' + role +
+                '</td><td>' + username +
+                '</td><td>' + email +
+                '</td><td><a href="/affiliates/edit/' + username + '"><i class="fa fa-edit"></i>Edit</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
+                '<span class="remove-coach-button" data-remove-url="' + removeUrl +
+                    '" data-unique-student-identifier="' + username +
+                    '" data-rolename="ccx_coach" data-action="revoke"><i class="fa fa-times-circle remove-icon"></i>Remove</span></td></tr>';
+            }
+            else {
+                var newRow = '<tr><td>' + role +
+                    '</td><td>' + username +
+                    '</td><td>' + email +
+                    '</td><td><span class="remove-coach-button" data-remove-url="' + removeUrl +
+                        '" data-unique-student-identifier="' + username +
+                        '" data-rolename="ccx_coach" data-action="revoke"><i class="fa fa-times-circle remove-icon"></i>Remove</span></td></tr>';
+            }
 
             $('.team-mgmt-table').find('tbody').append(newRow);
         }
     });
-
-
 </script>

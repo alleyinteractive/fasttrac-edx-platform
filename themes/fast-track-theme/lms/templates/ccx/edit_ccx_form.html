@@ -15,7 +15,7 @@
         <div class="field">
             <label class="sr" for="ccx_name">${_('Name your CCX')}</label>
             <input name="name" id="ccx_name" class="ccx-input-field" value="${ccx.display_name}"
-                   placeholder="${_('Name of your course...')}"/><br/>
+                   placeholder="${_('Name of your course...')}" required/><br/>
         </div>
     </div>
     <div class="field-wrapper">
@@ -32,6 +32,7 @@
             <label class="sr" for="ccx_course_description">${_('Course description')}</label>
             <textarea name="course_description" id="ccx_course_description"
                         class="ccx-input-field" placeholder="${_('click to start typing...')}"
+                        required
             >${ccx.course_description}</textarea><br/>
         </div>
     </div>
@@ -48,9 +49,9 @@
         <div class="field inline">
             <label class="sr" for="ccx_delivery_mode">${_('Delivery Mode')}</label>
             <select name="delivery_mode" id="ccx_delivery_mode" data-current-value="${ccx.delivery_mode}">
-                <option value="In Person - Required">In Person - Required</option>
-                <option value="In Person - Optional">In Person - Optional</option>
-                <option value="Online Only">Online Only</option>
+                % for choice in delivery_mode_choices:
+                    <option value="${choice[0]}">${choice[1]}</option>
+                % endfor
             </select>
         </div>
     </div>
@@ -64,6 +65,7 @@
                    value="${ccx.time.date()}"
                    type="text"
                    name="date"
+                   required
                    id="ccx_dialog_date" size="10"/>
             <i class="fa fa-calendar" aria-hidden="true"></i>
         </div>
@@ -75,6 +77,7 @@
                    value="${ccx.time.time()}"
                    type="text"
                    name="time"
+                   required
                    id="ccx_dialog_time" size=10/></br>
         </div>
     </div>
@@ -85,12 +88,12 @@
             <label class="sr" for="ccx_city">${_('City')}</label>
             <input name="city" id="ccx_city" class="ccx-input-field"
                    placeholder="${_('type in a city...')}"
-                   value="${ccx.location_city}"/><br/>
+                   value="${ccx.location_city}" required/><br/>
         </div>
         <div class="horizontal-field-container">
             <p class="field-name">${_('STATE')}</p>
             <label class="sr" for="ccx_state">${_('State')}</label>
-            <select name="state" id="ccx_state" class="ccx-select" data-current-value="${ccx.location_state}">
+            <select name="state" id="ccx_state" class="ccx-select" data-current-value="${ccx.location_state}" required>
                 % for STATE in STATE_CHOICES:
                     <option value="${STATE[0]}">${STATE[1]}</option>
                 % endfor
@@ -108,7 +111,7 @@
                 <% fee = 'Yes' %>
             %endif
             <select name="fee" id="ccx_fee" class="ccx-select"
-                    data-current-value="${fee}">
+                    data-current-value="${fee}" required>
                 <option value="True">Yes</option>
                 <option value="False">None</option>
             </select>
@@ -118,7 +121,7 @@
             <p class="field-name">${_('ENROLLMENT TYPE')}</p>
             <label class="sr" for="ccx_enrollment_type">${_('Enrollment type')}</label>
             <select name="enrollment_type" id="ccx_enrollment_type" class="ccx-select"
-                    data-current-value="${ccx.enrollment_type}">
+                    data-current-value="${ccx.enrollment_type}" required>
                 <option value="PRIVATE">Private</option>
                 <option value="PUBLIC">Public</option>
             </select>

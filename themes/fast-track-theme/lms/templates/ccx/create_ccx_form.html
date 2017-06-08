@@ -15,7 +15,7 @@
         <div class="field">
             <label class="sr" for="ccx_name">${_('Name your CCX')}</label>
             <input name="name" id="ccx_name" class="ccx-input-field"
-                   placeholder="${_('Name of your course...')}"/><br/>
+                   placeholder="${_('Name of your course...')}" required/><br/>
         </div>
     </div>
     <div class="field-wrapper">
@@ -30,9 +30,14 @@
             volutpat. Curabitur mollis ipsum ut elit pulvinar, eget mattis nibh volutpat.</p>
         <div class="field custom-course-description">
             <label class="sr" for="ccx_course_description">${_('Course description')}</label>
-                                    <textarea name="course_description" id="ccx_course_description"
-                                              class="ccx-input-field"
-                                              placeholder="${_('click to start typing...')}"></textarea><br/>
+                <textarea
+                    name="course_description"
+                    id="ccx_course_description"
+                    class="ccx-input-field"
+                    placeholder="${_('click to start typing...')}"
+                    required
+                ></textarea>
+                <br/>
         </div>
     </div>
     <div class="field-wrapper">
@@ -47,11 +52,11 @@
             mollis ipsum ut elit pulvinar, eget mattis nibh volutpat.</p>
         <div class="field inline">
             <label class="sr" for="ccx_delivery_mode">${_('Delivery Mode')}</label>
-            <select name="delivery_mode" id="ccx_delivery_mode">
-                <option selected disabled>class availability...</option>
-                <option value="In Person - Required">In Person - Required</option>
-                <option value="In Person - Optional">In Person - Optional</option>
-                <option value="Online Only">Online Only</option>
+            <select name="delivery_mode" id="ccx_delivery_mode" required>
+                <option selected disabled value="">class availability...</option>
+                % for choice in delivery_mode_choices:
+                    <option value="${choice[0]}">${choice[1]}</option>
+                % endfor
             </select>
         </div>
     </div>
@@ -64,7 +69,9 @@
             <input placeholder="${_('select a start date...')}" class="date ccx-input-field"
                    type="text"
                    name="date"
-                   id="ccx_dialog_date" size="10"/>
+                   id="ccx_dialog_date"
+                   size="10"
+                   required/>
             <i class="fa fa-calendar" aria-hidden="true"></i>
         </div>
         <div class="horizontal-field-container">
@@ -74,7 +81,10 @@
             <input placeholder="${_('select a starting time...')}" class="time ccx-input-field"
                    type="text"
                    name="time"
-                   id="ccx_dialog_time" size=10/></br>
+                   id="ccx_dialog_time"
+                   size=10
+                   required/>
+            </br>
         </div>
     </div>
 
@@ -83,13 +93,13 @@
             <p class="field-name">${_('CITY')}</p>
             <label class="sr" for="ccx_city">${_('City')}</label>
             <input name="city" id="ccx_city" class="ccx-input-field"
-                   placeholder="${_('type in a city...')}"/><br/>
+                   placeholder="${_('type in a city...')}" required/><br/>
         </div>
         <div class="horizontal-field-container">
             <p class="field-name">${_('STATE')}</p>
             <label class="sr" for="ccx_state">${_('State')}</label>
-            <select name="state" id="ccx_state" class="ccx-select">
-                <option selected disabled>select option...</option>
+            <select name="state" id="ccx_state" class="ccx-select" required>
+                <option selected disabled value="">select option...</option>
                 % for STATE in STATE_CHOICES:
                     <option value="${STATE[0]}">${STATE[1]}</option>
                 % endfor
@@ -101,8 +111,8 @@
         <div class="horizontal-field-container">
             <p class="field-name">${_('FEE')}</p>
             <label class="sr" for="ccx_fee">${_('Fee')}</label>
-            <select name="fee" id="ccx_fee" class="ccx-select">
-                <option selected disabled>select option...</option>
+            <select name="fee" id="ccx_fee" class="ccx-select" required>
+                <option selected disabled value="">select option...</option>
                 <option value="True">Yes</option>
                 <option value="False">None</option>
             </select>
@@ -111,8 +121,8 @@
         <div class="horizontal-field-container">
             <p class="field-name">${_('ENROLLMENT TYPE')}</p>
             <label class="sr" for="ccx_enrollment_type">${_('Enrollment type')}</label>
-            <select name="enrollment_type" id="ccx_enrollment_type" class="ccx-select">
-                <option selected disabled>select option...</option>
+            <select name="enrollment_type" id="ccx_enrollment_type" class="ccx-select" required>
+                <option selected disabled value="">select option...</option>
                 <option value="Private">Private</option>
                 <option value="Public">Public</option>
             </select>

@@ -881,7 +881,7 @@ def modify_access(request, course_id):
         return JsonResponse(response_payload)
 
     if action == 'allow':
-        allow_access(course, user, rolename)
+        allow_access(course, user, rolename, False)
 
         # add CCX table entry
         if hasattr(course.id, 'ccx'):
@@ -905,7 +905,7 @@ def modify_access(request, course_id):
             ).save()
 
     elif action == 'revoke':
-        revoke_access(course, user, rolename)
+        revoke_access(course, user, rolename, False)
 
         # delete CCX entry
         if hasattr(course.id, 'ccx'):
