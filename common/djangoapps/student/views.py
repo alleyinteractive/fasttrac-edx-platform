@@ -127,6 +127,8 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 from courseware import grades
+from django_countries import countries
+from student.models import UserProfile
 
 
 log = logging.getLogger("edx.student")
@@ -358,6 +360,45 @@ def affiliate(request, affiliate_username):
         'affiliate': affiliate,
         'courses': courses
     })
+
+def affiliate_edit(request, affiliate_username):
+    affiliate = User.objects.get(username=affiliate_username)
+    courses = CustomCourseForEdX.objects.filter(coach=affiliate)
+
+    allow_access = False
+    for ccx in courses:
+        if ccx.is_staff(request.user):
+            allow_access = True
+
+    if not allow_access:
+        raise Http404
+
+    if request.method == 'GET':
+        return render_to_response('affiliate_edit.html', {
+            'affiliate': affiliate,
+            'state_choices': settings.STATE_CHOICES,
+            'countries': countries,
+            'newsletter_choices': UserProfile.NEWSLETTER_CHOICES,
+            'gender_choices': UserProfile.GENDER_CHOICES,
+        })
+    elif request.method == 'POST':
+        for key in request.POST:
+            if key == 'year_of_birth':
+                setattr(affiliate.profile, key, int(request.POST[key]))
+            else:
+                setattr(affiliate.profile, key, request.POST[key])
+
+        affiliate.profile.save()
+
+        return render_to_response('affiliate_edit.html', {
+            'affiliate': affiliate,
+            'state_choices': settings.STATE_CHOICES,
+            'countries': countries,
+            'newsletter_choices': UserProfile.NEWSLETTER_CHOICES,
+            'gender_choices': UserProfile.GENDER_CHOICES,
+        })
+    else:
+        raise Http404
 
 
 def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disable=unused-argument

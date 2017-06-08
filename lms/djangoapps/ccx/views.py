@@ -206,11 +206,13 @@ def dashboard(request, course, ccx=None):
 
         context['is_ccx_coach'] = ccx.coach == request.user
         context['is_instructor'] = ccx.is_instructor(request.user)
+        context['is_staff'] = ccx.is_staff(request.user)
 
         for ccx in custom_courses:
             if ccx.coach.id == request.user.id:
                 context['is_ccx_coach'] = True
                 context['is_instructor'] = ccx.is_instructor(request.user)
+                context['is_staff'] = ccx.is_staff(request.user)
 
         context['ccx_courses'] = custom_courses
         context['edit_current'] = False
