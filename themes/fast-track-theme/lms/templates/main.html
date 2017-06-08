@@ -120,6 +120,19 @@ from pipeline_mako import render_require_js_path_overrides
     </script>
 % endif
 
+<script type="text/javascript">
+  var bugmuncher_options = {
+    api_key: "3b9ff801f62e96519523"
+  };
+  (function(){
+    var e = document.createElement("script");
+    e.setAttribute("type", "text/javascript");
+    var d = new Date(); var n = '?'+d.getFullYear()+(d.getMonth()+1)+d.getDate()+d.getHours();
+    e.setAttribute("src", "//cdn.bugmuncher.com/bugmuncher.js"+n);
+    document.getElementsByTagName("head")[0].appendChild(e);
+  })();
+</script>
+
 </head>
 
 <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
