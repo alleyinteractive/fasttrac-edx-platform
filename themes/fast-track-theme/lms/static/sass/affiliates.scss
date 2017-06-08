@@ -260,3 +260,50 @@ h1.explore-header {
     }
   }
 }
+
+.edit-affiliate-container {
+    text-align: center;
+    width: 60%;
+    margin: auto;
+
+    * {
+      text-align: left;
+    }
+
+    input, select {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      box-shadow: 0 0 0;
+      border-bottom: 1px solid $ft-orange;
+      border-radius: 0;
+      padding: 0;
+      font-style: normal;
+      background: transparent;
+      color: #999;
+    }
+
+    input:focus {
+      box-shadow: 0 0 0;
+      outline: 0;
+      color: #555;
+    }
+
+    input[type=submit] {
+      background: $ft-orange;
+      color: white;
+      padding: 1rem;
+      margin-bottom: 3rem;
+
+      &:hover {
+        opacity: .8;
+        color: $ft-orange;
+      }
+    }
+    label {
+      font-style: normal;
+      font-weight: bold;
+      color: #555;
+      font-size: 1.2rem;
+    }
+  }

@@ -4,56 +4,6 @@
 
 <%block name="pagetitle">Affiliate ${affiliate.profile.name}</%block>
 
-<style>
-  .edit-affiliate-container {
-    text-align: center;
-    width: 60%;
-    margin: auto;
-  }
-
-  .edit-affiliate-container * {
-    text-align: left;
-  }
-
-  .edit-affiliate-container input,
-  .edit-affiliate-container select {
-    width: 100%;
-    border: 0;
-    outline: 0;
-    box-shadow: 0 0 0;
-    border-bottom: 1px solid orangered;
-    border-radius: 0;
-    padding: 0;
-    font-style: normal;
-    background: transparent;
-    color: #999;
-  }
-
-  .edit-affiliate-container input:focus {
-    box-shadow: 0 0 0;
-    outline: 0;
-    color: #555;
-  }
-
-  .edit-affiliate-container input[type=submit] {
-    background: orangered;
-    color: white;
-    padding: 1rem;
-    margin-bottom: 3rem;
-  }
-
-  .edit-affiliate-container input[type=submit]:hover {
-    opacity: .8;
-  }
-
-  .edit-affiliate-container label {
-    font-style: normal;
-    font-weight: bold;
-    color: #555;
-    font-size: 1.2rem;
-  }
-</style>
-
 <section class="course-info">
   <form class="edit-affiliate-container" action="/affiliates/edit/${affiliate.username}" method="POST">
     <br>
