@@ -117,8 +117,8 @@ body.view-in-course {
 
   div.course-wrapper {
     display: inline-block;
-    max-width: 100%;
-    width: calc(100% - 301px); // border is 1px
+    max-width: 199%;
+    width: calc(100% - 307px); // border is 1px
     padding-bottom: 56px; // height of footer-wrapper
     border: none;
     border-left: 1px solid $ft-temp-gray;
@@ -127,7 +127,7 @@ body.view-in-course {
     background: white;
 
     &.extended {
-      width: 100%;
+      width: 99%;
       border-left: none;
       -webkit-transition: width 0.5s;
       transition: width 0.5s;
