@@ -58,7 +58,7 @@ from lms.djangoapps.ccx.overrides import (
 from lms.djangoapps.ccx.utils import (
     add_master_course_staff_to_ccx,
     assign_coach_role_to_ccx,
-    assign_instructor_role_to_ccx,
+    assign_staff_role_to_ccx,
     ccx_course,
     ccx_students_enrolling_center,
     get_ccx_by_ccx_id,
@@ -351,7 +351,7 @@ def create_ccx(request, course, ccx=None):
     )
 
     assign_coach_role_to_ccx(ccx_id, request.user, course.id)
-    assign_instructor_role_to_ccx(ccx_id, request.user, course.id)
+    assign_staff_role_to_ccx(ccx_id, request.user, course.id)
     add_master_course_staff_to_ccx(course, ccx_id, ccx.display_name)
     return redirect(url)
 

@@ -322,7 +322,7 @@ def assign_coach_role_to_ccx(ccx_locator, user, master_course_id):
                 allow_access(course, user, "ccx_coach", send_email=False)
 
 
-def assign_instructor_role_to_ccx(ccx_locator, user, master_course_id):
+def assign_staff_role_to_ccx(ccx_locator, user, master_course_id):
     """
     Check if user has ccx_coach role on master course then assign him coach role on ccx only
     if role is not already assigned. Because of this coach can open dashboard from master course
@@ -339,7 +339,7 @@ def assign_instructor_role_to_ccx(ccx_locator, user, master_course_id):
         if not role.has_user(user):
             # assign user role instructor on ccx
             with ccx_course(ccx_locator) as course:
-                allow_access(course, user, 'instructor', send_email=False)
+                allow_access(course, user, 'staff', send_email=False)
 
 
 def is_email(identifier):
