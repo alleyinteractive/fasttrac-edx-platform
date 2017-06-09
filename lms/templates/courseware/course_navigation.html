@@ -97,7 +97,7 @@ include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
                           <form>
                             <label for="course-search-input" class="sr">${_('Course Search')}</label>
                             <div class="search-field-wrapper">
-                              <input id="course-search-input" type="text" class="search-field" placeholder="SEARCH"/>
+                              <input id="course-search-input" type="text" class="search-field" placeholder="SEARCH" onkeyup="handleCourseSearch(event)"/>
                               <button type="submit" class="search-button">
                                   <span class="icon fa fa-search" aria-hidden="true"></span>
                               </button>
@@ -106,6 +106,15 @@ include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
                               </button>
                             </div>
                           </form>
+
+                          <script>
+                            var courseId = "${course.id}";
+                            function handleCourseSearch(event) {
+                                if(event.keyCode === 13) {
+                                    window.location = '/courses/' + courseId + '/search?query=' + event.target.value;
+                                }
+                            }
+                          </script>
                         </div>
                     </li>
                 % endif

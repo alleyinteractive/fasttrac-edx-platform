@@ -6,7 +6,7 @@ define([
     'use strict';
 
     return SearchForm.extend({
-        el: '#courseware-search-bar'
+        el: '#courseware-search-bar-HACK'
     });
 
 });
