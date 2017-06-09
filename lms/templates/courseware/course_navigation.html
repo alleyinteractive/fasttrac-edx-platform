@@ -94,7 +94,7 @@ include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
                 % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
                     <li class="course-search">
                         <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
-                          <form onsubmit="return false">
+                          <form>
                             <label for="course-search-input" class="sr">${_('Course Search')}</label>
                             <div class="search-field-wrapper">
                               <input id="course-search-input" type="text" class="search-field" placeholder="SEARCH" onkeyup="handleCourseSearch(event)"/>
