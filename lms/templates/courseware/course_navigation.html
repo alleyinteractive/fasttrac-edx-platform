@@ -110,11 +110,6 @@ include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
                           <script>
                             var courseId = "${course.id}";
                             function handleCourseSearch(event) {
-                                event.preventDefault();
-                                event.stopPropagation();
-
-                                console.log('serach');
-
                                 if(event.keyCode === 13) {
                                     window.location = '/courses/' + courseId + '/search?query=' + event.target.value;
                                 }
