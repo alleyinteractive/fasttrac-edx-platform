@@ -44,6 +44,10 @@ from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.mixin import LicenseMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
+################################# FASTTRAC WORKSPACE #############################
+
+WORKSPACE_URL = 'http://localhost:3000'
+
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "Your Platform Name Here"
