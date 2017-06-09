@@ -107,6 +107,8 @@ section.wrapper-xblock {
     color: $ft-green;
   }
 
+  /* Ordered and unordered lists */
+
   ol.ft.green {
     li {
       &:before {
@@ -151,6 +153,13 @@ section.wrapper-xblock {
       width: 2em;
       margin-left: -1em
     }
+  }
+
+  ol.ft p, ul.ft p {
+    display: inline-block;
+    vertical-align: top;
+    margin-bottom: 0;
+    margin-top: -2px;
   }
 
   .definition {
@@ -403,6 +412,10 @@ section.wrapper-xblock {
       width: 40px;
       background: url('../images/VideoIcon.svg') no-repeat center center;
     }
+  }
+
+  .video-description {
+    padding: 20px;
   }
 
   &.xmodule_display.xmodule_VideoModule .video {

@@ -102,6 +102,7 @@ $ft-dark-grey: #8d8d8d;
     color: $ft-green;
   }
 
+  /* Ordered and unordered lists */
   ol.ft.green {
     li {
       &:before {
@@ -146,6 +147,13 @@ $ft-dark-grey: #8d8d8d;
       width: 2em;
       margin-left: -1em
     }
+  }
+
+  ol.ft p, ul.ft p {
+    display: inline-block;
+    vertical-align: top;
+    margin-bottom: 0;
+    margin-top: -2px;
   }
 
   .definition {
@@ -397,6 +405,10 @@ $ft-dark-grey: #8d8d8d;
     }
   }
 
+  .video-description {
+    padding: 20px;
+  }
+
   .xmodule_display.xmodule_VideoModule .video {
     background: transparent;
     margin: 0 10px;
@@ -477,7 +489,7 @@ $ft-dark-grey: #8d8d8d;
       content: "";
       position: absolute;
       height: 15px;
-      border-bottom: 1px solid  $ft-light-grey;
+      border-bottom: 1px solid $ft-light-grey;
       top: 0;
     }
 
