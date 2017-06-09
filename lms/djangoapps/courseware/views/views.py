@@ -369,7 +369,8 @@ def course_info(request, course_id):
             'bookmarks': bookmarks,
             'last_viewed_item': last_viewed_item,
             'ccx': ccx,
-            'update_items': update_items
+            'update_items': update_items,
+            'workspace_url': settings.WORKSPACE_URL
         }
 
         # Get the URL of the user's last position in order to display the 'where you were last' message

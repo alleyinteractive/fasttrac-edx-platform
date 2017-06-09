@@ -298,6 +298,12 @@ AUTHENTICATION_BACKENDS = (
 
 LMS_BASE = None
 
+################################# FASTTRAC WORKSPACE #############################
+
+WORKSPACE_URL = 'http://localhost:3000'
+
+##############################################################################
+
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.
 # They are used so that URLs with deprecated-format strings still work.
 from lms.envs.common import (
