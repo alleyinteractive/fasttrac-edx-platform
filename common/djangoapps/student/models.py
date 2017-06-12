@@ -328,6 +328,9 @@ class UserProfile(models.Model):
     state = models.CharField(null=True, blank=True, default='na', choices=STATE_CHOICES, max_length=255)
     zipcode = models.CharField(null=True, blank=True, default='', max_length=255)
 
+    # field for affiliate program directors
+    affiliate_organization_name = models.CharField(null=True, blank=True, default='', max_length=255)
+
     @property
     def has_profile_image(self):
         """

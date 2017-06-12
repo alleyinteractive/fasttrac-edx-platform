@@ -177,6 +177,7 @@ class RegistrationView(APIView):
         "year_of_birth",
         "honor_code",
         "terms_of_service",
+        "affiliate_organization_name",
     ]
 
     # This end-point is available to anonymous users,
@@ -589,6 +590,21 @@ class RegistrationView(APIView):
             label=phone_number_label,
             required=required,
             placeholder='(111) 222 - 3333'
+        )
+
+    def _add_affiliate_organization_name_field(self, form_desc, required=False):
+        """Add a affiliate_organization_name field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        form_desc.add_field(
+            "affiliate_organization_name",
+            required=required
         )
 
     def _add_newsletter_field(self, form_desc, required=False):
