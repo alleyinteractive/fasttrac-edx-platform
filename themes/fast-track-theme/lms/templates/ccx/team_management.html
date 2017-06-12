@@ -3,6 +3,14 @@
 
 <h2 class="hd hd-2">${_("Team management")}</h2>
 <div class="table-wrapper">
+    % if is_staff:
+        <a href="/affiliates/edit/${ccx.coach.username}">
+            <i class="fa fa-edit"></i>
+            Edit Affiliate Info
+        </a>
+        <br>
+        <br>
+    % endif
     <table class="team-mgmt-table">
         <tr>
             <th class="thead">Role</th>
@@ -10,28 +18,20 @@
             <th class="thead">Email</th>
             <th class="thead">Actions</th>
         </tr>
-        %for ccx in ccx_courses:
+        %for ccx_course in ccx_courses:
             <tr>
                 <td>
-                    % if ccx.is_staff(ccx.coach):
+                    % if ccx_course.is_staff(ccx.coach):
                         Program Director
-                    % elif ccx.is_instructor(ccx.coach):
+                    % elif ccx_course.is_instructor(ccx.coach):
                         Course Manager
                     % else:
                         Facilitator
                     % endif
                 </td>
-                <td>${ccx.coach.profile.name}</td>
-                <td>${ccx.coach.email}</td>
+                <td>${ccx_course.coach.profile.name}</td>
+                <td>${ccx_course.coach.email}</td>
                 <td>
-                    % if is_staff:
-                        <a href="/affiliates/edit/${ccx.coach.username}">
-                            <i class="fa fa-edit"></i>
-                            Edit
-                        </a>
-                        &nbsp;&nbsp;&nbsp;
-                    % endif
-
                     <span class="remove-coach-button"
                         data-remove-url="${modify_access_url}"
                         data-unique-student-identifier="${ccx.coach.username}"
@@ -62,7 +62,6 @@
 
 <script>
     $(document).ready(function() {
-        var isStaff = '${is_staff}';
         $('#add-coach-form').on('submit', addCoachEventHandler);
         $('.team-mgmt-table').on('click', '.remove-coach-button', removeCoachEventHandler);
 
@@ -133,23 +132,12 @@
                     var role = 'Facilitator'
             }
 
-            if(isStaff) {
-               var newRow = '<tr><td>' + role +
+            var newRow = '<tr><td>' + role +
                 '</td><td>' + username +
                 '</td><td>' + email +
-                '</td><td><a href="/affiliates/edit/' + username + '"><i class="fa fa-edit"></i>Edit</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
-                '<span class="remove-coach-button" data-remove-url="' + removeUrl +
+                '</td><td><span class="remove-coach-button" data-remove-url="' + removeUrl +
                     '" data-unique-student-identifier="' + username +
                     '" data-rolename="ccx_coach" data-action="revoke"><i class="fa fa-times-circle remove-icon"></i>Remove</span></td></tr>';
-            }
-            else {
-                var newRow = '<tr><td>' + role +
-                    '</td><td>' + username +
-                    '</td><td>' + email +
-                    '</td><td><span class="remove-coach-button" data-remove-url="' + removeUrl +
-                        '" data-unique-student-identifier="' + username +
-                        '" data-rolename="ccx_coach" data-action="revoke"><i class="fa fa-times-circle remove-icon"></i>Remove</span></td></tr>';
-            }
 
             $('.team-mgmt-table').find('tbody').append(newRow);
         }

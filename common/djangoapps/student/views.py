@@ -312,7 +312,7 @@ def affiliates(request):
     affiliate_city = request.GET.get('affiliate_city', '')
     affiliate_state = request.GET.get('affiliate_state', '')
 
-    db_query = "SELECT DISTINCT au.username, aup.name, aup.state\
+    db_query = "SELECT DISTINCT au.username, aup.affiliate_organization_name, aup.state\
         FROM ccx_customcourseforedx AS ccx\
         LEFT JOIN auth_user AS au ON ccx.coach_id = au.id\
         LEFT JOIN auth_userprofile aup ON aup.user_id = au.id\
@@ -321,7 +321,7 @@ def affiliates(request):
     db_params = []
 
     if affiliate_name:
-        db_query += " AND aup.name LIKE %s"
+        db_query += " AND aup.affiliate_organization_name LIKE %s"
         db_params.append('%'+affiliate_name+'%')
 
     if affiliate_city:
@@ -341,7 +341,7 @@ def affiliates(request):
     for row in rows:
         data.append({
             'username': row[0],
-            'name': row[1],
+            'affiliate_organization_name': row[1],
             'state': row[2],
         })
 
