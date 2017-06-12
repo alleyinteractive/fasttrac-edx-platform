@@ -113,7 +113,7 @@ $link-color: #6f6f6f;
 .wrapper-footer {
   position: absolute;
   right: 0;
-  left:0;
+  left: 0;
 
   padding: 0 !important; // otherwise will be overwritten with course style
   margin-top: 0 !important;
@@ -172,6 +172,7 @@ $link-color: #6f6f6f;
   height: 65px;
   width: 100%;
 }
+
 /**
 * Explore courses page
 **/
@@ -363,13 +364,19 @@ $link-color: #6f6f6f;
 }
 
 /* COURSE DASHBOARD - info.html */
+$break-smaller: 1290px;
+
+body.view-in-course .info-wrapper {
+  max-width: 1366px !important;
+  box-shadow: none !important;
+}
 
 .view-course-info #main {
   background: #eee;
 
   .container {
     display: inline-block;
-    width: 72%;
+    width: calc(100% - 390px);
     background: transparent;
 
     .info-wrapper {
@@ -385,18 +392,23 @@ $link-color: #6f6f6f;
   * {
     letter-spacing: 0;
   }
+
+  .course-info-body div {
+    line-height: 1.5rem;
+  }
 }
 
 .sidebar-ft {
-  width: 20%;
-  margin-left: 5%;
+  width: 300px;
+  margin-left: 70px;
   display: inline-block;
   vertical-align: top;
   color: #777;
 
   .home {
     background: url("../images/welcomeBackground.jpg");
-    border: 0 none;
+    background-size: cover;
+    border: 1px solid #ddd;
     border-bottom: 4px solid $ft-orange;
     text-transform: uppercase;
 
@@ -466,14 +478,28 @@ $link-color: #6f6f6f;
     color: #aaa;
     padding: 10px;
   }
+
+  .date-continue-wrapper {
+    position: relative;
+    height: 2rem;
+
+    .date, a {
+      position: absolute;
+      bottom: 0;
+    }
+    a {
+      right: 0;
+    }
+  }
 }
 
 .search-box {
+  position: relative;
   background: url("../images/newSearchBg.jpg");
   border: 1px solid #ddd;
-  margin-left: -3px;
+  margin-left: -1px;
   border-left: 0 none;
-  width: 34%;
+  width: 33.4%;
   display: inline-block;
   vertical-align: top;
   box-sizing: border-box;
@@ -532,10 +558,10 @@ $link-color: #6f6f6f;
 }
 
 .search-box-content {
-  position: relative;
-  top: 45%;
-  left: 65%;
-  transform: translate(-50%, -50%);
+  position: absolute;
+  transform: none;
+  top: calc(100% - 180px);
+  left: calc(50% - 100px);
   margin: auto;
 
   h1 {
@@ -600,6 +626,8 @@ $link-color: #6f6f6f;
 }
 
 .ft-tabs {
+  margin-right: 2rem;
+  margin-left: 0.1rem;
   list-style: none;
   padding: 0;
   border-bottom: 2px solid #ddd;
@@ -610,7 +638,7 @@ $link-color: #6f6f6f;
     color: #ccc;
     font-size: 1.2rem;
     font-weight: bold;
-    padding: .4rem .5rem;
+    padding: .8rem .5rem;
     margin-right: 2rem;
     cursor: pointer;
     transition: color .6s;
@@ -637,20 +665,26 @@ $link-color: #6f6f6f;
   justify-content: flex-start;
 }
 
+#tab-tools {
+  margin-right: 2rem;
+}
+
 .ft-card {
-  width: 31%;
+  flex-grow: 1;
+  width: 25%;
   height: 300px;
   margin-bottom: 2rem;
-  margin-right: 1rem;
+  margin-right: 2rem;
   display: inline-block;
   background: white;
   border: 1px solid #ddd;
-  box-shadow: 1px 1px 3px #aaa;
   transition: box-shadow .6s;
   overflow: hidden;
 
   &:hover {
-    box-shadow: 2px 2px 5px #aaa;
+    -webkit-box-shadow: 4px 4px 22px 1px rgba(0, 0, 0, 0.06);
+    -moz-box-shadow: 4px 4px 22px 1px rgba(0, 0, 0, 0.06);
+    box-shadow: 4px 4px 22px 1px rgba(0, 0, 0, 0.06);
 
     h3 a {
       color: $ft-orange;
@@ -679,9 +713,27 @@ $link-color: #6f6f6f;
 
   .activities {
     padding: 1rem;
-    background: #efefef;
     height: 100%;
   }
+}
+
+@media (max-width: $break-smaller) {
+  body.view-in-course {
+    font-size: 14px;
+  }
+
+  .last-viewed-item {
+    margin: 1rem 3rem;
+  }
+
+  .ft-card, .ft-tabs, #tab-tools {
+    margin-right: 1.5rem;
+  }
+}
+
+/** small overrides **/
+.course-info-body.bookmarks > div {
+  border-bottom: none !important; // remove some weird border
 }
 
 // BOOKMARKS PAGE - bookmarks.html

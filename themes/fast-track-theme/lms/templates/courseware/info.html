@@ -57,7 +57,7 @@ from openedx.core.djangolib.markup import HTML, Text
     <div class="sidebar-ft">
       <div class="home">
         <div class="page-header-main">
-          <h1>Welcome ${user.first_name}!</h1>
+          <h1>Welcome ${user.profile.name}!</h1>
         </div>
       </div>
 
@@ -168,14 +168,16 @@ from openedx.core.djangolib.markup import HTML, Text
                 <p>
                   ${last_viewed_item['object'].display_name}
                 </p>
-                <span class="date">
-                  last viewed @ ${last_viewed_item['modified'].strftime("%B %d, %Y")}
-                </span>
-                <a href=${'/courses/' + last_viewed_item['course_id'] + '/jump_to/' + last_viewed_item['module_id']} class="btn-ft">
-                  Continue
-                  &nbsp;
-                  <span class="fa fa-arrow-right"></span>
-                </a>
+                <div class="date-continue-wrapper">
+                    <span class="date">
+                      last viewed @ ${last_viewed_item['modified'].strftime("%B %d, %Y")}
+                    </span>
+                    <a href=${'/courses/' + last_viewed_item['course_id'] + '/jump_to/' + last_viewed_item['module_id']} class="btn-ft">
+                      Continue
+                      &nbsp;
+                      <span class="fa fa-arrow-right"></span>
+                    </a>
+                </div>
               % else:
                 <p class="no-last-viewed-item">
                   <br><br>
@@ -205,7 +207,7 @@ from openedx.core.djangolib.markup import HTML, Text
             <li data-tab="tools">TOOLS OVERVIEW</li>
           </ul>
 
-          <div id="tab-course" class="ft-tab" style="display: block;">
+          <div id="tab-course" class="ft-tab">
             % for section in course.get_children():
               <div class="ft-card">
                 <h3>
