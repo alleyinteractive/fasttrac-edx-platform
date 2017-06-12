@@ -1,3 +1,4 @@
+<%! from ccx_keys.locator import CCXLocator %>
 <%page expression_filter="h"/>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
@@ -62,7 +63,7 @@
                     </span>
                   </span>
                   <span>
-                    <a href="/courses/${course.course_id}/about">
+                    <a href="/courses/${CCXLocator.from_course_locator(course.course_id, unicode(course.original_ccx_id))}/about">
                       View
                       <span class="fa fa-arrow-circle-o-right"></span>
                     </a>
