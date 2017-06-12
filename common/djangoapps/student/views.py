@@ -385,6 +385,9 @@ def affiliate_edit(request, affiliate_username):
         for key in request.POST:
             if key == 'year_of_birth':
                 setattr(affiliate.profile, key, int(request.POST[key]))
+            elif key == 'email':
+                affiliate.email = request.POST[key]
+                affiliate.save()
             else:
                 setattr(affiliate.profile, key, request.POST[key])
 
