@@ -123,8 +123,7 @@ $ft-dark-grey: #8d8d8d;
         color: $ft-orange;
         display: inline-block;
         width: 2em;
-        margin-left: -1.5em;
-        margin-right: 0.5em;
+        margin-left: -3em;
         text-align: right;
         direction: rtl
       }
@@ -144,16 +143,15 @@ $ft-dark-grey: #8d8d8d;
       content: "⋄";
       color: $ft-orange;
       display: inline-block;
-      width: 2em;
-      margin-left: -1em
+      width: 1em;
+      margin-left: -1em;
     }
   }
 
   ol.ft p, ul.ft p {
     display: inline-block;
     vertical-align: top;
-    margin-bottom: 0;
-    margin-top: -2px;
+    margin: -2px 0 0 1rem;
   }
 
   .definition {
