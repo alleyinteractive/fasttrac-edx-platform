@@ -85,6 +85,14 @@
             });
 
             var sectionOneFieldViews = [
+                new FieldsView.TextareaFieldView({
+                    model: accountSettingsModel,
+                    messagePosition: 'header',
+                    editable: editable,
+                    persistChanges: true,
+                    valueAttribute: 'email',
+                    title: 'Email'
+                }),
                 new FieldsView.DropdownFieldView({
                     model: accountSettingsModel,
                     screenReaderTitle: gettext('Country'),

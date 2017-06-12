@@ -129,14 +129,6 @@ def update_account_settings(requesting_user, update, username=None):
     if requesting_user.username != username:
         raise UserNotAuthorized()
 
-    # If user has requested to change email, we must call the multi-step process to handle this.
-    # It is not handled by the serializer (which considers email to be read-only).
-    changing_email = False
-    if "email" in update:
-        changing_email = True
-        new_email = update["email"]
-        del update["email"]
-
     # If user has requested to change name, store old name because we must update associated metadata
     # after the save process is complete.
     old_name = None
@@ -153,27 +145,18 @@ def update_account_settings(requesting_user, update, username=None):
 
     if read_only_fields:
         for read_only_field in read_only_fields:
-            field_errors[read_only_field] = {
-                "developer_message": u"This field is not editable via this API",
-                "user_message": _(u"The '{field_name}' field cannot be edited.").format(field_name=read_only_field)
-            }
-            del update[read_only_field]
+            if not read_only_field == 'email':
+                field_errors[read_only_field] = {
+                    "developer_message": u"This field is not editable via this API",
+                    "user_message": _(u"The '{field_name}' field cannot be edited.").format(field_name=read_only_field)
+                }
+                del update[read_only_field]
 
     user_serializer = AccountUserSerializer(existing_user, data=update)
     legacy_profile_serializer = AccountLegacyProfileSerializer(existing_user_profile, data=update)
 
     for serializer in user_serializer, legacy_profile_serializer:
         field_errors = add_serializer_errors(serializer, update, field_errors)
-
-    # If the user asked to change email, validate it.
-    if changing_email:
-        try:
-            student_views.validate_new_email(existing_user, new_email)
-        except ValueError as err:
-            field_errors["email"] = {
-                "developer_message": u"Error thrown from validate_new_email: '{}'".format(err.message),
-                "user_message": err.message
-            }
 
     # If we have encountered any validation errors, return them to the user.
     if field_errors:
@@ -227,17 +210,6 @@ def update_account_settings(requesting_user, update, username=None):
         raise AccountUpdateError(
             u"Error thrown when saving account updates: '{}'".format(err.message)
         )
-
-    # And try to send the email change request if necessary.
-    if changing_email:
-        try:
-            student_views.do_email_change_request(existing_user, new_email)
-        except ValueError as err:
-            raise AccountUpdateError(
-                u"Error thrown from do_email_change_request: '{}'".format(err.message),
-                user_message=err.message
-            )
-
 
 def _get_user_and_profile(username):
     """
