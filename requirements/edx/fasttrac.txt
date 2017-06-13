@@ -3,3 +3,6 @@ git+https://github.com/mbareta/edx-search@fasttrac#egg=edx-search==0.1.3
 
 # Custom input problem type
 git+https://github.com/vukoviciv/ft-input-problem-type-xblock.git#egg=ft-input-problem-type-xblock
+
+# Fork poll/survey
+git+https://github.com/vukoviciv/xblock-poll.git#egg=fxblock-poll

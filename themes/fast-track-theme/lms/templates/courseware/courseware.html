@@ -254,27 +254,6 @@ ${HTML(fragment.foot_html())}
                 $('body.view-in-course .course-wrapper').toggleClass('extended');
             }
         }
-
-        /* this part is only for poll xblocks (fastTrac survey) */
-        $(window).load(function() {
-            if($('.xblock-student_view-survey').length > 0) {
-                $('.poll-block-form-wrapper input.input-main')
-                      .addClass('ft-button-action')
-                      .attr('value', 'save');
-                $(transformQuestion());
-            }
-        });
-        function transformQuestion () {
-            var $question = $('.survey-question p');
-            $question.each(function() {
-                var $current_question = $(this);
-                var question_text = $current_question.text();
-                var q_heading = '<p class="question-heading">' + question_text.substr(0, question_text.indexOf('#')) + '</p>';
-                var q_description = '<p class="question-description">' + question_text.substr(question_text.indexOf('#') + 1, question_text.length) + '</p>';
-                $current_question.parent().append(q_heading).append(q_description);
-                $current_question.remove();
-            });
-        }
     </script>
 </div>
 
