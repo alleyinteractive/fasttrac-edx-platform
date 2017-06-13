@@ -85,6 +85,12 @@
             });
 
             var sectionOneFieldViews = [
+                new FieldsView.ReadonlyFieldView({
+                    model: accountSettingsModel,
+                    screenReaderTitle: gettext('Email'),
+                    valueAttribute: "email",
+                    helpMessage: ""
+                }),
                 new FieldsView.DropdownFieldView({
                     model: accountSettingsModel,
                     screenReaderTitle: gettext('Country'),
