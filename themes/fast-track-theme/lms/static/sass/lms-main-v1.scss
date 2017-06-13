@@ -469,3 +469,9 @@ $link-color: #6f6f6f;
 .xblock-student_view.xblock-student_view-lti_consumer h2.problem-header {
   display: none !important;
 }
+
+@media screen and (min-width: 980px) {
+  .find-courses .courses-container .courses:not(.no-course-discovery) .courses-listing .courses-listing-item:nth-child(3n+1), .university-profile .courses-container .courses:not(.no-course-discovery) .courses-listing .courses-listing-item:nth-child(3n+1) {
+      clear: none !important;
+  }
+}
