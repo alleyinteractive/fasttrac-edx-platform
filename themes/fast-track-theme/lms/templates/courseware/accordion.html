@@ -87,10 +87,12 @@ else:
                 % endif
             </a>
 
+            <%! import json %>
+
             % if section and section['active']:
                 <ol class="accordion-units">
                     % for unit in section['units']:
-                        <li id="accordion-unit-${unit['idx']}" onclick='handleUnitClick("${str(unit)}")'>
+                        <li id="accordion-unit-${unit['idx']}" onclick="handleUnitClick(this)" data-unit='${json.dumps(unit)}'>
                             <div class="icon-container">
                                 %if unit['is_bookmarked'] == 'True':
                                     <i class="fa fa-bookmark"></i>
@@ -112,8 +114,9 @@ else:
             $('#accordion-unit-' + activeNavUnitId).addClass('active');
         }
 
-        function handleUnitClick(unitPython) {
-            var unit = JSON.parse(unitPython.replace(/u'/g, "'").replace(/&quot;/g, '"').replace(/'/g, '"')); // depythonize
+        function handleUnitClick(element) {
+            var unitData = element.dataset.unit;
+            var unit = JSON.parse(unitData);
             var tabId = '#tab_' + unit.idx;
             $('.accordion-units li').removeClass('active');
             $('#accordion-unit-' + unit.idx).addClass('active');
