@@ -837,3 +837,7 @@ body.view-in-course .info-wrapper {
     }
   }
 }
+
+.xblock-student_view.xblock-student_view-lti_consumer h2.problem-header {
+  display: none !important;
+}
