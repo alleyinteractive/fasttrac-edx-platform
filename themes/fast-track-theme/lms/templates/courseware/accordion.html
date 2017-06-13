@@ -114,11 +114,10 @@ else:
             $('#accordion-unit-' + activeNavUnitId).addClass('active');
         }
 
-        function handleUnitClick(that) {
-            var unitPython = that.dataset.unit;
-            var unit = JSON.parse(unitPython);
+        function handleUnitClick(element) {
+            var unitData = element.dataset.unit;
+            var unit = JSON.parse(unitData);
             var tabId = '#tab_' + unit.idx;
-            debugger;
             $('.accordion-units li').removeClass('active');
             $('#accordion-unit-' + unit.idx).addClass('active');
             $(tabId).click();
