@@ -52,6 +52,19 @@ html, body, .window-wrap {
 }
 
 /**
+*   LANDING PAGE / when the user is not signed in
+**/
+
+.home > header {
+  background: url("../images/newSearchBg.jpg");
+}
+
+.home > header .title {
+  box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+}
+
+
+/**
 *   HEADER ADJUSTMENT
 **/
 
@@ -472,6 +485,6 @@ $link-color: #6f6f6f;
 
 @media screen and (min-width: 980px) {
   .find-courses .courses-container .courses:not(.no-course-discovery) .courses-listing .courses-listing-item:nth-child(3n+1), .university-profile .courses-container .courses:not(.no-course-discovery) .courses-listing .courses-listing-item:nth-child(3n+1) {
-      clear: none !important;
+    clear: none !important;
   }
 }
