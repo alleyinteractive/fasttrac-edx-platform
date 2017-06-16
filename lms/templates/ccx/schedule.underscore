@@ -10,7 +10,7 @@
   <table class="ccx-schedule">
     <thead>
       <tr>
-        <th><%- gettext('Module') %></th>
+        <th><%- gettext('Course Outline') %></th>
         <td class="remove-link"><button id="remove-all" class="ccx-button-link">
           <span class="fa fa-remove" aria-hidden="true"></span> <%- gettext('remove all') %>
         </button></td>
