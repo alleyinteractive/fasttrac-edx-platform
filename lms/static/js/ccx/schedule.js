@@ -59,7 +59,7 @@ var edx = edx || {};
         if (chapter_location !== 'none') {
           var chapter = self.find_unit(self.hidden, chapter_location);
           self.sequential_select.html('')
-          .append('<option value="all">' + 'All Modules' + '</option>')
+          .append('<option value="all">'+gettext("All Modules")+'</option>')
           .append(self.schedule_options(chapter.children));
           self.sequential_select.prop('disabled', false);
           $('#add-unit-button').prop('disabled', false);
@@ -218,7 +218,7 @@ var edx = edx || {};
       if (this.hidden.length) {
         // Populate chapters select, depopulate others
         this.chapter_select.html('')
-        .append('<option value="none">' + 'Select a Section ...' + '</option>')
+        .append('<option value="none">'+gettext("Select a Section")+'...</option>')
         .append(self.schedule_options(this.hidden));
         this.sequential_select.html('').prop('disabled', true);
         this.vertical_select.html('').prop('disabled', true);
