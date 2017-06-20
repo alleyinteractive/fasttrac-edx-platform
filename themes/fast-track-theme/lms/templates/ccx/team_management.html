@@ -21,9 +21,9 @@
         %for ccx_course in ccx_courses:
             <tr>
                 <td>
-                    % if ccx_course.is_staff(ccx.coach):
+                    % if ccx_course.is_staff(ccx_course.coach):
                         Program Director
-                    % elif ccx_course.is_instructor(ccx.coach):
+                    % elif ccx_course.is_instructor(ccx_course.coach):
                         Course Manager
                     % else:
                         Facilitator
@@ -35,7 +35,13 @@
                     <span class="remove-coach-button"
                         data-remove-url="${modify_access_url}"
                         data-unique-student-identifier="${ccx_course.coach.username}"
-                        data-rolename="ccx_coach"
+                        % if ccx_course.is_staff(ccx_course.coach):
+                            data-rolename="staff"
+                        % elif ccx_course.is_instructor(ccx_course.coach):
+                            data-rolename="instructor"
+                        % else:
+                            data-rolename="ccx_coach"
+                        % endif
                         data-action="revoke">
                             <i class="fa fa-times-circle remove-icon"></i>Remove
                     </span>
