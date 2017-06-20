@@ -287,7 +287,7 @@ def _reset_module_attempts(studentmodule):
     studentmodule.save()
 
 
-def get_email_params(course, auto_enroll, secure=True, course_key=None, display_name=None):
+def get_email_params(course, auto_enroll, secure=False, course_key=None, display_name=None):
     """
     Generate parameters used when parsing email templates.
 
