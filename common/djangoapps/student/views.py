@@ -684,6 +684,7 @@ def dashboard(request):
         if hasattr(course.id, 'ccx'):
             ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
             author = ccx.coach
+            course_enrollment.time = ccx.time
         else:
             author = User.objects.get(pk=course.published_by)
         course_enrollment.author = author.get_full_name() if author.get_full_name() else author.username

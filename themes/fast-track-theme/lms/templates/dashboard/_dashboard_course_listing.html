@@ -62,13 +62,14 @@ from student.helpers import (
 <article class="course${mode_class}">
   <%
       course_target = reverse('info', args=[unicode(course_overview.id)])
+      is_ccx = hasattr(enrollment.course_id, 'ccx')
 
-      if not hasattr(enrollment.course_id, 'ccx'):
-          button_target = '/courses/{0}/ccx_coach'.format(enrollment.course_id)
-          button_label = 'Create Custom Course'
-      else:
+      if is_ccx:
           button_target = course_target
           button_label = 'View Course'
+      else:
+          button_target = '/courses/{0}/ccx_coach'.format(enrollment.course_id)
+          button_label = 'Create Custom Course'
   %>
   <section class="details" aria-labelledby="details-heading-${course_overview.number}">
       <h2 class="hd hd-2 sr" id="details-heading-${course_overview.number}">${_('Course details')}</h2>
@@ -119,16 +120,20 @@ from student.helpers import (
           <span class="info-course-id">${course_overview.display_number_with_default}</span>
           <span class="info-date-block" data-tooltip="Hi">
           <% time_zone = get_user_time_zone(user) %>
-          % if course_overview.has_ended():
-            ${_("Ended - {end_date}").format(end_date=course_overview.end_datetime_text("SHORT_DATE", time_zone))}
-          % elif course_overview.has_started():
-            ${_("Started - {start_date}").format(start_date=course_overview.start_datetime_text("SHORT_DATE", time_zone))}
-          % elif course_overview.start_date_is_still_default: # Course start date TBD
-            ${_("Coming Soon")}
-          % elif course_overview.starts_within(days=5):   # hasn't started yet
-            ${_("Starts - {start_date}").format(start_date=course_overview.start_datetime_text("DAY_AND_TIME", time_zone))}
-          % else:   # hasn't started yet
-            ${_("Starts - {start_date}").format(start_date=course_overview.start_datetime_text("SHORT_DATE", time_zone))}
+          % if is_ccx:
+              ${enrollment.time.strftime("%B %d, %Y")}
+          % else:
+              % if course_overview.has_ended():
+                ${_("Ended - {end_date}").format(end_date=course_overview.end_datetime_text("SHORT_DATE", time_zone))}
+              % elif course_overview.has_started():
+                ${_("Started - {start_date}").format(start_date=course_overview.start_datetime_text("SHORT_DATE", time_zone))}
+              % elif course_overview.start_date_is_still_default: # Course start date TBD
+                ${_("Coming Soon")}
+              % elif course_overview.starts_within(days=5):   # hasn't started yet
+                ${_("Starts - {start_date}").format(start_date=course_overview.start_datetime_text("DAY_AND_TIME", time_zone))}
+              % else:   # hasn't started yet
+                ${_("Starts - {start_date}").format(start_date=course_overview.start_datetime_text("SHORT_DATE", time_zone))}
+              % endif
           % endif
           </span>
           <span class="info-author">${enrollment.author}</span>
