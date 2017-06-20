@@ -87,14 +87,14 @@ from openedx.core.djangolib.markup import HTML, Text
       <div class="bookmark-item">
         <a href="${result['data']['url']}">
         <a href=${"/courses/{}/jump_to/{}".format(course_id, result['_id'])}>
-          ${result['data']['content']['display_name'] or 'No title'}
+          ${result['data']['location'][-1] or 'No title'}
 
           % if result['_id'] in bookmarks:
             <span class="fa fa-bookmark"></span>
           % endif
         </a>
         <span class="path">
-          ${' > '.join(result['data']['location'])}
+          ${' > '.join(result['data']['location'][0:-1])}
         </span>
         <p>
           ${result['data']['excerpt'] | n}
