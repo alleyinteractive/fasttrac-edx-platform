@@ -300,6 +300,7 @@ class UserProfile(models.Model):
         choices=LEVEL_OF_EDUCATION_CHOICES
     )
     mailing_address = models.TextField(blank=True, null=True)
+    secondary_address = models.TextField(blank=True, null=True)
     city = models.TextField(blank=True, null=True)
     country = CountryField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
@@ -316,17 +317,58 @@ class UserProfile(models.Model):
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False, choices=BIO_CHOICES)
 
     # FastTrac custom fields
-    NEWSLETTER_CHOICES = (
+    YES_NO_CHOICES = (
         ('y', ugettext_noop('Yes')),
         ('n', ugettext_noop('No')),
     )
 
+    ETHNICITY_CHOICES = (
+        ('american', ugettext_noop('American Indian/Alaska Native')),
+        ('asian', ugettext_noop('Asian')),
+        ('pacific', ugettext_noop('Pacific Islander')),
+        ('african_american', ugettext_noop('Black/African American')),
+        ('hispanic', ugettext_noop('Latino/Hispanic')),
+        ('middle_eastern', ugettext_noop('Middle Eastern')),
+        ('white', ugettext_noop('White - non Hispanic')),
+        ('multiracial', ugettext_noop('Multiracial')),
+        ('na', ugettext_noop('Prefer not to answer')),
+        ('other', ugettext_noop('Other'))
+    )
+
+    EDUCATION_CHOICES = (
+        ('less_than_high_school', ugettext_noop('Less than high school graduate')),
+        ('high_school', ugettext_noop('High school graduate - Diploma or GED')),
+        ('technical_school', ugettext_noop('Technical, trade, or vocational school')),
+        ('college_without_degree', ugettext_noop('Some college, but no degree')),
+        ('associate_degree', ugettext_noop('Associate Degree')),
+        ('bachelors_degree', ugettext_noop('Bachelor\'s Degree')),
+        ('more_than_masters_degree', ugettext_noop('Master\'s, Doctorate, or Professional Degree'))
+    )
+
+    AGE_CATEGORY_CHOICES = (
+        ('under25', ugettext_noop('Under 25')),
+        ('25', ugettext_noop('25-34')),
+        ('35', ugettext_noop('35-44')),
+        ('45', ugettext_noop('45-54')),
+        ('55', ugettext_noop('55-64')),
+        ('65', ugettext_noop('65 or over'))
+    )
+
+
+    age_category = models.CharField(null=True, blank=True, choices=AGE_CATEGORY_CHOICES, max_length=255)
     company = models.CharField(null=True, blank=True, default='', max_length=255)
     title = models.CharField(null=True, blank=True, default='', max_length=255)
     phone_number = models.CharField(null=True, blank=True, default='', max_length=255)
-    newsletter = models.CharField(default='n', choices=NEWSLETTER_CHOICES, max_length=255)
+    newsletter = models.CharField(default='n', choices=YES_NO_CHOICES, max_length=255)
     state = models.CharField(null=True, blank=True, default='na', choices=STATE_CHOICES, max_length=255)
     zipcode = models.CharField(null=True, blank=True, default='', max_length=255)
+    ethnicity = models.CharField(null=True, blank=True, choices=ETHNICITY_CHOICES, max_length=255)
+    immigrant_status = models.CharField(null=True, blank=True, choices=YES_NO_CHOICES, max_length=255)
+    veteran_status = models.CharField(null=True, blank=True, choices=YES_NO_CHOICES, max_length=255)
+    education = models.CharField(null=True, blank=True, choices=EDUCATION_CHOICES, max_length=255)
+    facebook_link = models.CharField(null=True, blank=True, max_length=255)
+    twitter_link = models.CharField(null=True, blank=True, max_length=255)
+    linkedin_link = models.CharField(null=True, blank=True, max_length=255)
 
     # field for affiliate program directors
     affiliate_organization_name = models.CharField(null=True, blank=True, default='', max_length=255)

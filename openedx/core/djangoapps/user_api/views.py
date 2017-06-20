@@ -164,6 +164,8 @@ class RegistrationView(APIView):
         "first_name",
         "last_name",
         "mailing_address",
+        "secondary_address",
+        "age_category",
         "city",
         "state",
         "zipcode",
@@ -175,9 +177,16 @@ class RegistrationView(APIView):
         "bio",
         "gender",
         "year_of_birth",
-        "honor_code",
-        "terms_of_service",
+        "ethnicity",
+        "immigrant_status",
+        "veteran_status",
+        "education",
+        "facebook_link",
+        "linkedin_link",
+        "twitter_link",
         "affiliate_organization_name",
+        "honor_code",
+        "terms_of_service"
     ]
 
     # This end-point is available to anonymous users,
@@ -341,6 +350,7 @@ class RegistrationView(APIView):
         if data.get("honor_code") and "terms_of_service" not in data:
             data["terms_of_service"] = data["honor_code"]
 
+        data["year_of_birth"] = "1911"
         try:
             user = create_account_with_params(request, data)
         except ValidationError as err:
@@ -482,6 +492,32 @@ class RegistrationView(APIView):
             required=required
         )
 
+    def _add_age_category_field(self, form_desc, required=True):
+        """Add an age category field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's highest completed level of education.
+        age_category_label = _(u"Age")
+
+        options = [(name, _(label)) for name, label in UserProfile.AGE_CATEGORY_CHOICES]
+
+        # The labels are marked for translation in UserProfile model definition.
+        form_desc.add_field(
+            "age_category",
+            label=age_category_label,
+            field_type="select",
+            options=options,
+            required=required,
+            include_default_option=True
+        )
+
     def _add_level_of_education_field(self, form_desc, required=True):
         """Add a level of education field to a form description.
 
@@ -621,7 +657,7 @@ class RegistrationView(APIView):
         # form used to select the user's highest completed level of education.
         newsletter_label = _(u"Would you like to subscribe to the Kauffman Education Newsletter?")
 
-        options = [(name, _(label)) for name, label in UserProfile.NEWSLETTER_CHOICES]
+        options = [(name, _(label)) for name, label in UserProfile.YES_NO_CHOICES]
 
         # The labels are marked for translation in UserProfile model definition.
         form_desc.add_field(
@@ -656,6 +692,167 @@ class RegistrationView(APIView):
             options=options,
             required=required,
             include_default_option=True
+        )
+
+    def _add_ethnicity_field(self, form_desc, required=True):
+        """Add a ethnicity field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's highest completed level of education.
+        ethnicity_label = _(u"Race/Ethnicity")
+
+        options = [(name, _(label)) for name, label in UserProfile.ETHNICITY_CHOICES]
+
+        # The labels are marked for translation in UserProfile model definition.
+        form_desc.add_field(
+            "ethnicity",
+            label=ethnicity_label,
+            field_type="select",
+            options=options,
+            required=required,
+            include_default_option=True
+        )
+
+    def _add_immigrant_status_field(self, form_desc, required=True):
+        """Add a immigrant status field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's highest completed level of education.
+        immigrant_status_label = _(u"Were you born a citizen of the United States?")
+
+        options = [(name, _(label)) for name, label in UserProfile.YES_NO_CHOICES]
+
+        # The labels are marked for translation in UserProfile model definition.
+        form_desc.add_field(
+            "immigrant_status",
+            label=immigrant_status_label,
+            field_type="select",
+            options=options,
+            required=required,
+            include_default_option=True
+        )
+
+    def _add_veteran_status_field(self, form_desc, required=True):
+        """Add a veteran status field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's highest completed level of education.
+        veteran_status_label = _(u"Have you ever served in any branch of the U.S. Armed Forces, including the Coast Guard, the National Guard, or Reserve component of any service branch?")
+
+        options = [(name, _(label)) for name, label in UserProfile.YES_NO_CHOICES]
+
+        # The labels are marked for translation in UserProfile model definition.
+        form_desc.add_field(
+            "veteran_status",
+            label=veteran_status_label,
+            field_type="select",
+            options=options,
+            required=required,
+            include_default_option=True
+        )
+
+    def _add_education_field(self, form_desc, required=True):
+        """Add an education field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's highest completed level of education.
+        education_label = _(u"What was the highest degree or level of school you have completed?")
+
+        options = [(name, _(label)) for name, label in UserProfile.EDUCATION_CHOICES]
+
+        # The labels are marked for translation in UserProfile model definition.
+        form_desc.add_field(
+            "education",
+            label=education_label,
+            field_type="select",
+            options=options,
+            required=required,
+            include_default_option=True
+        )
+
+    def _add_facebook_link_field(self, form_desc, required=False):
+        """Add a facebook link field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+
+        facebook_link_label = _(u"Facebook")
+
+        form_desc.add_field(
+            "facebook_link",
+            label=facebook_link_label,
+            required=required
+        )
+
+    def _add_linkedin_link_field(self, form_desc, required=False):
+        """Add a linkedin link field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+
+        linkedin_link_label = _(u"Linkedin")
+
+        form_desc.add_field(
+            "linkedin_link",
+            label=linkedin_link_label,
+            required=required
+        )
+
+    def _add_twitter_link_field(self, form_desc, required=False):
+        """Add a twitter link field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+
+        twitter_link_label = _(u"Twitter")
+
+        form_desc.add_field(
+            "twitter_link",
+            label=twitter_link_label,
+            required=required
         )
 
     def _add_gender_field(self, form_desc, required=True):
@@ -707,6 +904,27 @@ class RegistrationView(APIView):
             required=required
         )
 
+    def _add_secondary_address_field(self, form_desc, required=True):
+        """Add a secondary address field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # meant to hold the user's mailing address.
+        secondary_address_label = _(u"Address 2")
+
+        form_desc.add_field(
+            "secondary_address",
+            label=secondary_address_label,
+            field_type="textarea",
+            required=required
+        )
+
     def _add_mailing_address_field(self, form_desc, required=True):
         """Add a mailing address field to a form description.
 
@@ -719,7 +937,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's mailing address.
-        mailing_address_label = _(u"Address")
+        mailing_address_label = _(u"Address 1")
 
         form_desc.add_field(
             "mailing_address",
