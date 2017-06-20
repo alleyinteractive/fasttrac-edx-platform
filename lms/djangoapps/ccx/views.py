@@ -353,6 +353,11 @@ def create_ccx(request, course, ccx=None):
     assign_coach_role_to_ccx(ccx_id, request.user, course.id)
     assign_staff_role_to_ccx(ccx_id, request.user, course.id)
     add_master_course_staff_to_ccx(course, ccx_id, ccx.display_name)
+
+    # reindex parent course in order to reindex edited ccx
+    reindex_parent_course_url = 'http://{}/course/{}/ccx_reindex'.format(settings.CMS_BASE, course.id)
+    requests.get(reindex_parent_course_url)
+
     return redirect(url)
 
 
