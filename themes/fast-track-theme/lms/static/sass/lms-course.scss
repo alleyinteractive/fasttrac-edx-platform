@@ -234,8 +234,9 @@ body.view-in-course .wrapper-course-material .course-material {
 }
 
 .wrapper-course-material .course-material {
-  max-width: calc(100% - 250px);
+  max-width: calc(100% - 50px);
   left: 50px;
+  z-index: 1; // fix user dropdown mix with tab content bug
 }
 
 .course-material {
