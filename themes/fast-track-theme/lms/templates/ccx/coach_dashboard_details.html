@@ -93,21 +93,17 @@
                 <a href="#" data-section="student_admin">${_("STUDENT ADMIN")}</a>
             </li>
         </ul>
-        <section id="schedule" class="idash-section" aria-label="${_('Schedule')}">
-            % if is_staff or is_instructor:
+        % if is_staff or is_instructor:
+            <section id="schedule" class="idash-section" aria-label="${_('Schedule')}">
                 <%include file="schedule.html" args="" />
-            % endif
-        </section>
-        <section id="team_management" class="idash-section" aria-label="${_('Team management')}">
-            % if is_staff or is_instructor:
+            </section>
+            <section id="team_management" class="idash-section" aria-label="${_('Team management')}">
                 <%include file="team_management.html" args="" />
-            % endif
-        </section>
-        <section id="membership" class="idash-section" aria-label="${_('Batch Enrollment')}">
-            % if is_staff or is_instructor:
+            </section>
+            <section id="membership" class="idash-section" aria-label="${_('Batch Enrollment')}">
                 <%include file="enrollment.html" args="" />
-            % endif
-        </section>
+            </section>
+        % endif
         <section id="student_admin" class="idash-section" aria-label="${_('Student Grades')}">
             <%include file="student_admin.html" args="" />
         </section>
