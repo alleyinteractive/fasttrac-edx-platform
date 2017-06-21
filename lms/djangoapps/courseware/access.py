@@ -140,7 +140,11 @@ def has_access(user, action, obj, course_key=None):
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)
     if isinstance(obj, CourseDescriptor):
-        return _has_access_course(user, action, obj)
+        if hasattr(obj.id, 'ccx'):
+            # HACK: staff and instructor have same permissions over CCX course
+            return _has_access_course(user, 'instructor', obj) or _has_access_course(user, 'staff', obj)
+        else:
+            return _has_access_course(user, action, obj)
 
     if isinstance(obj, CourseOverview):
         return _has_access_course(user, action, obj)

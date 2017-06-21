@@ -198,7 +198,8 @@ def dashboard(request, course, ccx=None):
         'STATE_CHOICES': STATE_CHOICES,
         'delivery_mode_choices': CustomCourseForEdX.DELIVERY_MODE_CHOICES,
         'is_instructor': False,
-        'is_ccx_coach': False
+        'is_ccx_coach': False,
+        'is_staff': False,
     }
     context.update(get_ccx_creation_dict(course))
     if ccx:
@@ -210,11 +211,12 @@ def dashboard(request, course, ccx=None):
         context['is_instructor'] = ccx.is_instructor(request.user)
         context['is_staff'] = ccx.is_staff(request.user)
 
-        for ccx in custom_courses:
-            if ccx.coach.id == request.user.id:
-                context['is_ccx_coach'] = True
-                context['is_instructor'] = ccx.is_instructor(request.user)
-                context['is_staff'] = ccx.is_staff(request.user)
+        if not context['is_ccx_coach']:
+            for ccx_course in custom_courses:
+                if ccx_course.coach.id == request.user.id:
+                    context['is_ccx_coach'] = True
+                    context['is_instructor'] = ccx_course.is_instructor(request.user)
+                    context['is_staff'] = ccx_course.is_staff(request.user)
 
         context['ccx_courses'] = custom_courses
         context['edit_current'] = False

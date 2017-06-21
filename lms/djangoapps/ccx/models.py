@@ -16,6 +16,7 @@ from xmodule_django.models import CourseKeyField, LocationKeyField
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from student.models import CourseAccessRole
+from ccx_keys.locator import CCXLocator
 
 
 log = logging.getLogger("edx.ccx")
@@ -168,10 +169,12 @@ class CustomCourseForEdX(models.Model):
         return None
 
     def is_instructor(self, user):
-        return CourseAccessRole.objects.filter(user=user, role='instructor').count() > 0
+        ccx_locator = CCXLocator.from_course_locator(self.course_id, unicode(self.original_ccx_id))
+        return CourseAccessRole.objects.filter(course_id=ccx_locator, user=user, role='instructor').count() > 0
 
     def is_staff(self, user):
-        return CourseAccessRole.objects.filter(user=user, role='staff').count() > 0
+        ccx_locator = CCXLocator.from_course_locator(self.course_id, unicode(self.original_ccx_id))
+        return CourseAccessRole.objects.filter(course_id=ccx_locator, user=user, role='staff').count() > 0
 
 
 class CcxFieldOverride(models.Model):
