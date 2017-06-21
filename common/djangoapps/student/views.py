@@ -25,7 +25,7 @@ from django.core.context_processors import csrf
 from django.core import mail
 from django.core.urlresolvers import reverse, NoReverseMatch, reverse_lazy
 from django.core.validators import validate_email, ValidationError
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, transaction, connection
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError, Http404
 from django.shortcuts import redirect
 from django.utils.encoding import force_bytes, force_text
@@ -305,8 +305,6 @@ def get_course_enrollments(user, org_to_include, orgs_to_exclude):
 
 
 def affiliates(request):
-    from django.db import connection
-
     data = []
     affiliate_name = request.GET.get('affiliate_name', '')
     affiliate_city = request.GET.get('affiliate_city', '')
@@ -643,6 +641,11 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
 
     return blocked
 
+
+def is_coach_on_master_course(user, course):
+    return CustomCourseForEdX.objects.filter(coach=user, course_id=course.id).count() > 0
+
+
 @transaction.non_atomic_requests
 @login_required
 @ensure_csrf_cookie
@@ -686,6 +689,7 @@ def dashboard(request):
             author = ccx.coach
             course_enrollment.time = ccx.time
         else:
+            course_enrollment.coach_on_master_course = is_coach_on_master_course(user, course)
             author = User.objects.get(pk=course.published_by)
         course_enrollment.author = author.get_full_name() if author.get_full_name() else author.username
 

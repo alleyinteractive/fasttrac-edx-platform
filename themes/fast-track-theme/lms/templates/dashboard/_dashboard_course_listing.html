@@ -64,12 +64,12 @@ from student.helpers import (
       course_target = reverse('info', args=[unicode(course_overview.id)])
       is_ccx = hasattr(enrollment.course_id, 'ccx')
 
-      if is_ccx:
-          button_target = course_target
-          button_label = 'View Course'
+      if not is_ccx and enrollment.coach_on_master_course:
+        button_target = '/courses/{0}/ccx_coach'.format(enrollment.course_id)
+        button_label = 'Create Custom Course'
       else:
-          button_target = '/courses/{0}/ccx_coach'.format(enrollment.course_id)
-          button_label = 'Create Custom Course'
+        button_target = course_target
+        button_label = 'View Course'
   %>
   <section class="details" aria-labelledby="details-heading-${course_overview.number}">
       <h2 class="hd hd-2 sr" id="details-heading-${course_overview.number}">${_('Course details')}</h2>
