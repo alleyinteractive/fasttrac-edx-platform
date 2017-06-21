@@ -77,7 +77,7 @@
     </div>
     <div class="instructor-nav-wrapper">
         <ul class="instructor-nav">
-            % if is_instructor:
+            % if is_staff or is_instructor:
                 <li class="nav-item">
                     <a href="#" data-section="schedule">${_("COURSE STRUCTURE")}</a>
                 </li>
@@ -93,17 +93,19 @@
                 <a href="#" data-section="student_admin">${_("STUDENT ADMIN")}</a>
             </li>
         </ul>
-        <section id="schedule" class="idash-section" aria-label="${_('Schedule')}">
+        % if is_staff or is_instructor:
+            <section id="schedule" class="idash-section" aria-label="${_('Schedule')}">
                 <%include file="schedule.html" args="" />
-        </section>
-        <section id="team_management" class="idash-section" aria-label="${_('Team management')}">
+            </section>
+            <section id="team_management" class="idash-section" aria-label="${_('Team management')}">
                 <%include file="team_management.html" args="" />
-        </section>
-        <section id="membership" class="idash-section" aria-label="${_('Batch Enrollment')}">
+            </section>
+            <section id="membership" class="idash-section" aria-label="${_('Batch Enrollment')}">
                 <%include file="enrollment.html" args="" />
-        </section>
+            </section>
+        % endif
         <section id="student_admin" class="idash-section" aria-label="${_('Student Grades')}">
-                <%include file="student_admin.html" args="" />
+            <%include file="student_admin.html" args="" />
         </section>
     </div>
 </div>
