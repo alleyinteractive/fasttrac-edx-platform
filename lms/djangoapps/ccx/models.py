@@ -169,7 +169,7 @@ class CustomCourseForEdX(models.Model):
         return None
 
     def is_instructor(self, user):
-        if self.course_id.startswith('ccx'):
+        if unicode(self.course_id).startswith('ccx'):
             ccx_locator = self.course_id
         else:
             ccx_locator = CCXLocator.from_course_locator(self.course_id, unicode(self.original_ccx_id))
@@ -177,7 +177,7 @@ class CustomCourseForEdX(models.Model):
         return CourseAccessRole.objects.filter(course_id=ccx_locator, user=user, role='instructor').count() > 0
 
     def is_staff(self, user):
-        if self.course_id.startswith('ccx'):
+        if unicode(self.course_id).startswith('ccx'):
             ccx_locator = self.course_id
         else:
             ccx_locator = CCXLocator.from_course_locator(self.course_id, unicode(self.original_ccx_id))
