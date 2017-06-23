@@ -95,7 +95,7 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'backpack_ui_img': staticfiles_storage.url('certificates/images/backpack-ui.png'),
             'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
             'state_options': settings.STATE_CHOICES,
-            'newsletter_options': UserProfile.NEWSLETTER_CHOICES,
+            'newsletter_options': UserProfile.YES_NO_CHOICES,
             'gender_options': UserProfile.GENDER_CHOICES,
             'bio_options': UserProfile.BIO_CHOICES,
         },

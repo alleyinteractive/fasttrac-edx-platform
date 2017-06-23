@@ -376,7 +376,7 @@ def affiliate_edit(request, affiliate_username):
             'affiliate': affiliate,
             'state_choices': settings.STATE_CHOICES,
             'countries': countries,
-            'newsletter_choices': UserProfile.NEWSLETTER_CHOICES,
+            'newsletter_choices': UserProfile.YES_NO_CHOICES,
             'gender_choices': UserProfile.GENDER_CHOICES,
         })
     elif request.method == 'POST':
@@ -392,7 +392,7 @@ def affiliate_edit(request, affiliate_username):
             'affiliate': affiliate,
             'state_choices': settings.STATE_CHOICES,
             'countries': countries,
-            'newsletter_choices': UserProfile.NEWSLETTER_CHOICES,
+            'newsletter_choices': UserProfile.YES_NO_CHOICES,
             'gender_choices': UserProfile.GENDER_CHOICES,
         })
     else:
