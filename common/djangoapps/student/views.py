@@ -49,7 +49,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from course_modes.models import CourseMode
 from shoppingcart.api import order_history
 from student.models import (
-    Registration, UserProfile,
+    Registration, UserProfile, CourseAccessRole,
     PendingEmailChange, CourseEnrollment, CourseEnrollmentAttribute, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
@@ -305,36 +305,66 @@ def get_course_enrollments(user, org_to_include, orgs_to_exclude):
 
 
 def affiliates(request):
-    data = []
     affiliate_name = request.GET.get('affiliate_name', '')
     affiliate_city = request.GET.get('affiliate_city', '')
     affiliate_state = request.GET.get('affiliate_state', '')
 
-    db_query = "SELECT DISTINCT au.username, aup.affiliate_organization_name, aup.state\
-        FROM ccx_customcourseforedx AS ccx\
+    affiliates = fetch_ccx_affiliates(affiliate_name, affiliate_city, affiliate_state)
+
+    return render_to_response('affiliates.html', {
+        'affiliates': affiliates,
+        'affiliate_name': affiliate_name,
+        'affiliate_city': affiliate_city,
+        'affiliate_state': affiliate_state
+    })
+
+
+def fetch_ccx_affiliates(affiliate_name, affiliate_city, affiliate_state):
+    data = []
+    # if we need to update fields, we do it here for both queries
+    db_query_fields = "SELECT DISTINCT au.username, aup.affiliate_organization_name, aup.state "
+
+    # this query returns all ccx creators
+    ccx_query = db_query_fields + "FROM ccx_customcourseforedx AS ccx\
         LEFT JOIN auth_user AS au ON ccx.coach_id = au.id\
         LEFT JOIN auth_userprofile aup ON aup.user_id = au.id\
         WHERE ccx.original_ccx_id = ccx.id"
 
+    # this query returns all ccx coaches on master courses
+    car_query = db_query_fields + "FROM student_courseaccessrole as car\
+        LEFT JOIN auth_user AS au ON car.user_id = au.id\
+        LEFT JOIN auth_userprofile aup ON aup.user_id = au.id\
+        WHERE course_id NOT LIKE \"ccx-%\"\
+        AND role = \"ccx_coach\""
+
     db_params = []
 
     if affiliate_name:
-        db_query += " AND aup.affiliate_organization_name LIKE %s"
+        ccx_query += " AND aup.affiliate_organization_name LIKE %s"
+        car_query += " AND aup.affiliate_organization_name LIKE %s"
         db_params.append('%'+affiliate_name+'%')
 
     if affiliate_city:
-        db_query += " AND aup.city LIKE %s"
+        ccx_query += " AND aup.city LIKE %s"
+        car_query += " AND aup.city LIKE %s"
         db_params.append('%'+affiliate_city+'%')
 
     if affiliate_state:
-        db_query += " AND aup.state = %s"
+        ccx_query += " AND aup.state = %s"
+        car_query += " AND aup.state = %s"
         db_params.append(affiliate_state)
 
-    db_query += ";"
+    # close the queries
+    ccx_query += ";"
+    car_query += ";"
 
     with connection.cursor() as cursor:
-        cursor.execute(db_query, db_params)
-        rows = cursor.fetchall()
+        cursor.execute(ccx_query, db_params or None)
+        ccx_rows = cursor.fetchall()
+        cursor.execute(car_query, db_params or None)
+        car_rows = cursor.fetchall()
+
+    rows = set(ccx_rows + car_rows) # set removes duplicates
 
     for row in rows:
         data.append({
@@ -343,12 +373,7 @@ def affiliates(request):
             'state': row[2],
         })
 
-    return render_to_response('affiliates.html', {
-        'affiliates': data,
-        'affiliate_name': affiliate_name,
-        'affiliate_city': affiliate_city,
-        'affiliate_state': affiliate_state
-    })
+    return data
 
 def affiliate(request, affiliate_username):
     affiliate = User.objects.get(username=affiliate_username)
