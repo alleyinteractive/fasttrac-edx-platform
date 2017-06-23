@@ -103,6 +103,10 @@
     </div>
 </div>
 
+% if reindex_url:
+    <iframe src="${reindex_url.replace(' ', '+')}" frameborder="0" height="0" width="0"></iframe>
+% endif
+
 <script>
     $(function() {
         var $container = $('.course-information');

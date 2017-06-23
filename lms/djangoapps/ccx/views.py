@@ -200,6 +200,7 @@ def dashboard(request, course, ccx=None):
         'is_instructor': False,
         'is_ccx_coach': False,
         'is_staff': False,
+        'reindex_url': request.GET.get('reindex_url')
     }
     context.update(get_ccx_creation_dict(course))
     if ccx:
@@ -262,10 +263,9 @@ def edit_ccx(request, course, ccx=None):
 
     # reindex parent course in order to reindex edited ccx
     reindex_parent_course_url = 'http://{}/course/{}/ccx_reindex'.format(settings.CMS_BASE, course.id)
-    requests.get(reindex_parent_course_url)
 
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_id})
-    return redirect(url)
+    return redirect(url + "?reindex_url={}".format(reindex_parent_course_url))
 
 
 @ensure_csrf_cookie
@@ -358,9 +358,8 @@ def create_ccx(request, course, ccx=None):
 
     # reindex parent course in order to reindex edited ccx
     reindex_parent_course_url = 'http://{}/course/{}/ccx_reindex'.format(settings.CMS_BASE, course.id)
-    requests.get(reindex_parent_course_url)
 
-    return redirect(url)
+    return redirect(url + "?reindex_url={}".format(reindex_parent_course_url))
 
 
 @ensure_csrf_cookie
