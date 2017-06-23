@@ -88,10 +88,6 @@
                     <a href="#" data-section="membership">${_("ENROLLMENT")}</a>
                 </li>
             % endif
-
-            <li class="nav-item">
-                <a href="#" data-section="student_admin">${_("STUDENT ADMIN")}</a>
-            </li>
         </ul>
         % if is_staff or is_instructor:
             <section id="schedule" class="idash-section" aria-label="${_('Schedule')}">
@@ -104,9 +100,6 @@
                 <%include file="enrollment.html" args="" />
             </section>
         % endif
-        <section id="student_admin" class="idash-section" aria-label="${_('Student Grades')}">
-            <%include file="student_admin.html" args="" />
-        </section>
     </div>
 </div>
 
