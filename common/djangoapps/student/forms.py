@@ -54,7 +54,8 @@ class PasswordResetFormNoActive(PasswordResetForm):
             use_https=False,
             token_generator=default_token_generator,
             from_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
-            request=None
+            request=None,
+            survey_gizmo=False
     ):
         """
         Generates a one-use only link for resetting password and sends to the
@@ -80,9 +81,13 @@ class PasswordResetFormNoActive(PasswordResetForm):
                 'protocol': 'https' if use_https else 'http',
                 'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
             }
-            subject = loader.render_to_string(subject_template_name, context)
             # Email subject *must not* contain newlines
-            subject = subject.replace('\n', '')
+            if survey_gizmo:
+                subject = 'Account creation on FastTrac'
+                email_template_name = 'registration/password_reset_email_survey_gizmo.html'
+            else:
+                subject = loader.render_to_string(subject_template_name, context).replace('\n', '')
+
             email = loader.render_to_string(email_template_name, context)
             send_mail(subject, email, from_email, [user.email])
 
