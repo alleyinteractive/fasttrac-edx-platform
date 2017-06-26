@@ -81,11 +81,11 @@ from openedx.core.djangolib.markup import HTML, Text
             </div>
             <div>
               <b>Meeting Location:</b>
-              ${'{}, {} {}'.format(ccx.location_city, ccx.location_state, ccx.location_postal_code)}
+              ${'{}, {} {}'.format(ccx.location_city or '', ccx.location_state or '', ccx.location_postal_code or '')}
             </div>
             <div>
               <b>Contact Information:</b>
-              ${'{} / {}'.format(ccx.coach.email, ccx.coach.profile.phone_number)}
+              ${'{} / {}'.format(ccx.coach.email or '', ccx.coach.profile.phone_number or '')}
             </div>
           % endif
         </div>
