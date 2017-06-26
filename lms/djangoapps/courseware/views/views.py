@@ -685,7 +685,6 @@ def course_about(request, course_id):
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
-
     # This is commented because we want to treat CCX same way as the original course
     # if hasattr(course_key, 'ccx'):
         # if un-enrolled/non-registered user try to access CCX (direct for registration)
@@ -695,8 +694,7 @@ def course_about(request, course_id):
         # return redirect(reverse('dashboard'))
 
     with modulestore().bulk_operations(course_key):
-        permission = get_permission_for_course_about()
-        course = get_course_with_access(request.user, permission, course_key)
+        course = get_course_by_id(course_key)
         course_details = CourseDetails.populate(course)
         modes = CourseMode.modes_for_course_dict(course_key)
 
