@@ -771,7 +771,7 @@ def course_about(request, course_id):
             ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
             enrollment_allowed = ccx.enrollment_type.upper() == 'PUBLIC'
             can_enroll = enrollment_allowed
-            invitation_only = enrollment_allowed
+            invitation_only = not enrollment_allowed # invitation_only is a negation of enrollment_allowed
 
         is_course_full = CourseEnrollment.objects.is_course_full(course)
 
