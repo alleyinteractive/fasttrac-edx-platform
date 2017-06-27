@@ -565,7 +565,7 @@ def enroll_user_into_default_course(sender, instance, created, **kwargs):
     Enroll user into FastTrac course.
     """
     if created:
-        course_key = CourseKey.from_string('course-v1:test+test+2014_T1')
+        course_key = CourseKey.from_string(settings.FASTTRAC_COURSE_KEY)
         CourseEnrollment.enroll(instance, course_key)
 
 
