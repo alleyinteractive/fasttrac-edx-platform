@@ -126,7 +126,6 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 
-from courseware import grades
 from django_countries import countries
 from student.models import UserProfile
 
@@ -671,12 +670,10 @@ def is_coach_on_master_course(user, course):
     return CustomCourseForEdX.objects.filter(coach=user, course_id=course.id).count() > 0
 
 
-@transaction.non_atomic_requests
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
     user = request.user
-    store = modulestore()
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
 
@@ -703,20 +700,17 @@ def dashboard(request):
     # set progress for each course
     # set author for each course
     for course_enrollment in course_enrollments:
-        course_id = course_enrollment.course_id
-        course = store.get_course(course_id)
-        # progress
-        # use unwrapped _grade method to prevent triggering grade update signal
-        course_enrollment.course_progress = grades._grade(user, course, False)
+        course = course_enrollment.course
+
         # author
         if hasattr(course.id, 'ccx'):
             ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
             author = ccx.coach
+            course_enrollment.author = author.profile.name
             course_enrollment.time = ccx.time
         else:
             course_enrollment.coach_on_master_course = is_coach_on_master_course(user, course)
-            author = User.objects.get(pk=course.published_by)
-        course_enrollment.author = author.get_full_name() if author.get_full_name() else author.username
+            course_enrollment.author = 'FastTrac'
 
     # Retrieve the course modes for each course
     enrolled_course_ids = [enrollment.course_id for enrollment in course_enrollments]
