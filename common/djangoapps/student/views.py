@@ -59,6 +59,7 @@ from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_re
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 from lms.djangoapps.ccx.models import CustomCourseForEdX
+from lms.djangoapps.ccx.utils import is_ccx_coach_on_master_course
 from bulk_email.models import Optout, BulkEmailFlag  # pylint: disable=import-error
 from certificates.models import CertificateStatuses, certificate_status_for_student
 from certificates.api import (  # pylint: disable=import-error
@@ -381,6 +382,7 @@ def fetch_ccx_affiliates(affiliate_name, affiliate_city, affiliate_state):
 
     return data
 
+
 def affiliate(request, affiliate_username):
     affiliate = User.objects.get(username=affiliate_username)
     courses = CustomCourseForEdX.objects.raw('SELECT * FROM ccx_customcourseforedx WHERE original_ccx_id = id AND coach_id=%s', [affiliate.id])
@@ -389,6 +391,7 @@ def affiliate(request, affiliate_username):
         'affiliate': affiliate,
         'courses': courses
     })
+
 
 def affiliate_edit(request, affiliate_username):
     affiliate = User.objects.get(username=affiliate_username)
@@ -673,10 +676,6 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
     return blocked
 
 
-def is_coach_on_master_course(user, course):
-    return CustomCourseForEdX.objects.filter(coach=user, course_id=course.id).count() > 0
-
-
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
@@ -716,7 +715,7 @@ def dashboard(request):
             course_enrollment.author = author.profile.name
             course_enrollment.time = ccx.time
         else:
-            course_enrollment.coach_on_master_course = is_coach_on_master_course(user, course)
+            course_enrollment.coach_on_master_course = is_ccx_coach_on_master_course(user, course)
             course_enrollment.author = 'FastTrac'
 
     # Retrieve the course modes for each course

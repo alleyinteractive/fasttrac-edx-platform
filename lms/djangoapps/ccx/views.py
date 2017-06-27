@@ -66,6 +66,7 @@ from lms.djangoapps.ccx.utils import (
     get_date,
     parse_date,
     prep_course_for_grading,
+    is_ccx_coach_on_master_course
 )
 
 log = logging.getLogger(__name__)
@@ -235,6 +236,9 @@ def edit_ccx(request, course, ccx=None):
     if not ccx:
         raise Http404
 
+    if not is_ccx_coach_on_master_course(request.user, course):
+        return HttpResponseForbidden()
+
     name = request.POST.get('name')
     delivery_mode = request.POST.get('delivery_mode')
     location_city = request.POST.get('city')
@@ -275,6 +279,9 @@ def create_ccx(request, course, ccx=None):
     """
     Create a new CCX
     """
+    if not is_ccx_coach_on_master_course(request.user, course):
+        return HttpResponseForbidden()
+
     name = request.POST.get('name')
     delivery_mode = request.POST.get('delivery_mode')
     location_city = request.POST.get('city')

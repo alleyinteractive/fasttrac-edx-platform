@@ -31,7 +31,7 @@ from instructor.access import (
 from instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
-from student.models import CourseEnrollment, CourseEnrollmentException
+from student.models import CourseEnrollment, CourseEnrollmentException, CourseAccessRole
 from student.roles import (
     CourseCcxCoachRole,
     CourseInstructorRole,
@@ -491,3 +491,15 @@ def remove_master_course_staff_from_ccx(master_course, ccx_key, display_name, se
                     email_students=send_email,
                     email_params=email_params,
                 )
+
+
+def is_ccx_coach_on_master_course(user, course):
+    """
+    Args:
+        user: User object
+        course: Master course object
+
+    Returns: boolean (if user is ccx_coch on master course)
+    Checks in student_courseaccessrole table.
+    """
+    return CourseAccessRole.objects.filter(user=user, course_id=course.id, role='ccx_coach').count() > 0

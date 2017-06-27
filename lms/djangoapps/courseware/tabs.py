@@ -8,8 +8,10 @@ from django.utils.translation import ugettext as _, ugettext_noop
 from courseware.access import has_access
 from courseware.entrance_exams import user_must_complete_entrance_exam
 from openedx.core.lib.course_tabs import CourseTabPluginManager
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, CourseAccessRole
 from xmodule.tabs import CourseTab, CourseTabList, key_checker
+
+from lms.djangoapps.ccx.utils import is_ccx_coach_on_master_course
 
 FASTTRACK_DISABLED_TAB_TYPES = ['progress', 'wiki', 'discussion']
 
@@ -333,10 +335,14 @@ def _get_dynamic_tabs(course, user):
         if getattr(tab_type, "is_dynamic", False):
             tab = tab_type(dict())
 
-            tab.name = _get_name_for_tab(tab)
-
             if tab.is_enabled(course, user=user):
-                dynamic_tabs.append(tab)
+                if tab.type is 'ccx_coach':
+                    if is_ccx_coach_on_master_course(user, course):
+                        dynamic_tabs.append(tab)
+                else:
+                    dynamic_tabs.append(tab)
+
+            tab.name = _get_name_for_tab(tab)
     dynamic_tabs.sort(key=lambda dynamic_tab: dynamic_tab.name)
     return dynamic_tabs
 
