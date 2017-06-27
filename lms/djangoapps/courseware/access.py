@@ -142,7 +142,7 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(obj, CourseDescriptor):
         if hasattr(obj.id, 'ccx'):
             # HACK: staff and instructor have same permissions over CCX course
-            return _has_access_course(user, 'instructor', obj) or _has_access_course(user, 'staff', obj)
+            return _has_access_course(user, 'instructor', obj) or _has_access_course(user, 'staff', obj) or _has_access_course(user, action, obj)
         else:
             return _has_access_course(user, action, obj)
 
