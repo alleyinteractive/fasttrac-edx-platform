@@ -488,3 +488,17 @@ $link-color: #6f6f6f;
     clear: none !important;
   }
 }
+
+.home .courses-container .courses .courses-listing .courses-listing-item {
+  clear: none !important;
+  float: none !important;
+  display: inline-block !important;
+
+  & .learn-more {
+    background: $ft-orange;
+  }
+
+  & .course-image .cover-image:before {
+    height: 135px !important;
+  }
+}

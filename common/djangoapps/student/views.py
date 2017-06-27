@@ -176,7 +176,14 @@ def index(request, extra_context=None, user=AnonymousUser()):
     else:
         courses = sort_by_announcement(courses)
 
-    context = {'courses': courses}
+    public_ccxs = CustomCourseForEdX.objects.raw('\
+        SELECT * FROM ccx_customcourseforedx\
+        WHERE id = original_ccx_id\
+        AND UPPER(enrollment_type) = "PUBLIC"')
+
+    public_ccx_ids = [unicode(ccx.id) for ccx in public_ccxs]
+
+    context = {'courses': [c for c in courses if not hasattr(c.id, 'ccx') or c.id.ccx in public_ccx_ids]}
 
     context['homepage_overlay_html'] = configuration_helpers.get_value('homepage_overlay_html')
 
