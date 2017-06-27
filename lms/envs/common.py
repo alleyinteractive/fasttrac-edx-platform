@@ -2993,3 +2993,5 @@ COURSE_DISCOVERY_MEANINGS = {
         'name': 'Delivery Mode'
     },
 }
+
+FASTTRAC_COURSE_KEY = 'course-v1:edX+DemoX+Demo_Course'
