@@ -559,6 +559,15 @@ def user_post_save_callback(sender, **kwargs):
         hidden_fields=['password']
     )
 
+@receiver(post_save, sender=User)
+def enroll_user_into_default_course(sender, instance, created, **kwargs):
+    """
+    Enroll user into FastTrac course.
+    """
+    if created:
+        course_key = CourseKey.from_string('course-v1:test+test+2014_T1')
+        CourseEnrollment.enroll(instance, course_key)
+
 
 class UserSignupSource(models.Model):
     """
