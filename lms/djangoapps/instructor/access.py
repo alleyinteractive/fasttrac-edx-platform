@@ -79,7 +79,7 @@ def _change_access(course, user, level, action, send_email=True):
         raise ValueError("unrecognized level '{}'".format(level))
 
     if action == 'allow':
-        if level == 'ccx_coach':
+        if level == 'ccx_coach' or hasattr(course.id, 'ccx'):
             email_params = get_email_params(course, True)
             enroll_email(
                 course_id=course.id,
