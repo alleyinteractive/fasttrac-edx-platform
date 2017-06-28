@@ -62,7 +62,7 @@
         <button class="add-button" value="submit">Add</button>
     </form>
     <div id="error-modal" class="error hidden">
-        <span class="content">This affiliate already exists.</span>
+        <span class="content"></span>
     </div>
 </div>
 
@@ -84,8 +84,12 @@
                 data: data,
                 success: function(responseData) {
                     if (responseData.addingExistingCCXCoachOrInstructor === true) {
-                        showErrorModal();
-                    } else {
+                        showErrorModal('This affiliate already exists.');
+                    }
+                    else if (responseData.userDoesNotExist === true) {
+                        showErrorModal('Affiliate ' + responseData.unique_student_identifier + ' does not exist.');
+                    }
+                    else {
                         addCoachRow(responseData, url);
                         $form.find('input[type=text]').val('');
                     }
@@ -114,7 +118,8 @@
             });
         }
 
-        function showErrorModal() {
+        function showErrorModal(errorText) {
+            $('#error-modal .content').text(errorText);
             $('#error-modal').removeClass('hidden');
             setTimeout(function(){
                 $('#error-modal').addClass('hidden');
