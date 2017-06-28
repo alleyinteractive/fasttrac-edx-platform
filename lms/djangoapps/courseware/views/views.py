@@ -340,7 +340,6 @@ def course_info(request, course_id):
             else:
                 last_viewed_item = None
 
-
         if hasattr(course.id, 'ccx'):
             ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
         else:
