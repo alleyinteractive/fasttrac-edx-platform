@@ -87,7 +87,7 @@
                         showErrorModal('This affiliate already exists.');
                     }
                     else if (responseData.userDoesNotExist === true) {
-                        showErrorModal('This affiliate ' + responseData.unique_student_identifier + ' does not exist.');
+                        showErrorModal('Affiliate ' + responseData.unique_student_identifier + ' does not exist.');
                     }
                     else {
                         addCoachRow(responseData, url);
