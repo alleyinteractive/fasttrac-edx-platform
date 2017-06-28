@@ -528,4 +528,14 @@ section.wrapper-xblock {
       color: $ft-dark-grey;
     }
   }
+
+  .tools-title.green {
+    .fa {
+      color: $ft-green;
+    }
+
+    .subtitle-container {
+      border-right: 3px solid $ft-green;
+    }
+  }
 }

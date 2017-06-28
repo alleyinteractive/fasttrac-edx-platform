@@ -520,4 +520,14 @@ $ft-dark-grey: #8d8d8d;
       color: $ft-dark-grey;
     }
   }
+
+  .tools-title.green {
+    .fa {
+      color: $ft-green;
+    }
+
+    .subtitle-container {
+      border-right: 3px solid $ft-green;
+    }
+  }
 }
