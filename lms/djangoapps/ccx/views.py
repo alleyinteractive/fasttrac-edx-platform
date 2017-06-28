@@ -585,7 +585,7 @@ def ccx_invite(request, course, ccx=None):
 
     ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params, ccx.coach)
 
-    url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx.course_id})
+    url = reverse('ccx_coach_dashboard', kwargs={'course_id': course_key})
     return redirect(url)
 
 
