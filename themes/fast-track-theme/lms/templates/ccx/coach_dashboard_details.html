@@ -68,16 +68,17 @@
                     <p class="field-info">${ccx.get_enrollment_type_display()}</p>
                 </div>
             </div>
-
-            <div class="field submit">
-                <a href="${edit_ccx_dasboard_url}">
-                    <button id="create-ccx" class="ft-button-action" type="submit">Update course</button>
-                </a>
-            </div>
-    </div>
-    <div class="instructor-nav-wrapper">
-        <ul class="instructor-nav">
             % if is_staff or is_instructor:
+                <div class="field submit">
+                    <a href="${edit_ccx_dasboard_url}">
+                        <button id="create-ccx" class="ft-button-action" type="submit">Update course</button>
+                    </a>
+                </div>
+            % endif
+    </div>
+    % if is_staff or is_instructor:
+        <div class="instructor-nav-wrapper">
+            <ul class="instructor-nav">
                 <li class="nav-item">
                     <a href="#" data-section="schedule">${_("COURSE STRUCTURE")}</a>
                 </li>
@@ -87,9 +88,7 @@
                 <li class="nav-item">
                     <a href="#" data-section="membership">${_("ENROLLMENT")}</a>
                 </li>
-            % endif
-        </ul>
-        % if is_staff or is_instructor:
+            </ul>
             <section id="schedule" class="idash-section" aria-label="${_('Schedule')}">
                 <%include file="schedule.html" args="" />
             </section>
@@ -99,8 +98,8 @@
             <section id="membership" class="idash-section" aria-label="${_('Batch Enrollment')}">
                 <%include file="enrollment.html" args="" />
             </section>
-        % endif
-    </div>
+        </div>
+    % endif
 </div>
 
 % if reindex_url:

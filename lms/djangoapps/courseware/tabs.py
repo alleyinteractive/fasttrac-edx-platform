@@ -11,8 +11,6 @@ from openedx.core.lib.course_tabs import CourseTabPluginManager
 from student.models import CourseEnrollment, CourseAccessRole
 from xmodule.tabs import CourseTab, CourseTabList, key_checker
 
-from lms.djangoapps.ccx.utils import is_ccx_coach_on_master_course
-
 FASTTRACK_DISABLED_TAB_TYPES = ['progress', 'wiki', 'discussion']
 
 FASTTRACK_TAB_NAMES_OVERRIDES = {
@@ -336,11 +334,7 @@ def _get_dynamic_tabs(course, user):
             tab = tab_type(dict())
 
             if tab.is_enabled(course, user=user):
-                if tab.type is 'ccx_coach':
-                    if is_ccx_coach_on_master_course(user, course):
-                        dynamic_tabs.append(tab)
-                else:
-                    dynamic_tabs.append(tab)
+                dynamic_tabs.append(tab)
 
             tab.name = _get_name_for_tab(tab)
     dynamic_tabs.sort(key=lambda dynamic_tab: dynamic_tab.name)
@@ -356,3 +350,4 @@ def _get_name_for_tab(tab):
     if tab.type in FASTTRACK_TAB_NAMES_OVERRIDES:
         return FASTTRACK_TAB_NAMES_OVERRIDES[tab.type]
     return tab.name
+

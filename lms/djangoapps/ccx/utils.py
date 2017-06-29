@@ -501,4 +501,8 @@ def is_ccx_coach_on_master_course(user, course):
     Returns: boolean (if user is ccx_coch on master course)
     Checks in student_courseaccessrole table.
     """
+    if 'ccx' in str(course.id):
+        # Master course cannot be ccx
+        return False
+
     return CourseAccessRole.objects.filter(user=user, course_id=course.id, role='ccx_coach').count() > 0

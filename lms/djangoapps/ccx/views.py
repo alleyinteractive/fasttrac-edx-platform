@@ -114,7 +114,7 @@ def coach_dashboard(view):
             # if there is a ccx, we must validate that it is the ccx for this coach
             if ccx is not None:
                 coach_ccx = get_ccx_by_ccx_id(course, request.user, ccx.original_ccx_id)
-                if coach_ccx is None:
+                if not coach_ccx:
                     return HttpResponseForbidden(
                         _('You must be the coach for this ccx to access this view')
                     )
@@ -235,8 +235,7 @@ def edit_ccx(request, course, ccx=None):
     if not ccx:
         raise Http404
 
-    if not is_ccx_coach_on_master_course(request.user, course):
-        return HttpResponseForbidden()
+    # TODO instructor or staff on ccx
 
     name = request.POST.get('name')
     delivery_mode = request.POST.get('delivery_mode')
