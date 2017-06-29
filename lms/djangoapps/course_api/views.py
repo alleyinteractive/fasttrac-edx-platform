@@ -189,7 +189,6 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             ]
     """
 
-    pagination_class = NamespacedPageNumberPagination
     serializer_class = CourseSerializer
 
     def get_queryset(self):
@@ -206,3 +205,6 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             org=form.cleaned_data['org'],
             filter_=form.cleaned_data['filter_'],
         )
+
+    def paginate_queryset(self, queryset, view=None):
+        return None
