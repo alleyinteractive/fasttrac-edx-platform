@@ -329,41 +329,41 @@ def affiliates(request):
 def fetch_ccx_affiliates(affiliate_name, affiliate_city, affiliate_state):
     data = []
     # if we need to update fields, we do it here for both queries
-    db_query_fields = "SELECT DISTINCT au.username, aup.affiliate_organization_name, aup.state "
+    db_query_fields = 'SELECT DISTINCT au.username, aup.affiliate_organization_name, aup.state '
 
     # this query returns all ccx creators
-    ccx_query = db_query_fields + "FROM ccx_customcourseforedx AS ccx\
+    ccx_query = db_query_fields + 'FROM ccx_customcourseforedx AS ccx\
         LEFT JOIN auth_user AS au ON ccx.coach_id = au.id\
         LEFT JOIN auth_userprofile aup ON aup.user_id = au.id\
-        WHERE ccx.original_ccx_id = ccx.id"
+        WHERE ccx.original_ccx_id = ccx.id'
 
     # this query returns all ccx coaches on master courses
-    car_query = db_query_fields + "FROM student_courseaccessrole as car\
+    car_query = db_query_fields + 'FROM student_courseaccessrole as car\
         LEFT JOIN auth_user AS au ON car.user_id = au.id\
         LEFT JOIN auth_userprofile aup ON aup.user_id = au.id\
-        WHERE course_id NOT LIKE \"ccx-%\"\
-        AND role = \"ccx_coach\""
+        WHERE course_id NOT LIKE "ccx-%%"\
+        AND role = "ccx_coach"'
 
     db_params = []
 
     if affiliate_name:
-        ccx_query += " AND aup.affiliate_organization_name LIKE %s"
-        car_query += " AND aup.affiliate_organization_name LIKE %s"
+        ccx_query += ' AND aup.affiliate_organization_name LIKE %s'
+        car_query += ' AND aup.affiliate_organization_name LIKE %s'
         db_params.append('%'+affiliate_name+'%')
 
     if affiliate_city:
-        ccx_query += " AND aup.city LIKE %s"
-        car_query += " AND aup.city LIKE %s"
+        ccx_query += ' AND aup.city LIKE %s'
+        car_query += ' AND aup.city LIKE %s'
         db_params.append('%'+affiliate_city+'%')
 
     if affiliate_state:
-        ccx_query += " AND aup.state = %s"
-        car_query += " AND aup.state = %s"
+        ccx_query += ' AND aup.state = %s'
+        car_query += ' AND aup.state = %s'
         db_params.append(affiliate_state)
 
     # close the queries
-    ccx_query += ";"
-    car_query += ";"
+    ccx_query += ';'
+    car_query += ';'
 
     with connection.cursor() as cursor:
         cursor.execute(ccx_query, db_params or None)
