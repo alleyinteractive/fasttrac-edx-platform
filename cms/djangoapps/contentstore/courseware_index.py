@@ -595,7 +595,7 @@ class CourseAboutSearchIndexer(object):
             'image_url': course_image_url(course),
             'enrollment_type': 'PRIVATE' if course.invitation_only else 'PUBLIC',
             'affiliate_name': 'FastTrac',
-            'location_state': 'KS',
+            'location_state': 'MO',
             'delivery_mode': 'ONLINE_ONLY',
             'location_city': 'Kansas City'
         }
