@@ -12,8 +12,10 @@ def can_access_all_blocks(requesting_user, course_key):
     Returns whether the requesting_user can access all the blocks
     in the course.
     """
-    return has_access(requesting_user, CourseStaffRole.ROLE, course_key)
-
+    return (
+        (requesting_user.id and CourseEnrollment.is_enrolled(requesting_user, course_key)) or
+        has_access(requesting_user, CourseStaffRole.ROLE, course_key)
+    )
 
 def can_access_others_blocks(requesting_user, course_key):
     """
