@@ -593,7 +593,11 @@ class CourseAboutSearchIndexer(object):
             'course': course_id,
             'content': {},
             'image_url': course_image_url(course),
-            'enrollment_type': 'PRIVATE' if course.invitation_only else 'PUBLIC'
+            'enrollment_type': 'PRIVATE' if course.invitation_only else 'PUBLIC',
+            'affiliate_name': 'FastTrac',
+            'location_state': 'KA',
+            'delivery_mode': 'ONLINE_ONLY',
+            'location_city': 'Kansas City'
         }
 
         # load data for all of the 'about' modules for this course into a dictionary

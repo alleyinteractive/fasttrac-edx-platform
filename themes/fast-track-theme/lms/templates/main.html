@@ -115,6 +115,7 @@ from pipeline_mako import render_require_js_path_overrides
 
       ga('create', '${ga_acct}', 'auto');
       ga('set', 'userId', '${user.username}');
+      ga('set', 'userName', '${user.username}');
       ga('send', 'pageview');
     </script>
 % endif
