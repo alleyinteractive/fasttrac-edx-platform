@@ -2,6 +2,12 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <h2 class="hd hd-2">${_("Team management")}</h2>
+<div class="team-management-note">
+    Before adding email in box below:
+    <br>
+    1. Confirm the person you are adding as a Course Manager or Facilitator has registered as a user on the website.
+    <br>
+    2. Confirm the email they registered with and enter it below. Then, use drop down to select role and click "Add"</div>
 <div class="table-wrapper">
     % if is_staff:
         <a href="/affiliates/edit/${ccx.coach.username}">
