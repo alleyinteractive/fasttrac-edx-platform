@@ -332,12 +332,15 @@ def course_info(request, course_id):
             cursor.execute("SELECT module_id, course_id, modified from courseware_studentmodule WHERE student_id=%s AND course_id=%s ORDER BY modified DESC LIMIT 1;", [user.id, course_id])
             row = cursor.fetchone()
             if row:
-                last_viewed_item = {
-                    'module_id': row[0],
-                    'course_id': row[1],
-                    'modified': row[2],
-                    'object': modulestore().get_item(UsageKey.from_string(row[0]))
-                }
+                try:
+                    last_viewed_item = {
+                        'module_id': row[0],
+                        'course_id': row[1],
+                        'modified': row[2],
+                        'object': modulestore().get_item(UsageKey.from_string(row[0]))
+                    }
+                except ItemNotFoundError:
+                    last_viewed_item = None
             else:
                 last_viewed_item = None
 
