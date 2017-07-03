@@ -267,6 +267,7 @@ def jump_to(_request, course_id, location):
 
 
 @ensure_csrf_cookie
+@login_required
 @ensure_valid_course_key
 def course_info(request, course_id):
     """
@@ -391,6 +392,7 @@ def course_info(request, course_id):
 
 
 @ensure_csrf_cookie
+@login_required
 @ensure_valid_course_key
 def bookmarks(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
@@ -406,6 +408,7 @@ def bookmarks(request, course_id):
     return render_to_response('courseware/bookmarks.html', context)
 
 @ensure_csrf_cookie
+@login_required
 @ensure_valid_course_key
 def search(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
