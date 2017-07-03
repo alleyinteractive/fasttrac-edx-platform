@@ -511,7 +511,7 @@ def sort_search_results_by_recently_viewed(results, course_id, user_id):
             if search_result['_id'] == module_id:
                 search_result['last_viewed'] = modified
 
-    return sorted(search_results['results'], key=lambda result: result.get('last_viewed', datetime.min).replace(tzinfo=None), reverse=True)
+    return sorted(results, key=lambda result: result.get('last_viewed', datetime.min).replace(tzinfo=None), reverse=True)
 
 
 
