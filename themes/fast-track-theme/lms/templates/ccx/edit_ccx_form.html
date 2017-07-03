@@ -116,8 +116,9 @@
             <label class="sr" for="ccx_enrollment_type">${_('Enrollment type')}</label>
             <select name="enrollment_type" id="ccx_enrollment_type" class="ccx-select"
                     data-current-value="${ccx.enrollment_type}" required>
-                <option value="PRIVATE">Private</option>
-                <option value="PUBLIC">Public</option>
+                % for choice in enrollment_choices:
+                    <option value="${choice[0]}">${choice[1]}</option>
+                % endfor
             </select>
         </div>
     </div>

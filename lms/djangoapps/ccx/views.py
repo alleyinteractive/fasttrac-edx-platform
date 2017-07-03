@@ -129,7 +129,8 @@ def edit_course_view(request, course, ccx):
     context = {
         'course': course,
         'ccx': ccx,
-        'delivery_mode_choices': CustomCourseForEdX.DELIVERY_MODE_CHOICES
+        'delivery_mode_choices': CustomCourseForEdX.DELIVERY_MODE_CHOICES,
+        'enrollment_choices': CustomCourseForEdX.ENROLLMENT_TYPE_CHOICES,
     }
 
     context.update(get_ccx_creation_dict(course))
@@ -197,6 +198,7 @@ def dashboard(request, course, ccx=None):
         'ccx': ccx,
         'STATE_CHOICES': STATE_CHOICES,
         'delivery_mode_choices': CustomCourseForEdX.DELIVERY_MODE_CHOICES,
+        'enrollment_choices': CustomCourseForEdX.ENROLLMENT_TYPE_CHOICES,
         'is_instructor': False,
         'is_ccx_coach': False,
         'is_staff': False,
