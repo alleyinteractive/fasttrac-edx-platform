@@ -369,6 +369,7 @@ class UserProfile(models.Model):
     facebook_link = models.CharField(null=True, blank=True, max_length=255)
     twitter_link = models.CharField(null=True, blank=True, max_length=255)
     linkedin_link = models.CharField(null=True, blank=True, max_length=255)
+    public_email = models.CharField(null=True, blank=True, max_length=255)
 
     # field for affiliate program directors
     affiliate_organization_name = models.CharField(null=True, blank=True, default='', max_length=255)
