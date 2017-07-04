@@ -358,6 +358,14 @@ def course_info(request, course_id):
 
         update_items = get_course_update_items(course_updates)
 
+        sections = course.get_children()
+
+        if hasattr(course.id, 'ccx'):
+            schedule = get_ccx_schedule(course, course.id.ccx)
+            ccx_chapter_locations = [s['location'] for s in schedule]
+            sections = [s for s in sections if unicode(s.location) in ccx_chapter_locations]
+
+
         context = {
             'request': request,
             'masquerade_user': user,
@@ -373,7 +381,8 @@ def course_info(request, course_id):
             'last_viewed_item': last_viewed_item,
             'ccx': ccx,
             'update_items': update_items,
-            'workspace_url': settings.WORKSPACE_URL
+            'workspace_url': settings.WORKSPACE_URL,
+            'sections': sections
         }
 
         # Get the URL of the user's last position in order to display the 'where you were last' message

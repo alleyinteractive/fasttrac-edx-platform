@@ -208,7 +208,7 @@ from openedx.core.djangolib.markup import HTML, Text
           </ul>
 
           <div id="tab-course" class="ft-tab">
-            % for section in course.get_children():
+            % for section in sections:
               <div class="ft-card">
                 <h3>
                   <a href="${"/courses/{}/courseware/{}/".format(course.id, section.url_name)}">
