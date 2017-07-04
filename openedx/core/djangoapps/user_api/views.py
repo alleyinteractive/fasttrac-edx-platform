@@ -184,6 +184,7 @@ class RegistrationView(APIView):
         "facebook_link",
         "linkedin_link",
         "twitter_link",
+        "public_email",
         "affiliate_organization_name",
         "honor_code",
         "terms_of_service"
@@ -852,6 +853,25 @@ class RegistrationView(APIView):
         form_desc.add_field(
             "twitter_link",
             label=twitter_link_label,
+            required=required
+        )
+
+    def _add_public_email_field(self, form_desc, required=False):
+        """Add a public email link field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+
+        public_email_label = _(u"Public Email")
+
+        form_desc.add_field(
+            "public_email",
+            label=public_email_label,
             required=required
         )
 
