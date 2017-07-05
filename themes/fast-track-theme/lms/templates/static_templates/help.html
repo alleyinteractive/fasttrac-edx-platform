@@ -1,0 +1,48 @@
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="../main.html" />
+
+<%namespace name='static' file='/static_content.html'/>
+<%block name="pagetitle">${_("Help")}</%block>
+
+<main id="main" aria-label="Content" tabindex="-1">
+    <section class="container about">
+        <h1>FAQ</h1>
+        <p><b><h4>Are the five course sections sequential?</h4></b><br><br>
+          The content sections (Ideate through Launch) are in sequential order for entrepreneurs who would like to go through the course from beginning to end. However, the course is also designed to allow entrepreneurs to go directly to specific areas of interest or need, and jump around the course as needed.
+        </p><br><br>
+        <p><b><h4>What activities can I complete in the course?</h4></b><br><br>
+          There are 4 different activity types that you’ll find in the course:<br><br>
+          <img src="${static.url("images/typesofactivities.png")}" alt="types of activities"><br><br>
+          You’ll see them both in the course and you can also find them and work on them from your Workspace.
+        </p><br><br>
+        <p><b><h4>What are Reality Checks?</h4></b><br><br>
+          In addition to these activities, you’ll also regularly quick brainstorms around a particular topic throughout the course called Reality Checks.<br><br>
+          <img src="${static.url("images/realitychecks.png")}" alt="reality checks"><br><br>
+          Reality Checks are a great place to take notes and refine your ideas, and you’ll find that if you complete them then it will be easier to complete the main course activities. Unlike the main course activities, which you can access from your Workspace, the Reality Checks are only saved right where you found them in the course. So, if you want to quickly remember where one of them is, we suggest you bookmark the page (see how to do this in the FAQ below).
+        </p><br><br>
+        <p><b><h4>Are my answers private?</h4></b><br><br>
+          Yes. All of the activities in the course are private. When you save your responses they are only accessible to you.
+        </p><br><br>
+        <p><b><h4>Will I receive feedback on my Workspace activities and Reality Checks?</h4></b><br><br>
+          If you would like feedback on your Workspace activities, simply download a copy and share with an advisor, coach or friend. Reality Checks are not available for download since they are only accessible in your course (not as part of the Workspace).
+        </p><br><br>
+        <p><b><h4>How do I bookmark a page?</h4></b><br><br>
+          Click on the bookmark icon in the top right-hand corner of the screen.<br><br>
+          <img src="${static.url("images/clicktobookmark.png")}" alt="click to bookmark"><br><br>
+          To remove the bookmark, simply click on the icon a second time. If you want to see all of your bookmarks, you can find a list from your Dashboard.
+        </p><br><br>
+        <p><b><h4>Can I highlight text?</h4></b><br><br>
+          You can bookmark text using the bookmark icon. You cannot not highlight text, at present.
+        </p><br><br>
+        <p><b><h4>Can I print sections of the material?</h4></b><br><br>
+          Individual content pages can be printed through your browser (Control or Command + P). All printed material is copyrighted by Ewing Marion Kauffman Foundation, All Rights Reserved
+        </p><br><br>
+        <p><b><h4>How is my profile used?</h4></b><br><br>
+          Your profile information is for your own personal use at this time, and for the Kauffman FastTrac and Ewing Marion Kauffman Foundation uses outlined in the Privacy Policy (link). In the future, you may have the option to interact with other entrepreneurs and access other Kauffman tools.
+        </p><br><br>
+        <p><b><h4>What Messages display on my dashboard and who are they from?</h4></b><br><br>
+          All messages are from Kauffman FastTrac at this time.
+        </p><br><br>
+    </section>
+</main>
