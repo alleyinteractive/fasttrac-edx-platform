@@ -99,13 +99,8 @@
         <div class="horizontal-field-container">
             <p class="field-name">${_('FEE')}</p>
             <label class="sr" for="ccx_fee">${_('Fee')}</label>
-            % if not ccx.fee:
-                <% fee = 'None' %>
-            % else:
-                <% fee = 'Yes' %>
-            %endif
             <select name="fee" id="ccx_fee" class="ccx-select"
-                    data-current-value="${fee}" required>
+                    data-current-value="${ccx.fee}" required>
                 <option value="True">Yes</option>
                 <option value="False">None</option>
             </select>
