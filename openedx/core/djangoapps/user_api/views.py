@@ -656,7 +656,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's highest completed level of education.
-        newsletter_label = _(u"Would you like to subscribe to the Kauffman Education Newsletter?")
+        newsletter_label = _(u"Would you like to subscribe to the Kauffman Founder Education Email Newsletter?")
 
         options = [(name, _(label)) for name, label in UserProfile.YES_NO_CHOICES]
 
@@ -1122,7 +1122,7 @@ class RegistrationView(APIView):
             terms_text = _(u"Terms of Service and Honor Code")
 
         terms_link = u"<a href=\"{url}\">{terms_text}</a>".format(
-            url=marketing_link("HONOR"),
+            url=marketing_link("TERMS"),
             terms_text=terms_text
         )
 

@@ -20,7 +20,7 @@ if settings.STATIC_GRAB:
     valid_templates = valid_templates + [
         'server-down.html',
         'server-error.html'
-        'server-overloaded.html',
+        'server-overloaded.html'
     ]
 
 
