@@ -360,11 +360,19 @@ def course_info(request, course_id):
 
         sections = course.get_children()
 
+        # ccx can only have subset of sections, so show only ones included in ccx schedule
         if hasattr(course.id, 'ccx'):
             schedule = get_ccx_schedule(course, course.id.ccx)
             ccx_chapter_locations = [s['location'] for s in schedule]
             sections = [s for s in sections if unicode(s.location) in ccx_chapter_locations]
 
+        # fetch last viewed subsection
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(course.id, request.user, course, depth=2)
+        # copied functionality from function get_last_accessed_courseware, but looped it for each section
+        for section in sections:
+            section_module = get_module_for_descriptor(user, request, section, field_data_cache, course.id, course=course)
+            subsection_module = get_current_child(section_module)
+            section.last_subsection_url_name = subsection_module.url_name
 
         context = {
             'request': request,
