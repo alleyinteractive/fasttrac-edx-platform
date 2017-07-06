@@ -122,7 +122,11 @@ from pipeline_mako import render_require_js_path_overrides
 
 <script type="text/javascript">
   var bugmuncher_options = {
-    api_key: "cd9d0312a0c59b558394"
+    api_key: "cd9d0312a0c59b558394",
+    require_email: true,
+    % if hasattr(user, 'email'):
+      prefill_email: '${user.email}'
+    % endif
   };
   (function(){
     var e = document.createElement("script");
