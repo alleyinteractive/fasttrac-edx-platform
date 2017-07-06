@@ -184,7 +184,12 @@ def index(request, extra_context=None, user=AnonymousUser()):
 
     public_ccx_ids = [unicode(ccx.id) for ccx in public_ccxs]
 
-    context = {'courses': [c for c in courses if not hasattr(c.id, 'ccx') or c.id.ccx in public_ccx_ids]}
+    # filter out private CCX courses
+    courses = [c for c in courses if not hasattr(c.id, 'ccx') or c.id.ccx in public_ccx_ids]
+    # filter out invitation_only master courses
+    courses = [c for c in courses if not c.invitation_only]
+
+    context = {'courses': courses}
 
     context['homepage_overlay_html'] = configuration_helpers.get_value('homepage_overlay_html')
 
