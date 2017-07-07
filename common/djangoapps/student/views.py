@@ -129,7 +129,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 from django_countries import countries
 from student.models import UserProfile
-
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -379,10 +379,13 @@ def fetch_ccx_affiliates(affiliate_name, affiliate_city, affiliate_state):
     rows = set(ccx_rows + car_rows) # set removes duplicates
 
     for row in rows:
+        user = User.objects.get(username=row[0])
+        image_url = get_profile_image_urls_for_user(user)['medium']
         data.append({
             'username': row[0],
             'affiliate_organization_name': row[1],
             'state': row[2],
+            'image_url': image_url
         })
 
     return data

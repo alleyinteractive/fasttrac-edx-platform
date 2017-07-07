@@ -6,6 +6,7 @@ from courseware.courses import get_course_about_section
 from django.conf import settings
 from edxmako.shortcuts import marketing_link
 from openedx.core.lib.courses import course_image_url
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 %>
 
 <%inherit file="../main.html" />
@@ -192,7 +193,11 @@ from openedx.core.lib.courses import course_image_url
       % if get_course_about_section(request, course, "video"):
       <a href="#video-modal" class="media" rel="leanModal">
         <div class="hero">
-          <img src="${course_image_urls['large']}" alt="" />
+          % if ccx:
+            <img src="${get_profile_image_urls_for_user(ccx.coach)['large']}" alt="" />
+          % else:
+            <img src="${course_image_urls['large']}" alt="" />
+          % endif
           <div class="play-intro"></div>
         </div>
       </a>

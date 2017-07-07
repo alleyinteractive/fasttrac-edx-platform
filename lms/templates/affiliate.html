@@ -5,6 +5,11 @@
 
 <%block name="pagetitle">Affiliate ${affiliate.profile.name}</%block>
 
+<%
+  from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
+  image_url = get_profile_image_urls_for_user(affiliate)['full']
+%>
+
 <section class="course-info">
   <header class="course-profile">
     <div class="intro-inner-wrapper">
@@ -25,7 +30,7 @@
 
         <div class="media">
           <div class="hero">
-            <img src="http://i.imgur.com/PxyiByD.png" alt="" />
+            <img src="${image_url}" alt="" />
           </div>
         </div>
       </div>
@@ -45,7 +50,7 @@
           <ul>
             % for course in courses:
               <li class="affiliate-card">
-                <div class="image" style="background-image: url(http://i.imgur.com/EkZzVq0.jpg);"></div>
+                <div class="image" style="background-image: url(${image_url});"></div>
                 <div class="name">
                   ${course.display_name}
                 </div>

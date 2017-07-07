@@ -20,6 +20,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.library_tools import normalize_key_for_search
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from ccx_keys.locator import CCXLocator
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 
 # REINDEX_AGE is the default amount of time that we look back for changes
 # that might have happened. If we are provided with a time at which the
@@ -650,7 +651,7 @@ class CourseAboutSearchIndexer(object):
                     "number": course.number
                 },
                 "course": ccx_course_id,
-                "image_url": course_info['image_url'],
+                "image_url": get_profile_image_urls_for_user(ccx.coach)['small'],
                 "org": course.org,
                 "id": ccx_course_id,
                 "delivery_mode": ccx.delivery_mode,

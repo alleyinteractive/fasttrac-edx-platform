@@ -4,6 +4,10 @@
 
 <%block name="pagetitle">Explore Affiliates</%block>
 
+<%
+  from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
+%>
+
 <section class="container explore-affiliates">
 
   <script type="text/javascript">
@@ -71,7 +75,7 @@
     <ul>
       % for affiliate in affiliates:
         <li class="affiliate-card">
-          <div class="image" style="background-image: url(http://i.imgur.com/EkZzVq0.jpg);"></div>
+          <div class="image" style="background-image: url(${affiliate['image_url']});"></div>
           <div class="name">
             ${affiliate['affiliate_organization_name']}
           </div>
