@@ -204,7 +204,11 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
       %else:
       <div class="media">
         <div class="hero">
-          <img src="${course_image_urls['large']}" alt="" />
+          % if ccx:
+            <img src="${get_profile_image_urls_for_user(ccx.coach)['large']}" alt="" />
+          % else:
+            <img src="${course_image_urls['large']}" alt="" />
+          % endif
         </div>
       </div>
       % endif
