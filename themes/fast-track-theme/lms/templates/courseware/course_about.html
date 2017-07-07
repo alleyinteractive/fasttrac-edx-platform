@@ -183,7 +183,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
               href_class = "register"
           %>
           <a href="${reg_href}" class="${href_class}">
-            ${_("Enroll in {course_name}").format(course_name=course.display_number_with_default) | h}
+            ${_("Enroll") | h}
           </a>
           <div id="register_error"></div>
         %endif
@@ -236,7 +236,6 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
 
         % if not ccx:
           <ol class="important-dates">
-            <li class="important-dates-item"><span class="icon fa fa-info-circle" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
             % if not course.start_date_is_still_default:
               <li class="important-dates-item"><span class="icon fa fa-calendar" aria-hidden="true"></span><p class="important-dates-item-title">${_("Classes Start")}</p><span class="important-dates-item-text start-date">${course.start_datetime_text()}</span></li>
             % endif
