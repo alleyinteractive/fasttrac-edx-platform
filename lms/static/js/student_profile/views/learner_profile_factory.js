@@ -145,7 +145,6 @@
                 mailing_address: 'Address',
                 city: 'City',
                 zipcode: 'Zip/Postal Code',
-                country: 'Country',
                 company: 'Company',
                 title: 'Title',
                 phone_number: 'Phone Number'
