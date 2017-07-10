@@ -76,9 +76,9 @@
                 </div>
             % endif
     </div>
-    % if is_staff or is_instructor:
-        <div class="instructor-nav-wrapper">
-            <ul class="instructor-nav">
+    <div class="instructor-nav-wrapper">
+        <ul class="instructor-nav">
+            % if is_staff or is_instructor:
                 <li class="nav-item">
                     <a href="#" data-section="schedule">${_("COURSE STRUCTURE")}</a>
                 </li>
@@ -88,7 +88,12 @@
                 <li class="nav-item">
                     <a href="#" data-section="membership">${_("ENROLLMENT")}</a>
                 </li>
-            </ul>
+            % endif
+            <li class="nav-item">
+                <a href="#" data-section="student_admin">${_("STUDENT ADMIN")}</a>
+            </li>
+        </ul>
+        % if is_staff or is_instructor:
             <section id="schedule" class="idash-section" aria-label="${_('Schedule')}">
                 <%include file="schedule.html" args="" />
             </section>
@@ -98,8 +103,11 @@
             <section id="membership" class="idash-section" aria-label="${_('Batch Enrollment')}">
                 <%include file="enrollment.html" args="" />
             </section>
-        </div>
-    % endif
+        % endif
+        <section id="student_admin" class="idash-section" aria-label="${_('Student Grades')}">
+                <%include file="student_admin.html" args="" />
+        </section>
+    </div>
 </div>
 
 % if reindex_url:
