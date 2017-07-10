@@ -111,6 +111,9 @@ from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
+from edxmako.shortcuts import render_to_string
+from django.conf import settings
+from django.core.mail import send_mail
 
 log = logging.getLogger(__name__)
 
@@ -903,6 +906,14 @@ def modify_access(request, course_id):
                 display_name=ccx_name,
                 original_ccx_id=course.id.ccx
             ).save()
+
+            # send affiliate email KF-261
+            if rolename == 'ccx_coach':
+                from_address = settings.DEFAULT_FROM_EMAIL
+                subject = 'FastTrac Facilitator - Short Survey'
+                message = render_to_string('emails/affiliate_add.txt', {})
+
+                send_mail(subject, message, from_address, [user.email], fail_silently=False)
 
     elif action == 'revoke':
         revoke_access(course, user, rolename, False)
