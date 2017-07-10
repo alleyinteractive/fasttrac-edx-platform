@@ -14,6 +14,13 @@
 
     <br>
     <div>
+      <label for="">Profile Image</label>
+      <input class="upload-profile-image" type="file" name="file">
+    </div>
+    <br>
+
+    <br>
+    <div>
       <label for="">Affiliate Organization</label>
       <br>
       <input type="text" value="${affiliate.profile.affiliate_organization_name}" name="affiliate_organization_name">
@@ -80,59 +87,9 @@
 
     <br>
     <div>
-      <label for="">Company</label>
-      <br>
-      <input type="text" value="${affiliate.profile.company}" name="company">
-    </div>
-    <br>
-
-    <br>
-    <div>
-      <label for="">Title</label>
-      <br>
-      <input type="text" value="${affiliate.profile.title}" name="title">
-    </div>
-    <br>
-
-    <br>
-    <div>
       <label for="">Phone Number</label>
       <br>
       <input type="text" value="${affiliate.profile.phone_number}" name="phone_number">
-    </div>
-    <br>
-
-    <br>
-    <div>
-      <label for="">Newsletter</label>
-      <br>
-      <br>
-      <select name="newsletter">
-        % for choice in newsletter_choices:
-          <option value="${choice[0]}" ${'selected' if affiliate.profile.newsletter == choice[0] else ''}>${choice[1]}</option>
-        % endfor
-      </select>
-    </div>
-    <br>
-
-    <br>
-    <div>
-      <label for="">Gender</label>
-      <br>
-      <br>
-      <select name="gender">
-        % for choice in gender_choices:
-          <option value="${choice[0]}" ${'selected' if affiliate.profile.gender == choice[0] else ''}>${choice[1]}</option>
-        % endfor
-      </select>
-    </div>
-    <br>
-
-    <br>
-    <div>
-      <label for="">Year of Birth</label>
-      <br>
-      <input type="number" value="${affiliate.profile.year_of_birth}" name="year_of_birth">
     </div>
     <br>
 
@@ -141,4 +98,11 @@
     <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
     <input type="submit" value="Save" />
   </div>
+
+% if reindex_urls:
+  % for reindex_url in reindex_urls:
+    <iframe src="${reindex_url.replace(' ', '+')}" frameborder="0" height="0" width="0"></iframe>
+  % endfor
+% endif
+
 </section>

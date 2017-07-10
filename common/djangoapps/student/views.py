@@ -26,6 +26,7 @@ from django.core import mail
 from django.core.urlresolvers import reverse, NoReverseMatch, reverse_lazy
 from django.core.validators import validate_email, ValidationError
 from django.db import IntegrityError, transaction, connection
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError, Http404
 from django.shortcuts import redirect
 from django.utils.encoding import force_bytes, force_text
@@ -60,6 +61,7 @@ from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=im
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.utils import is_ccx_coach_on_master_course
+from openedx.core.djangoapps.profile_images.views import ProfileImageUploadView
 from bulk_email.models import Optout, BulkEmailFlag  # pylint: disable=import-error
 from certificates.models import CertificateStatuses, certificate_status_for_student
 from certificates.api import (  # pylint: disable=import-error
@@ -414,28 +416,36 @@ def affiliate_edit(request, affiliate_username):
         raise Http404
 
     if request.method == 'GET':
+
         return render_to_response('affiliate_edit.html', {
             'affiliate': affiliate,
             'state_choices': settings.STATE_CHOICES,
-            'countries': countries,
-            'newsletter_choices': UserProfile.YES_NO_CHOICES,
-            'gender_choices': UserProfile.GENDER_CHOICES,
+            'countries': countries
         })
     elif request.method == 'POST':
+
         for key in request.POST:
             if key == 'year_of_birth':
                 setattr(affiliate.profile, key, int(request.POST[key]))
             else:
                 setattr(affiliate.profile, key, request.POST[key])
 
-        affiliate.profile.save()
+        with transaction.atomic():
+            affiliate.profile.save()
+            ProfileImageUploadView.as_view()(request, affiliate_username)
+
+        course_access_roles = CourseAccessRole.objects.filter(user=affiliate, role='ccx_coach').exclude(Q(course_id__startswith='ccx-'))
+
+        course_ids = [c.course_id for c in course_access_roles]
+        course_reindex_urls = []
+        for id in course_ids:
+            course_reindex_urls.append('http://{}/course/{}/ccx_reindex'.format(settings.CMS_BASE, id))
 
         return render_to_response('affiliate_edit.html', {
             'affiliate': affiliate,
             'state_choices': settings.STATE_CHOICES,
             'countries': countries,
-            'newsletter_choices': UserProfile.YES_NO_CHOICES,
-            'gender_choices': UserProfile.GENDER_CHOICES,
+            'reindex_urls': course_reindex_urls
         })
     else:
         raise Http404
