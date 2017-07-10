@@ -15,7 +15,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
         % if hasattr(course.id, 'ccx'):
           <%
             ccx_custom_course = CustomCourseForEdX.objects.get(pk=course.id.ccx)
-            image_url = get_profile_image_urls_for_user(ccx_custom_course.coach)['small']
+            image_url = get_profile_image_urls_for_user(ccx_custom_course.coach)['full']
           %>
           <img src="${image_url}" alt="${course.display_name_with_default} ${course.display_number_with_default}" />
         % else:

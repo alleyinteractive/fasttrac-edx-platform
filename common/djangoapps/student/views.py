@@ -380,7 +380,7 @@ def fetch_ccx_affiliates(affiliate_name, affiliate_city, affiliate_state):
 
     for row in rows:
         user = User.objects.get(username=row[0])
-        image_url = get_profile_image_urls_for_user(user)['medium']
+        image_url = get_profile_image_urls_for_user(user)['full']
         data.append({
             'username': row[0],
             'affiliate_organization_name': row[1],

@@ -651,7 +651,7 @@ class CourseAboutSearchIndexer(object):
                     "number": course.number
                 },
                 "course": ccx_course_id,
-                "image_url": get_profile_image_urls_for_user(ccx.coach)['small'],
+                "image_url": get_profile_image_urls_for_user(ccx.coach)['full'],
                 "org": course.org,
                 "id": ccx_course_id,
                 "delivery_mode": ccx.delivery_mode,

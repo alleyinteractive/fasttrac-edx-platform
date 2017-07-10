@@ -194,7 +194,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
       <a href="#video-modal" class="media" rel="leanModal">
         <div class="hero">
           % if ccx:
-            <img src="${get_profile_image_urls_for_user(ccx.coach)['large']}" alt="" />
+            <img src="${get_profile_image_urls_for_user(ccx.coach)['full']}" alt="" />
           % else:
             <img src="${course_image_urls['large']}" alt="" />
           % endif
@@ -205,7 +205,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
       <div class="media">
         <div class="hero">
           % if ccx:
-            <img src="${get_profile_image_urls_for_user(ccx.coach)['large']}" alt="" />
+            <img src="${get_profile_image_urls_for_user(ccx.coach)['full']}" alt="" />
           % else:
             <img src="${course_image_urls['large']}" alt="" />
           % endif
