@@ -5,7 +5,7 @@
 <%block name="pagetitle">Affiliate ${affiliate.profile.name}</%block>
 
 <section class="course-info">
-  <form class="edit-affiliate-container" action="/affiliates/edit/${affiliate.username}" method="POST">
+  <form class="edit-affiliate-container" action="/affiliates/edit/${affiliate.username}" method="POST" enctype="multipart/form-data">
     <br>
     <h1 class="explore-header">Edit Affiliate Info</h1>
 

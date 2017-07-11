@@ -432,7 +432,7 @@ def affiliate_edit(request, affiliate_username):
 
         with transaction.atomic():
             affiliate.profile.save()
-            ProfileImageUploadView.as_view()(request, affiliate_username)
+            ProfileImageUploadView().post(request, affiliate_username)
 
         course_access_roles = CourseAccessRole.objects.filter(user=affiliate, role='ccx_coach').exclude(Q(course_id__startswith='ccx-'))
 
