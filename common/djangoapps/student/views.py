@@ -26,7 +26,7 @@ from django.core import mail
 from django.core.urlresolvers import reverse, NoReverseMatch, reverse_lazy
 from django.core.validators import validate_email, ValidationError
 from django.db import IntegrityError, transaction, connection
-from django.db.models import Q
+from django.db.models import Q, F
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError, Http404
 from django.shortcuts import redirect
 from django.utils.encoding import force_bytes, force_text
@@ -395,7 +395,7 @@ def fetch_ccx_affiliates(affiliate_name, affiliate_city, affiliate_state):
 
 def affiliate(request, affiliate_username):
     affiliate = User.objects.get(username=affiliate_username)
-    courses = CustomCourseForEdX.objects.raw('SELECT * FROM ccx_customcourseforedx WHERE original_ccx_id = id AND coach_id=%s', [affiliate.id])
+    courses = CustomCourseForEdX.objects.filter(coach=affiliate, enrollment_type=CustomCourseForEdX.PUBLIC, id=F('original_ccx_id'))
 
     return render_to_response('affiliate.html', {
         'affiliate': affiliate,
