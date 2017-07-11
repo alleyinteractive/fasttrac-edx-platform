@@ -215,7 +215,7 @@ def _get_exif_orientation(exif):
     value is not set.
     """
     exif_dict = piexif.load(exif)
-    return exif_dict['0th'].get(piexif.ImageIFD.Orientation)
+    return exif_dict['0th'].get(piexif.ImageIFD.Orientation, 1)
 
 
 def _get_valid_file_types():
