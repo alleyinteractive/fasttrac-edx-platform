@@ -55,6 +55,7 @@ from .tools import get_units_with_due_date, title_or_url
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from openedx.core.djangolib.markup import HTML, Text
+from student.models import CourseAccessRole
 
 log = logging.getLogger(__name__)
 
@@ -74,7 +75,11 @@ class InstructorDashboardTab(CourseTab):
         """
         Returns true if the specified user has staff access.
         """
-        return bool(user and has_access(user, 'staff', course, course.id))
+        if hasattr(course.id, 'ccx'):
+            has_staff_access = CourseAccessRole.objects.filter(course_id=course.id, user=user, role='staff').exists()
+            return has_staff_access
+        else:
+            return bool(user and has_access(user, 'staff', course, course.id))
 
 
 @ensure_csrf_cookie
