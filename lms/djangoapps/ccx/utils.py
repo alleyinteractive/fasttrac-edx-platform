@@ -251,7 +251,7 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
     """
     errors = []
 
-    if action == 'Enroll' or action == 'add':
+    if action.upper() == 'ENROLL' or action == 'add':
         ccx_course_overview = CourseOverview.get_from_id(course_key)
         course_locator = course_key.to_course_locator()
         staff = CourseStaffRole(course_locator).users_with_role()
@@ -275,7 +275,7 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
                 errors.append(error)
                 break
             enroll_email(course_key, email, auto_enroll=True, email_students=email_students, email_params=email_params)
-    elif action == 'Unenroll' or action == 'revoke':
+    elif action.upper() == 'UNENROLL' or action == 'revoke':
         for identifier in identifiers:
             try:
                 email, __ = get_valid_student_with_email(identifier)
