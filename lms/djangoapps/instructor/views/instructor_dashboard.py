@@ -76,8 +76,7 @@ class InstructorDashboardTab(CourseTab):
         Returns true if the specified user has staff access.
         """
         if hasattr(course.id, 'ccx'):
-            has_staff_access = CourseAccessRole.objects.filter(course_id=course.id, user=user, role='staff').exists()
-            return has_staff_access
+            return user and user.is_staff
         else:
             return bool(user and has_access(user, 'staff', course, course.id))
 

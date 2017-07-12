@@ -174,7 +174,7 @@ class CustomCourseForEdX(models.Model):
         else:
             ccx_locator = CCXLocator.from_course_locator(self.course_id, unicode(self.original_ccx_id))
 
-        return CourseAccessRole.objects.filter(course_id=ccx_locator, user=user, role='instructor').count() > 0
+        return CourseAccessRole.objects.filter(course_id=ccx_locator, user=user, role='instructor').exists()
 
     def is_staff(self, user):
         if unicode(self.course_id).startswith('ccx'):
@@ -182,7 +182,7 @@ class CustomCourseForEdX(models.Model):
         else:
             ccx_locator = CCXLocator.from_course_locator(self.course_id, unicode(self.original_ccx_id))
 
-        return CourseAccessRole.objects.filter(course_id=ccx_locator, user=user, role='staff').count() > 0
+        return CourseAccessRole.objects.filter(course_id=ccx_locator, user=user, role='staff').exists()
 
 
 class CcxFieldOverride(models.Model):
