@@ -21,6 +21,7 @@ from xmodule.library_tools import normalize_key_for_search
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from ccx_keys.locator import CCXLocator
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
+from django.db.models import F
 
 # REINDEX_AGE is the default amount of time that we look back for changes
 # that might have happened. If we are provided with a time at which the
@@ -637,7 +638,7 @@ class CourseAboutSearchIndexer(object):
         courses_to_index = [course_info]
 
         # index CCX courses of this course
-        ccxs = CustomCourseForEdX.objects.filter(course_id=course.id)
+        ccxs = CustomCourseForEdX.objects.filter(course_id=course.id, id=F('original_ccx_id'))
         for ccx in ccxs:
             ccx_course_id = unicode(CCXLocator.from_course_locator(course.id, ccx.original_ccx_id))
             ccx_info = {
