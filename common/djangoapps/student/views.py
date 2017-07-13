@@ -432,7 +432,16 @@ def affiliate_edit(request, affiliate_username):
 
         with transaction.atomic():
             affiliate.profile.save()
-            ProfileImageUploadView().post(request, affiliate_username)
+            uploadImageResponse = ProfileImageUploadView().post(request, affiliate_username)
+
+            if uploadImageResponse.status_code == 400:
+                return render_to_response('affiliate_edit.html', {
+                    'affiliate': affiliate,
+                    'state_choices': settings.STATE_CHOICES,
+                    'countries': countries,
+                    'error_message': uploadImageResponse.data['user_message']
+                })
+
 
         return render_to_response('affiliate_edit.html', {
             'affiliate': affiliate,
