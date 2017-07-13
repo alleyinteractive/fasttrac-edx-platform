@@ -98,11 +98,4 @@
     <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
     <input type="submit" value="Save" />
   </div>
-
-% if reindex_urls:
-  % for reindex_url in reindex_urls:
-    <iframe src="${reindex_url.replace(' ', '+')}" frameborder="0" height="0" width="0"></iframe>
-  % endfor
-% endif
-
 </section>

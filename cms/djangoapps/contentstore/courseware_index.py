@@ -18,10 +18,6 @@ from search.search_engine_base import SearchEngine
 from xmodule.annotator_mixin import html_to_text
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.library_tools import normalize_key_for_search
-from lms.djangoapps.ccx.models import CustomCourseForEdX
-from ccx_keys.locator import CCXLocator
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
-from django.db.models import F
 
 # REINDEX_AGE is the default amount of time that we look back for changes
 # that might have happened. If we are provided with a time at which the
@@ -594,12 +590,7 @@ class CourseAboutSearchIndexer(object):
             'id': course_id,
             'course': course_id,
             'content': {},
-            'image_url': course_image_url(course),
-            'enrollment_type': 'PRIVATE' if course.invitation_only else 'PUBLIC',
-            'affiliate_name': 'FastTrac',
-            'location_state': 'MO',
-            'delivery_mode': 'ONLINE_ONLY',
-            'location_city': 'Kansas City'
+            'image_url': course_image_url(course)
         }
 
         # load data for all of the 'about' modules for this course into a dictionary
@@ -636,37 +627,6 @@ class CourseAboutSearchIndexer(object):
                     course_info[about_information.property_name] = section_content
 
         courses_to_index = [course_info]
-
-        # index CCX courses of this course
-        ccxs = CustomCourseForEdX.objects.filter(course_id=course.id, id=F('original_ccx_id'))
-        for ccx in ccxs:
-            ccx_course_id = unicode(CCXLocator.from_course_locator(course.id, ccx.original_ccx_id))
-            ccx_info = {
-                "modes": [mode.slug for mode in CourseMode.modes_for_course(course.id)],
-                "language": "en",
-                "start": course.start,
-                "number": course.number,
-                "content": {
-                    "overview": strip_html_content_to_text(ccx.course_description),
-                    "display_name": ccx.display_name,
-                    "number": course.number
-                },
-                "course": ccx_course_id,
-                "image_url": get_profile_image_urls_for_user(ccx.coach)['full'],
-                "org": course.org,
-                "id": ccx_course_id,
-                "delivery_mode": ccx.delivery_mode,
-                "location_city": ccx.location_city,
-                "location_postal_code": ccx.location_postal_code,
-                "location_state": ccx.location_state,
-                "time": ccx.time,
-                "fee": ccx.fee,
-                "course_description": ccx.course_description,
-                "affiliate_name": ccx.coach.profile.affiliate_organization_name,
-                "enrollment_type": ccx.enrollment_type.upper(),
-            }
-
-            courses_to_index.append(ccx_info)
 
         # Broad exception handler to protect around and report problems with indexing
         try:

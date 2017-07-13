@@ -1,0 +1,76 @@
+<%namespace name='static' file='static_content.html'/>
+<%!
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+%>
+
+<%page args="course" expression_filter="h"/>
+<%
+  if hasattr(course.id, 'ccx'):
+    ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
+  else:
+    ccx = None
+%>
+
+<article class="course" role="region">
+    <a href="/courses/${course.id}/about">
+        <header class="course-image">
+            % if hasattr(course.id, 'ccx'):
+              <%
+                image_url = get_profile_image_urls_for_user(ccx.coach)['full']
+              %>
+              <img src="${image_url}" alt="${course.display_name}" />
+            % else:
+              <img src="${course.course_image_url}" alt="${course.display_name}" />
+            % endif
+            <div class="course-date-wrapper" aria-hidden="true">
+                <p class=course-date>
+                  Start date:
+                  % if hasattr(course.id, 'ccx'):
+                    ${ccx.time.strftime("%B %d, %Y")}
+                  % else:
+                    ${course.start.strftime("%B %d, %Y")}
+                  % endif
+                </p>
+            </div>
+        </header>
+        <section class="course-info" aria-hidden="true">
+            % if hasattr(course.id, 'ccx'):
+              <h3 class="affiliate-name">
+                  ${ccx.coach.profile.name}
+              </h3>
+            % endif
+            <h2 class="course-name">
+                ${course.display_name}
+            </h2>
+            <p class="course-overview">
+                % if hasattr(course.id, 'ccx'):
+                  ${ccx.course_description}
+                % endif
+            </p>
+            <div class="course-footer">
+                <div class="course-delivery">
+                  % if hasattr(course.id, 'ccx') and ccx.delivery_mode == 'IN_PERSON':
+                      <i class="fa fa-users"></i>
+                      In-Person
+                  % else:
+                      <i class="fa fa-globe"></i>
+                      Online
+                  % endif
+                </div>
+                <div class="course-state-wrapper">
+                    <div class="course-state"><i class="fa fa-map-marker"></i>
+                      % if hasattr(course.id, 'ccx'):
+                        ${ccx.location_state}
+                      % else:
+                        MO
+                      % endif
+                    </div>
+                </div>
+                <div class="course-view-action">View
+                    <i class="fa fa-arrow-circle-o-right"></i>
+                </div>
+            </div>
+        </section>
+    </a>
+</article>

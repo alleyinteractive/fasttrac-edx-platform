@@ -4,55 +4,107 @@
   from openedx.core.djangolib.js_utils import dump_js_escaped_json
 %>
 <%inherit file="../main.html" />
-<%
-  course_discovery_enabled = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY')
-%>
+
+<%block name="headextra">
+    <%static:css group='style-course-vendor'/>
+</%block>
 
 <%namespace name='static' file='../static_content.html'/>
-
-% if course_discovery_enabled:
-<%block name="header_extras">
-  % for template_name in ["course_card", "filter_bar", "filter", "facet", "facet_option"]:
-  <script type="text/template" id="${template_name}-tpl">
-      <%static:include path="discovery/${template_name}.underscore" />
-  </script>
-  % endfor
-  <%static:require_module module_name="js/discovery/discovery_factory" class_name="DiscoveryFactory">
-    DiscoveryFactory(
-      ${course_discovery_meanings | n, dump_js_escaped_json},
-      getParameterByName('search_query')
-    );
-  </%static:require_module>
-</%block>
-% endif
-
-<script type="text/javascript">
-  $(document).ready(function() {
-    $('.wrapper-footer').addClass('explore-courses-footer')
-  })
-</script>
 
 <%block name="pagetitle">${_("Courses")}</%block>
 
 <main id="main" class="explore-courses" aria-label="Content" tabindex="-1">
-  % if course_discovery_enabled:
   <div aria-label="${_('Refine Your Search')}" class="search-facets">
     <div class="header-search-facets-wrapper">
       <h2 class="header-search-facets">${_('Refine Course List')}</h2>
     </div>
     <div class="search-facets-lists">
+      <a href="/courses" class="clear-all"> <span class="fa fa-remove"></span> Clear All</a>
+      <br>
+      <form action="/courses" method="POST">
+        <h3 class="header-facet">
+          <i class="fa fa-calendar"></i>
+          START DATE
+        </h3>
+        <ul class="facet-list">
+          <li>
+            <input
+              placeholder="from..."
+              value="${date_from}"
+              class="date"
+              type="text"
+              name="date_from"/>
+          </li>
+          <br>
+          <li>
+            <input
+              placeholder="to..."
+              value="${date_to}"
+              class="date"
+              type="text"
+              name="date_to"/>
+          </li>
+        </ul>
+
+        <h3 class="header-facet">
+          <i class="fa fa-cloud-download"></i>
+          DELIVERY
+        </h3>
+        <ul class="facet-list">
+          % for choice in delivery_mode_choices:
+            <li>
+              <input type="checkbox" name="delivery_mode" class="delivery_mode_checkbox" value="${choice[0]}" id="delivery_mode_${choice[0]}" ${ 'checked' if filter_states.get('delivery_mode') == choice[0] else '' }>
+              <label for="delivery_mode_${choice[0]}">
+                ${choice[1]}
+                <i class="fa fa-times"></i>
+              </label>
+            </li>
+          % endfor
+        </ul>
+
+        <h3 class="header-facet">
+          <i class="fa fa-map-marker"></i>
+          LOCATION
+        </h3>
+        <ul class="facet-list">
+          <li>
+            <input type="text" placeholder="city" name="location_city" value="${filter_states.get('location_city', '')}">
+          </li>
+          <br>
+          <li>
+            <select name="location_state">
+              <option selected disabled> state </option>
+              % for choice in state_choices:
+                <option value="${choice[0]}" ${ 'selected' if filter_states.get('location_state') == choice[0] else '' }>${choice[1]}</option>
+              % endfor
+            </select>
+          </li>
+        </ul>
+
+        <h3 class="header-facet">
+          <i class="fa fa-user"></i>
+          AFFILIATE
+        </h3>
+        <ul class="facet-list">
+          <li>
+            <select name="coach_id">
+              <option selected disabled> select affiliate </option>
+              % for affiliate in affiliates:
+                <option value="${affiliate.id}" ${ 'selected' if filter_states.get('coach_id') == unicode(affiliate.id) else '' }>${affiliate.profile.name}</option>
+              % endfor
+            </select>
+          </li>
+        </ul>
+
+        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+
+        <button>
+          SUBMIT
+          <i class="fa fa-arrow-circle-right"></i>
+        </button>
+      </form>
     </div>
   </div>
-  % endif
-
-
-  <script>
-    $(document).ready(function(){
-      $('.explore-header').on('click', function() {
-        $('.hidden-explore-option').toggleClass('hidden');
-      })
-    })
-  </script>
 
   <div class="find-courses">
     <h1 class="explore-header">
@@ -64,20 +116,43 @@
       </a>
     </h1>
     <div class="courses-container">
-      % if course_discovery_enabled:
-      <div id="filter-bar" class="filters hide-phone is-collapsed">
-      </div>
-      % endif
-
-      <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
+      <div class="courses" role="region" aria-label="${_('List of Courses')}">
         <ul class="courses-listing">
           %for course in courses:
           <li class="courses-listing-item">
-            <%include file="../course.html" args="course=course" />
+            <%include file="../explore_course_card.html" args="course=course" />
           </li>
           %endfor
+
+          % if len(courses) == 0:
+            <h1 class="no-results"> 0 RESULTS</h1>
+            <h2 class="no-results">
+              No matching results. Try changing your search parameters,
+              or take the self paced version of the course.
+            </h2>
+          % endif
         </ul>
       </div>
     </div>
   </div>
 </main>
+
+<script>
+  $(document).ready(function(){
+    $('.wrapper-footer').addClass('explore-courses-footer')
+
+    $('.explore-header').on('click', function() {
+      $('.hidden-explore-option').toggleClass('hidden');
+    })
+
+    $('.date').datepicker({'dateFormat': 'm/d/yy'});
+
+    $('input[type=checkbox]').on('click', function(){
+      if(this.checked) {
+        $('.delivery_mode_checkbox').prop('checked', false);
+        $(this).prop('checked', true);
+      }
+    });
+  });
+</script>
+

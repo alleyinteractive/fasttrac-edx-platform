@@ -16,7 +16,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.core.context_processors import csrf
 from django.db import transaction, connection
-from django.db.models import Q
+from django.db.models import Q, F
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
@@ -99,6 +99,8 @@ from openedx.core.djangoapps.bookmarks.models import Bookmark
 from search.api import perform_search
 from ccx.views import get_ccx_schedule
 from openedx.core.lib.xblock_utils import get_course_update_items
+from lms.envs.common import STATE_CHOICES
+from ccx_keys.locator import CCXLocator
 
 
 log = logging.getLogger("edx.courseware")
@@ -138,23 +140,53 @@ def courses(request):
     """
     Render "find courses" page.  The course selection work is done in courseware.courses.
     """
-    courses_list = []
-    course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
-    if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-        courses_list = get_courses(request.user)
+    ccx_filters = build_ccx_filters(request)
+    ccxs = CustomCourseForEdX.objects.filter(**ccx_filters)
+    ccx_keys = []
 
-        if configuration_helpers.get_value(
-                "ENABLE_COURSE_SORTING_BY_START_DATE",
-                settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]
-        ):
-            courses_list = sort_by_start_date(courses_list)
-        else:
-            courses_list = sort_by_announcement(courses_list)
+    for ccx in ccxs:
+        ccx_course_id = unicode(CCXLocator.from_course_locator(ccx.course.id, ccx.id))
+        ccx_course_key = CourseKey.from_string(ccx_course_id)
+        ccx_keys.append(ccx_course_key)
+
+    courses = CourseOverview.objects.filter(Q(id__in=ccx_keys) | ~Q(id__startswith='ccx')).filter(invitation_only=0)
 
     return render_to_response(
         "courseware/courses.html",
-        {'courses': courses_list, 'course_discovery_meanings': course_discovery_meanings}
+        {
+            'courses': courses,
+            'affiliates': set([c.coach for c in ccxs]),
+            'state_choices': STATE_CHOICES,
+            'delivery_mode_choices': CustomCourseForEdX.DELIVERY_MODE_CHOICES,
+            'filter_states': ccx_filters,
+            'date_from': request.POST.get('date_from', ''),
+            'date_to': request.POST.get('date_to', '')
+        }
     )
+
+
+def build_ccx_filters(request):
+    filter_fields = ['location_city', 'location_state', 'delivery_mode', 'coach_id']
+    filters = {
+        'id': F('original_ccx_id'),
+        'enrollment_type': CustomCourseForEdX.PUBLIC
+    }
+
+    for field in filter_fields:
+        value = request.POST.get(field)
+        if value:
+            filters[field] = value
+
+    date_from = request.POST.get('date_from')
+    date_to = request.POST.get('date_to')
+
+    if date_from:
+        filters['time__gte'] = datetime.strptime(date_from, '%m/%d/%Y')
+
+    if date_to:
+        filters['time__lte'] = datetime.strptime(date_to, '%m/%d/%Y')
+
+    return filters
 
 
 def get_current_child(xmodule, min_depth=None, requested_child=None):

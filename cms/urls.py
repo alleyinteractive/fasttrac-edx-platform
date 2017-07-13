@@ -91,11 +91,6 @@ urlpatterns += patterns(
         'course_search_index_handler',
         name='course_search_index_handler'
     ),
-    url(
-        r'^course/{}/ccx_reindex?$'.format(settings.COURSE_KEY_PATTERN),
-        'ccx_reindex_handler',
-        name='ccx_reindex_handler'
-    ),
     url(r'^course/{}?$'.format(settings.COURSE_KEY_PATTERN), 'course_handler', name='course_handler'),
     url(r'^course_notifications/{}/(?P<action_state_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
         'course_notifications_handler'),

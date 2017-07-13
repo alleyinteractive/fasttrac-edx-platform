@@ -434,18 +434,10 @@ def affiliate_edit(request, affiliate_username):
             affiliate.profile.save()
             ProfileImageUploadView().post(request, affiliate_username)
 
-        course_access_roles = CourseAccessRole.objects.filter(user=affiliate, role='ccx_coach').exclude(Q(course_id__startswith='ccx-'))
-
-        course_ids = [c.course_id for c in course_access_roles]
-        course_reindex_urls = []
-        for id in course_ids:
-            course_reindex_urls.append('http://{}/course/{}/ccx_reindex'.format(settings.CMS_BASE, id))
-
         return render_to_response('affiliate_edit.html', {
             'affiliate': affiliate,
             'state_choices': settings.STATE_CHOICES,
-            'countries': countries,
-            'reindex_urls': course_reindex_urls
+            'countries': countries
         })
     else:
         raise Http404
