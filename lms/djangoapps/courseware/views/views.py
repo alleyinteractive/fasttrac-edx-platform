@@ -135,10 +135,9 @@ def user_groups(user):
 
 
 @ensure_csrf_cookie
-@cache_if_anonymous()
 def courses(request):
     """
-    Render "find courses" page.  The course selection work is done in courseware.courses.
+    Render "find courses" page.
     """
     ccx_filters = build_ccx_filters(request)
     ccxs = CustomCourseForEdX.objects.filter(**ccx_filters)
