@@ -5,4 +5,28 @@
 <div class="gradebook-wrapper">
     <p><a href="${gradebook_url}">${_('View gradebook')}</a></p>
     <p><a href="${grades_csv_url}">${_('Download student grades')}</a></p>
+
+    <br>
+    <br>
+
+    <table class="students-table">
+        <thead>
+            <td>Name</td>
+            <td>Username</td>
+            <td>Email</td>
+            <td>Date Enrolled</td>
+            <td>Active</td>
+        </thead>
+        <tbody>
+            % for enrollment in enrollments:
+                <tr>
+                    <td>${enrollment.user.profile.name}</td>
+                    <td>${enrollment.user.username}</td>
+                    <td>${enrollment.user.email}</td>
+                    <td>${enrollment.created.strftime("%B %d, %Y @ %-I:%M%p")}</td>
+                    <td>${ 'Yes' if enrollment.is_active else 'No' }</td>
+                </tr>
+            % endfor
+        </tbody>
+    </table>
 </div>

@@ -503,3 +503,21 @@ $link-color: #6f6f6f;
     height: 135px !important;
   }
 }
+
+
+.students-table {
+  width: 100%;
+
+  thead td {
+    font-weight: bold;
+    height: 50px;
+  }
+
+  tbody tr {
+    height: 40px;
+
+    &:hover {
+      background: #ddd;
+    }
+  }
+}
