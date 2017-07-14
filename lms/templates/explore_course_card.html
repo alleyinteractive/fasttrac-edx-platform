@@ -50,7 +50,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
             </p>
             <div class="course-footer">
                 <div class="course-delivery">
-                  % if hasattr(course.id, 'ccx') and ccx.delivery_mode == 'IN_PERSON':
+                  % if hasattr(course.id, 'ccx') and ccx.delivery_mode == CustomCourseForEdX.IN_PERSON:
                       <i class="fa fa-users"></i>
                       In-Person
                   % else:

@@ -298,7 +298,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
             <li class="important-dates-item">
               <span class="icon fa fa-info-circle"></span>
               <p class="important-dates-item-title">Delivery</p>
-              <span class="important-dates-item-text">${ccx.delivery_mode}</span>
+              <span class="important-dates-item-text">${ccx.get_delivery_mode_display()}</span>
             </li>
             <li class="important-dates-item">
               <span class="icon fa fa-map-marker"></span>
