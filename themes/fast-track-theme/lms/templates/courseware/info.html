@@ -88,6 +88,15 @@ from openedx.core.djangolib.markup import HTML, Text
               <b>Contact Information:</b>
               ${'{} / {}'.format(ccx.coach.email or '', ccx.coach.profile.phone_number or '')}
             </div>
+          % else:
+            <div>
+              <b>Affiliate:</b>
+              Kauffman FastTrac
+            </div>
+            <div>
+              <b>Contact Information:</b>
+              <a href="mailto:info@fasttrac.org">info@fasttrac.org</a>
+            </div>
           % endif
         </div>
       </div>
