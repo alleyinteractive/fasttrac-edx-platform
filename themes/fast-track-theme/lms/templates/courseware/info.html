@@ -74,7 +74,9 @@ from openedx.core.djangolib.markup import HTML, Text
           % if ccx:
             <div>
               <b>Affiliate:</b>
-              ${ccx.coach.profile.name}
+              <a href="/affiliates/${ccx.coach.username}">
+                ${ccx.coach.profile.affiliate_organization_name}
+              </a>
             </div>
             <div>
               <b>Meeting Date & Time:</b>

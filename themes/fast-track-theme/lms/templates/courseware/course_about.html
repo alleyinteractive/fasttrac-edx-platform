@@ -117,7 +117,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
           <h1>
             % if ccx:
               ${ccx.display_name}
-              <a href="#">${ccx.coach.profile.name}</a>
+              <a href="/affiliates/${ccx.coach.username}">${ccx.coach.profile.affiliate_organization_name}</a>
             % else:
               ${course.display_name_with_default_escaped}
               <a href="#">${course.display_org_with_default | h}</a>
