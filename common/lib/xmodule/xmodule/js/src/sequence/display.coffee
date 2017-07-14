@@ -142,6 +142,12 @@ class @Sequence
     $dropdown_items = $('#xblocks-dropdown-items').empty()
 
     titles = $active_tab.find('.element-title')
+
+    if titles.length == 0
+      $('.xblocks-dropdown-menu').hide()
+    else
+      $('.xblocks-dropdown-menu').show()
+
     titles.each (index) ->
       $dropdown_items.append '<a id="' + titles[index].id + '">' + $(titles[index]).find('span').text() + '</a>'
     handleOnClickDropdownItem()
@@ -290,7 +296,7 @@ class @Sequence
       window.location.href = @prevUrl
     else
       # If the bottom nav is used, scroll to the top of the page on change.
-      if is_bottom_nav 
+      if is_bottom_nav
         $.scrollTo 0, 150
       offset =
         next: 1
