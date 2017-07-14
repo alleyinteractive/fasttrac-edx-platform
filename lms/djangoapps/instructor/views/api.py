@@ -888,9 +888,9 @@ def modify_access(request, course_id):
 
         # add CCX table entry
         if hasattr(course.id, 'ccx'):
-            existing_ccx_enrollements = CustomCourseForEdX.objects.filter(original_ccx_id=course.id.ccx, coach_id=user.id).count()
+            ccx_enrollment_exists = CustomCourseForEdX.objects.filter(original_ccx_id=course.id.ccx, coach_id=user.id).exists()
 
-            if existing_ccx_enrollements > 0:
+            if ccx_enrollment_exists:
                 response_payload = {
                     'unique_student_identifier': user.username,
                     'rolename': rolename,
@@ -908,7 +908,10 @@ def modify_access(request, course_id):
             ).save()
 
             # send affiliate email KF-261
-            if rolename == 'ccx_coach':
+            # send email only if coach is enrolled into a CCX derived from FastTrac course
+            partial_course_key = settings.FASTTRAC_COURSE_KEY.split(':')[1]
+
+            if rolename == 'ccx_coach' and partial_course_key in unicode(course_id):
                 from_address = settings.DEFAULT_FROM_EMAIL
                 subject = 'FastTrac Facilitator - Short Survey'
                 message = render_to_string('emails/affiliate_add.txt', {})
