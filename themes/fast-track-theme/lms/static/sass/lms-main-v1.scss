@@ -304,8 +304,10 @@ $link-color: #6f6f6f;
     .course-image {
       .cover-image {
         border-bottom: 6px solid $ft-temp-darkgray;
-        height: 135px;
+        height: 200px;
         width: 298px;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
       }
     }
 
@@ -494,13 +496,14 @@ $link-color: #6f6f6f;
   clear: none !important;
   float: none !important;
   display: inline-block !important;
+  margin: 0 0 70px 0 !important;
 
   & .learn-more {
     background: $ft-orange;
   }
 
   & .course-image .cover-image:before {
-    height: 135px !important;
+    height: 200px !important;
   }
 }
 
@@ -520,4 +523,26 @@ $link-color: #6f6f6f;
       background: #ddd;
     }
   }
+}
+
+.wrapper-course-image {
+    height: 115px;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+
+    a {
+      height: 100%;
+      width: 100%;
+    }
+}
+
+.course-info .hero {
+  height: 200px !important;
+  background-size: 100% 100%;
+}
+
+.courses-container .courses .course-image img {
+  height: 200px;
+  max-height: 200px;
 }

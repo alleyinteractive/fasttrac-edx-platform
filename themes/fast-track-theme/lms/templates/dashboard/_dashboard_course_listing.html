@@ -81,9 +81,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
           ccx_custom_course = CustomCourseForEdX.objects.get(pk=enrollment.course.id.ccx)
           image_url = get_profile_image_urls_for_user(ccx_custom_course.coach)['full']
         %>
-        <a href="${course_target}" data-course-key="${enrollment.course_id}" class="cover">
-          <img src="${image_url}" class="course-image" alt="${_('{course_number} {course_name} Home Page').format(course_number=course_overview.number, course_name=course_overview.display_name_with_default)}" />
-        </a>
+        <a href="${course_target}" data-course-key="${enrollment.course_id}" class="cover" style="background-image: url(${image_url})"></a>
       % elif show_courseware_link:
         % if not is_course_blocked:
             <a href="${course_target}" data-course-key="${enrollment.course_id}" class="cover">

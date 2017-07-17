@@ -192,22 +192,20 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
       </section>
       % if get_course_about_section(request, course, "video"):
       <a href="#video-modal" class="media" rel="leanModal">
-        <div class="hero">
-          % if ccx:
-            <img src="${get_profile_image_urls_for_user(ccx.coach)['full']}" alt="" />
-          % else:
-            <img src="${course_image_urls['large']}" alt="" />
-          % endif
-          <div class="play-intro"></div>
-        </div>
+        % if ccx:
+          <div class="hero" style="background-image: url(${get_profile_image_urls_for_user(ccx.coach)['full']})">
+        % else:
+          <div class="hero" style="background-image: url(${course_image_urls['large']})">
+        % endif
+        <div class="play-intro"></div>
+      </div>
       </a>
       %else:
       <div class="media">
-        <div class="hero">
           % if ccx:
-            <img src="${get_profile_image_urls_for_user(ccx.coach)['full']}" alt="" />
+            <div class="hero" style="background-image: url(${get_profile_image_urls_for_user(ccx.coach)['full']})">
           % else:
-            <img src="${course_image_urls['large']}" alt="" />
+            <div class="hero" style="background-image: url(${course_image_urls['large']})">
           % endif
         </div>
       </div>
