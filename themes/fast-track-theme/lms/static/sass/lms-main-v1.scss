@@ -496,7 +496,6 @@ $link-color: #6f6f6f;
   clear: none !important;
   float: none !important;
   display: inline-block !important;
-  margin: 0 0 70px 0 !important;
 
   & .learn-more {
     background: $ft-orange;
@@ -545,4 +544,8 @@ $link-color: #6f6f6f;
 .courses-container .courses .course-image img {
   height: 200px;
   max-height: 200px;
+}
+
+.courses-listing .courses-listing-item {
+  margin: 0 0 70px 0 !important;
 }

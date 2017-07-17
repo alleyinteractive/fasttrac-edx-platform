@@ -148,7 +148,12 @@ def courses(request):
         ccx_course_key = CourseKey.from_string(ccx_course_id)
         ccx_keys.append(ccx_course_key)
 
-    courses = CourseOverview.objects.filter(Q(id__in=ccx_keys) | ~Q(id__startswith='ccx')).filter(invitation_only=0)
+    should_hide_master_course = get_should_hide_master_course(request)
+
+    if should_hide_master_course:
+        courses = CourseOverview.objects.filter(id__in=ccx_keys)
+    else:
+        courses = CourseOverview.objects.filter(Q(id__in=ccx_keys) | ~Q(id__startswith='ccx')).filter(invitation_only=0)
 
     return render_to_response(
         "courseware/courses.html",
@@ -162,6 +167,22 @@ def courses(request):
             'date_to': request.POST.get('date_to', '')
         }
     )
+
+def get_should_hide_master_course(request):
+    location_city = request.POST.get('location_city')
+    location_state = request.POST.get('location_state')
+    delivery_mode = request.POST.get('delivery_mode')
+    coach_id = request.POST.get('coach_id')
+
+    # the master course needs to be hidden if
+    # city isn't Kansas, state isn't Missouri
+    # delivery_mode isn't Online
+    # or we selected a coach
+
+    return ((location_city and not location_city.startswith('Kansas'))
+        or (location_state and location_state != 'MO')
+        or (delivery_mode and delivery_mode != CustomCourseForEdX.ONLINE_ONLY)
+        or coach_id)
 
 
 def build_ccx_filters(request):
