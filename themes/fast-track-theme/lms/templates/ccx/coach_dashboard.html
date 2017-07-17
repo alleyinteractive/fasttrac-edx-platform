@@ -85,6 +85,14 @@
         });
     });
 
+    function setActiveTab(activeSection) {
+        var $section_sel = $("#" + activeSection);
+        $section_sel.show();
+        var $navSelection = $('.instructor-nav').find('[data-section ="' + activeSection + '"]');
+        $navSelection.addClass("active-section");
+        $navSelection.parent().addClass("active-section-nav");
+    }
+
     function setup_tabs() {
         $(".instructor-nav a").on("click", function (event) {
             event.preventDefault();
@@ -96,18 +104,23 @@
             $(section_sel).show();
             $(this).addClass("active-section");
             $(this).parent().addClass("active-section-nav");
+
+            if (typeof(Storage) !== "undefined") {
+                var activeSection = $('.instructor-nav .active-section').data("section");
+                localStorage.setItem("activeSection", activeSection);
+            } else {
+                console.log("Browser doesn't support local storage");
+            }
         });
 
-        var url = document.URL,
-                hashbang = url.indexOf('#!');
-        if (hashbang != -1) {
-            var selector = '.instructor-nav a[data-section=' +
-                    url.substr(hashbang + 2) + ']';
-            $(selector).click();
+        var localActiveSection = localStorage.getItem("activeSection");
+        // fallback to first section
+        if(!localActiveSection) {
+            var $nav_item = $('.instructor-nav').first();
+            localActiveSection = $nav_item.find('a').data('section');
         }
-        else {
-            $(".instructor-nav a").first().click();
-        }
+
+        setActiveTab(localActiveSection);
     }
 
     function setup_management_form() {
@@ -159,7 +172,7 @@
     }
 
     $(setup_tabs);
-    $(setup_management_form)
+    $(setup_management_form);
     $(document).ready(function () {
         if ($('#ccx_std_list_messages').length) {
             $('#ccx_std_list_messages')[0].focus();
