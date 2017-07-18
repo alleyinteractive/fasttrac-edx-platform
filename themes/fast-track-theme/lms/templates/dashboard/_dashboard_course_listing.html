@@ -138,7 +138,13 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
               % endif
           % endif
           </span>
-          <span class="info-author">${enrollment.author}</span>
+          <span class="info-author">
+            % if is_ccx:
+              ${ccx_custom_course.coach.profile.affiliate_organization_name}
+            % else:
+              ${enrollment.author}
+            % endif
+          </span>
         </div>
         <div class="wrapper-course-actions">
           <div class="course-actions">
