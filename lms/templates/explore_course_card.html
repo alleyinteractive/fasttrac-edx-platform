@@ -37,7 +37,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
         <section class="course-info" aria-hidden="true">
             % if hasattr(course.id, 'ccx'):
               <h3 class="affiliate-name">
-                  ${ccx.coach.profile.name}
+                  ${ccx.coach.profile.affiliate_organization_name}
               </h3>
             % endif
             <h2 class="course-name">
