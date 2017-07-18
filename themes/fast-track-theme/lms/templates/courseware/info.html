@@ -88,7 +88,7 @@ from openedx.core.djangolib.markup import HTML, Text
             </div>
             <div>
               <b>Contact Information:</b>
-              ${'{} / {}'.format(ccx.coach.email or '', ccx.coach.profile.phone_number or '')}
+              ${'{} / {}'.format(ccx.coach.profile.public_email or '', ccx.coach.profile.phone_number or '')}
             </div>
           % else:
             <div>
