@@ -59,7 +59,12 @@
                 </div>
                 <div class="card-footer">
                   <span class="delivery-mode-item">
-                      ${course.delivery_mode}
+                    % if course.delivery_mode == 'IN_PERSON':
+                        <i class="fa fa-users"></i>
+                    % else:
+                        <i class="fa fa-globe"></i>
+                    % endif
+                    ${course.get_delivery_mode_display()}
                   </span>
                   <span class="skewed-footer-item">
                     <span>
