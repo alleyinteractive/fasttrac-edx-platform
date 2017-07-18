@@ -348,7 +348,6 @@ def create_ccx(request, course, ccx=None):
 
     assign_coach_role_to_ccx(ccx_id, request.user, course.id)
     assign_staff_role_to_ccx(ccx_id, request.user, course.id)
-    add_master_course_staff_to_ccx(course, ccx_id, ccx.display_name)
 
     return redirect(url)
 
