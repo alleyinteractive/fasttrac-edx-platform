@@ -182,13 +182,14 @@
                     new FieldsView.DropdownFieldView({
                         model: accountSettingsModel,
                         editable: editable,
-                        showMessages: false,
+                        showMessages: true,
                         placeholderValue: gettext('Add ' + value),
                         valueAttribute: key,
                         options: options[key + '_options'],
                         helpMessage: value,
                         persistChanges: true,
-                        titleVisible: true
+                        titleVisible: true,
+                        title: value
                     })
                 );
             }
