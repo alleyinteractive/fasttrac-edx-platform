@@ -224,7 +224,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
 
       <div class="inner-wrapper">
         % if ccx:
-          ${ccx.course_description}
+          <pre>${ccx.course_description}</pre>
         % else:
           ${get_course_about_section(request, course, "overview")}
         % endif
