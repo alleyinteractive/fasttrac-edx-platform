@@ -10,6 +10,8 @@ from courseware.courses import get_course_info_section, get_course_date_summary
 
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangolib.markup import HTML, Text
+
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 %>
 
 <%block name="pagetitle">${_("{course_number} Course Info").format(course_number=course.display_number_with_default)}</%block>
@@ -84,7 +86,11 @@ from openedx.core.djangolib.markup import HTML, Text
             </div>
             <div>
               <b>Meeting Location:</b>
-              ${'{}, {} {}'.format(ccx.location_city or '', ccx.location_state or '', ccx.location_postal_code or '')}
+              % if ccx.delivery_mode == CustomCourseForEdX.IN_PERSON:
+                ${'{}, {} {}'.format(ccx.location_city or '', ccx.location_state or '', ccx.location_postal_code or '')}
+              % else:
+                Online
+              % endif
             </div>
             <div>
               <b>Contact Information:</b>

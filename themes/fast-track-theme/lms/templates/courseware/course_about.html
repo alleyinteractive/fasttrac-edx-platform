@@ -7,6 +7,7 @@ from django.conf import settings
 from edxmako.shortcuts import marketing_link
 from openedx.core.lib.courses import course_image_url
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 %>
 
 <%inherit file="../main.html" />
@@ -298,14 +299,16 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
               <p class="important-dates-item-title">Delivery</p>
               <span class="important-dates-item-text">${ccx.get_delivery_mode_display()}</span>
             </li>
-            <li class="important-dates-item">
-              <span class="icon fa fa-map-marker"></span>
-              <p class="important-dates-item-title">Location</p>
-              <span class="important-dates-item-text">
-                ${ccx.location_city},
-                ${ccx.location_state}
-              </span>
-            </li>
+            % if ccx.delivery_mode == CustomCourseForEdX.IN_PERSON:
+              <li class="important-dates-item">
+                <span class="icon fa fa-map-marker"></span>
+                <p class="important-dates-item-title">Location</p>
+                  <span class="important-dates-item-text">
+                    ${ccx.location_city},
+                    ${ccx.location_state}
+                  </span>
+              </li>
+              % endif
             <li class="important-dates-item">
               <span class="icon fa fa-money"></span>
               <p class="important-dates-item-title">Fee</p>
