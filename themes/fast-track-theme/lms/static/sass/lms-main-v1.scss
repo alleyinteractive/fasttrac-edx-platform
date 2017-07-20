@@ -558,7 +558,17 @@ $link-color: #6f6f6f;
   margin: 0 0 70px 0 !important;
 }
 
+.wrapper-profile {
+  .wrapper-profile-field-account-privacy {
+    display: none;
+  }
+}
+
 // LEARNER PROFILE PAGE
 .u-field.u-field-dropdown {
-    padding: 10px 15px 15px 15px;
+  padding: 10px 15px 15px 15px;
+}
+
+label.u-field-title {
+  width: 100%;
 }

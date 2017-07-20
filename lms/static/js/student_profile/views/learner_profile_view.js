@@ -20,16 +20,18 @@
                 this.router = new Router();
                 this.firstRender = true;
             },
-            
+
             template: _.template(learnerProfileTemplate),
 
             showFullProfile: function () {
-                var isAboveMinimumAge = this.options.accountSettingsModel.isAboveMinimumAge();
-                if (this.options.ownProfile) {
-                    return isAboveMinimumAge && this.options.preferencesModel.get('account_privacy') === 'all_users';
-                } else {
-                    return this.options.accountSettingsModel.get('profile_is_public');
-                }
+                // var isAboveMinimumAge = this.options.accountSettingsModel.isAboveMinimumAge();
+                // if (this.options.ownProfile) {
+                //     return isAboveMinimumAge && this.options.preferencesModel.get('account_privacy') === 'all_users';
+                // } else {
+                //     return this.options.accountSettingsModel.get('profile_is_public');
+                // }
+
+                return true;
             },
 
             setActiveTab: function(tab) {
@@ -108,7 +110,7 @@
                 if (this.options.ownProfile) {
                     var fieldView = this.options.accountPrivacyFieldView,
                         settings = this.options.accountSettingsModel;
-                    fieldView.profileIsPrivate =  !settings.get('year_of_birth');
+                    fieldView.profileIsPrivate = !settings.get('year_of_birth');
                     fieldView.requiresParentalConsent = settings.get('requires_parental_consent');
                     fieldView.isAboveMinimumAge = settings.isAboveMinimumAge();
                     fieldView.undelegateEvents();

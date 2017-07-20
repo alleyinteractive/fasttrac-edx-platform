@@ -2706,6 +2706,17 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'language_proficiencies',
         'bio',
         'account_privacy',
+        'state',
+        'zipcode',
+        'company',
+        'city',
+        'phone_number',
+        'newsletter',
+        'facebook_link',
+        'twitter_link',
+        'linkedin_link',
+        'public_email',
+        'affiliate_organization_name',
         # Not an actual field, but used to signal whether badges should be public.
         'accomplishments_shared',
     ],
@@ -2740,10 +2751,14 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'state',
         'zipcode',
         'company',
-        'title',
         'city',
         'phone_number',
         'newsletter',
+        'facebook_link',
+        'twitter_link',
+        'linkedin_link',
+        'public_email',
+        'affiliate_organization_name',
     ]
 }
 

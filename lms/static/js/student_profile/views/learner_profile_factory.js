@@ -146,7 +146,6 @@
                 city: 'City',
                 zipcode: 'Zip/Postal Code',
                 company: 'Company',
-                title: 'Title',
                 phone_number: 'Phone Number'
             };
 

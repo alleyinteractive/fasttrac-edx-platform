@@ -71,7 +71,9 @@
             },
 
             saveSuccess: function() {
-                ga('send', 'event', 'Registration form', 'Submit', 'Registration');
+                if (window.ga) {
+                    ga('send', 'event', 'Registration form', 'Click', 'Registration attempt');
+                }
                 this.trigger('auth-complete');
             },
 
