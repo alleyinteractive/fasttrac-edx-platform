@@ -167,7 +167,7 @@ body.view-in-course .info-wrapper {
 
   a.btn-ft {
     background: $ft-orange;
-    color: white;
+    color: white !important;
     padding: .3rem 1.6rem;
     text-transform: uppercase;
     font-size: 1rem;
@@ -175,7 +175,7 @@ body.view-in-course .info-wrapper {
     float: right;
 
     :hover {
-      color: white;
+      color: white !important;
     }
   }
 

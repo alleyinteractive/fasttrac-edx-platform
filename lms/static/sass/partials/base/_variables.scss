@@ -307,11 +307,14 @@ $credit-color-base: rgb(244,195,0); // accessible with black text
 // edx-specific: Studio/Staff actions
 $staff-color: $pink;
 
+// FastTrac orange
+$ft-orange: #f76b1c;
+
 
 // ----------------------------
 // #TYPOGRAPHY
 // ----------------------------
-$sans-serif: 'Open Sans', $verdana, sans-serif !default;
+$sans-serif: 'Roboto', $verdana, sans-serif !default;
 $monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace !default;
 $body-font-family: $sans-serif !default;
 $serif: $georgia !default;
@@ -423,11 +426,11 @@ $action-secondary-disabled-bg: $m-gray-d3 !default;
 $action-secondary-disabled-fg: $white !default;
 
 // actions - misc
-$link-color: $blue !default;
-$link-color-d1: $blue !default;
-$link-hover: $blue-l1 !default; // from our Pattern Library http://ux.edx.org/elements/colors/
+$link-color: $ft-orange !default;
+$link-color-d1: $ft-orange !default;
+$link-hover: $ft-orange !default; // from our Pattern Library http://ux.edx.org/elements/colors/
 $site-status-color: $pink !default;
-$button-color: $blue !default;
+$button-color: $white !default;
 $button-archive-color: rgb(238,238,238) !default; // #eeeeee
 
 // larger, random elements
