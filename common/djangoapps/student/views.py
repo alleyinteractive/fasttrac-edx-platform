@@ -336,7 +336,7 @@ def affiliates(request):
 def fetch_ccx_affiliates(affiliate_name, affiliate_city, affiliate_state):
     data = []
     # if we need to update fields, we do it here for both queries
-    db_query_fields = 'SELECT DISTINCT au.username, aup.affiliate_organization_name, aup.state '
+    db_query_fields = 'SELECT DISTINCT au.username, aup.affiliate_organization_name, aup.state, aup.description '
 
     # this query returns all ccx creators
     ccx_query = db_query_fields + 'FROM ccx_customcourseforedx AS ccx\
@@ -387,6 +387,7 @@ def fetch_ccx_affiliates(affiliate_name, affiliate_city, affiliate_state):
             'username': row[0],
             'affiliate_organization_name': row[1],
             'state': row[2],
+            'description': row[3],
             'image_url': image_url
         })
 
