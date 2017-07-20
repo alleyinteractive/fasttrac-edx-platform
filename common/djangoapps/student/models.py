@@ -373,6 +373,7 @@ class UserProfile(models.Model):
 
     # field for affiliate program directors
     affiliate_organization_name = models.CharField(null=True, blank=True, default='', max_length=255)
+    description = models.CharField(null=True, blank=True, max_length=255, default='')
 
     @property
     def has_profile_image(self):

@@ -106,6 +106,14 @@
     <br>
 
     <br>
+    <div>
+      <label for="">Description</label>
+      <br>
+      <textarea name="description">${affiliate.profile.description or ''}</textarea>
+    </div>
+    <br>
+
+    <br>
     <br>
     <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
     <input type="submit" value="Save" />
