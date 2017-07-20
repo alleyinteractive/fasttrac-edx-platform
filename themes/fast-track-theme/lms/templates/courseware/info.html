@@ -58,7 +58,7 @@ from openedx.core.djangolib.markup import HTML, Text
     <div class="sidebar-ft">
       <div class="home">
         <div class="page-header-main">
-          <h1>Welcome ${user.profile.name}!</h1>
+          <h1>Welcome, ${user.profile.name.split(' ')[0]}!</h1>
         </div>
       </div>
 
