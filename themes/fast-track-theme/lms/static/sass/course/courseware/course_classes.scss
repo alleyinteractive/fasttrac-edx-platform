@@ -267,6 +267,19 @@ $ft-dark-grey: #8d8d8d;
     }
   }
 
+  .tip.gray {
+    background-image: url('../images/TipBackgroundPattern_Gray.jpg');
+    border-color: $ft-dark-grey;
+
+    &:before {
+      border-color: $ft-dark-grey;
+    }
+
+    .highlight {
+      color: $ft-dark-grey;
+    }
+  }
+
   .alt-quote {
     vertical-align: middle;
     color: #555;
