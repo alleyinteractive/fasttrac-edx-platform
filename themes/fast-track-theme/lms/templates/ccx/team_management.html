@@ -19,13 +19,14 @@
     % endif
     <table class="team-mgmt-table">
         <tr>
-            <th class="thead">Role</th>
             <th class="thead">Name</th>
+            <th class="thead">Role</th>
             <th class="thead">Email</th>
             <th class="thead">Actions</th>
         </tr>
         %for ccx_course in ccx_courses:
             <tr>
+                <td>${ccx_course.coach.profile.name}</td>
                 <td>
                     % if ccx.is_staff(ccx_course.coach):
                         Program Director
@@ -35,7 +36,6 @@
                         Facilitator
                     % endif
                 </td>
-                <td>${ccx_course.coach.profile.name}</td>
                 <td>${ccx_course.coach.email}</td>
                 <td>
                     <span class="remove-coach-button"
@@ -148,8 +148,8 @@
                     var role = 'Facilitator'
             }
 
-            var newRow = '<tr><td>' + role +
-                '</td><td>' + username +
+            var newRow = '<tr><td>' + username +
+                '</td><td>' + role +
                 '</td><td>' + email +
                 '</td><td><span class="remove-coach-button" data-remove-url="' + removeUrl +
                     '" data-unique-student-identifier="' + username +
