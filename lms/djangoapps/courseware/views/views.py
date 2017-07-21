@@ -188,9 +188,11 @@ def get_should_hide_master_course(request):
 def build_ccx_filters(request):
     filter_fields = ['location_city', 'location_state', 'delivery_mode', 'coach_id']
     filters = {
-        'id': F('original_ccx_id'),
-        'enrollment_type': CustomCourseForEdX.PUBLIC
+        'id': F('original_ccx_id')
     }
+
+    if not request.user.is_staff:
+        filters['enrollment_type'] = CustomCourseForEdX.PUBLIC
 
     for field in filter_fields:
         value = request.POST.get(field)
