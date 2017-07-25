@@ -401,6 +401,13 @@ urlpatterns += (
         name='course_bookmarks',
     ),
     url(
+        r'^courses/{}/messages$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        'courseware.views.views.messages',
+        name='course_messages',
+    ),
+    url(
         r'^courses/{}/search$'.format(
             settings.COURSE_ID_PATTERN,
         ),

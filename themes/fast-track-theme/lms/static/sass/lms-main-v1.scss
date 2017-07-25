@@ -467,6 +467,36 @@ $link-color: #6f6f6f;
   }
 }
 
+.messages {
+  text-align: center;
+
+  & > * {
+    text-align: left;
+  }
+
+  h1 {
+    color: #aaa;
+    font-size: 4rem;
+    font-weight: bold;
+    font-style: italic;
+    width: 70%;
+    margin: 2rem auto;
+    text-transform: uppercase;
+  }
+
+  .message {
+    width: 70%;
+    margin: auto;
+    padding: 1rem;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .message-date {
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+}
+
 .header-facet {
   margin: 2rem 1rem 1rem;
   font-weight: bold;

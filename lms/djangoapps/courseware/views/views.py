@@ -489,6 +489,28 @@ def bookmarks(request, course_id):
 @ensure_csrf_cookie
 @login_required
 @ensure_valid_course_key
+def messages(request, course_id):
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_by_id(course_key, depth=2)
+
+    location = course_key.make_usage_key('course_info', 'updates')
+    try:
+        course_updates = modulestore().get_item(location)
+    except ItemNotFoundError:
+        course_updates = modulestore().create_item(request.user.id, location.course_key, location.block_type, location.block_id)
+
+    messages = get_course_update_items(course_updates)
+
+    context = {
+        'messages': messages,
+        'course': course
+    }
+
+    return render_to_response('courseware/messages.html', context)
+
+@ensure_csrf_cookie
+@login_required
+@ensure_valid_course_key
 def search(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key, depth=2)

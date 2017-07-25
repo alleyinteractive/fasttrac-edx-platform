@@ -1,0 +1,48 @@
+<%page expression_filter="h"/>
+<%inherit file="../main.html" />
+<%def name="online_help_token()"><% return "courseinfo" %></%def>
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+
+from courseware.courses import get_course_info_section, get_course_date_summary
+
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<%block name="pagetitle">${_("{course_number} Messages").format(course_number=course.display_number_with_default)}</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='messages'" />
+
+<%static:require_module_async module_name="js/courseware/toggle_element_visibility" class_name="ToggleElementVisibility">
+        ToggleElementVisibility();
+</%static:require_module_async>
+<%static:require_module_async module_name="js/courseware/course_home_events" class_name="CourseHomeEvents">
+        CourseHomeEvents();
+</%static:require_module_async>
+
+<%block name="bodyclass">view-in-course view-course-info ${course.css_class or ''}</%block>
+<main id="main" aria-label="Content" tabindex="-1">
+  <div class="messages">
+    <h1>
+      Messages
+    </h1>
+
+    % if len(messages) == 0:
+      <h2>You have no messages yet...</h2>
+    % endif
+
+    % for message in messages:
+      <div class="message">
+        <div style="font-style: italic;" class="message-date">${message['date']}</div>
+        <div class="message-content">${message['content']}</div>
+      </div>
+    % endfor
+  </div>
+</main>
