@@ -55,7 +55,11 @@
                   ${course.display_name}
                 </div>
                 <div class="description">
-                  ${course.course_description}
+                  % if len(course.course_description) > 90:
+                    <span>${course.course_description[:90] + '...'}</span>
+                  % else:
+                      <span>${course.course_description}</span>
+                  % endif
                 </div>
                 <div class="card-footer">
                   <span class="delivery-mode-item">
