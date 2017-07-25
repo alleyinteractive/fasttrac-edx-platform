@@ -155,7 +155,10 @@ def courses(request):
     elif request.user.is_staff:
         courses = CourseOverview.objects.filter(Q(id__in=ccx_keys) | ~Q(id__startswith='ccx'))
     else:
-        courses = CourseOverview.objects.filter(Q(id__in=ccx_keys) | ~Q(id__startswith='ccx')).filter(invitation_only=0)
+        courses = CourseOverview.objects.filter(Q(id__in=ccx_keys) | ~Q(id__startswith='ccx'))
+
+    if not request.user.is_staff:
+        courses.filter(invitation_only=0)
 
     return render_to_response(
         "courseware/courses.html",
