@@ -11,17 +11,17 @@
             <td style="text-align: right">Date Enrolled</td>
         </thead>
         <tbody>
-            % for enrollment in enrollments:
+            % for student_enrollment in ccx_student_enrollments:
                 <tr
-                    style="opacity: ${1 if enrollment.is_active else 0.7}"
-                    % if not enrollment.is_active:
+                    style="opacity: ${1 if student_enrollment.is_active else 0.7}"
+                    % if not student_enrollment.is_active:
                         title="Student is enrolled but inactive."
                     % endif
                 >
-                    <td>${enrollment.user.profile.name}</td>
-                    <td>${enrollment.user.username}</td>
-                    <td>${enrollment.user.email}</td>
-                    <td style="text-align: right">${enrollment.created.strftime("%m/%d/%Y")}</td>
+                    <td>${student_enrollment.user.profile.name}</td>
+                    <td>${student_enrollment.user.username}</td>
+                    <td>${student_enrollment.user.email}</td>
+                    <td style="text-align: right">${student_enrollment.created.strftime("%m/%d/%Y")}</td>
                 </tr>
             % endfor
         </tbody>

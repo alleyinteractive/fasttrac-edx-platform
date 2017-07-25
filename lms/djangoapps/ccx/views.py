@@ -28,7 +28,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.models import User
-
+from student.models import CourseAccessRole
 from courseware.access import has_access
 from courseware.courses import get_course_by_id
 
@@ -153,7 +153,11 @@ def edit_ccx_context(course, ccx, user):
     context['schedule'] = json.dumps(schedule, indent=4)
     context['save_url'] = reverse(
         'save_ccx', kwargs={'course_id': ccx_locator})
-    context['ccx_members'] = CourseEnrollment.objects.filter(course_id=ccx_locator, is_active=True)
+
+    non_student_user_ids = CourseAccessRole.objects.filter(course_id=ccx_locator).values_list('user_id', flat=True)
+    ccx_student_enrollments = CourseEnrollment.objects.filter(course_id=ccx_locator, is_active=True).exclude(user_id__in=non_student_user_ids)
+
+    context['ccx_student_enrollments'] = ccx_student_enrollments
     context['gradebook_url'] = reverse(
         'ccx_gradebook', kwargs={'course_id': ccx_locator})
     context['grades_csv_url'] = reverse(
@@ -211,8 +215,11 @@ def dashboard(request, course, ccx=None):
         context['ccx_courses'] = custom_courses
         context['edit_current'] = False
 
+        non_student_user_ids = CourseAccessRole.objects.filter(course_id=ccx_locator).values_list('user_id', flat=True)
+        ccx_student_enrollments = CourseEnrollment.objects.filter(course_id=ccx_locator).exclude(user_id__in=non_student_user_ids)
+
         # show students on Student Admin tab
-        context['enrollments'] = CourseEnrollment.objects.filter(course_id=ccx_locator)
+        context['ccx_student_enrollments'] = ccx_student_enrollments
     else:
         context['create_ccx_url'] = reverse(
             'create_ccx', kwargs={'course_id': course.id})

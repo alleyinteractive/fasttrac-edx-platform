@@ -133,10 +133,10 @@
                         </tr>
                         </thead>
                         <tbody>
-                            %for member in ccx_members:
+                            %for student_enrollment in ccx_student_enrollments:
                                 <tr>
-                                    <td>${member.user.profile.name}</td>
-                                    <td>${member.user.email}</td>
+                                    <td>${student_enrollment.user.profile.name}</td>
+                                    <td>${student_enrollment.user.email}</td>
                                     <td class="revoke-td">
                                         <a class="revoke">
                                             <span class="fa fa-times-circle"
