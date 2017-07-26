@@ -152,13 +152,11 @@ def courses(request):
 
     if should_hide_master_course:
         courses = CourseOverview.objects.filter(id__in=ccx_keys)
-    elif request.user.is_staff:
-        courses = CourseOverview.objects.filter(Q(id__in=ccx_keys) | ~Q(id__startswith='ccx'))
     else:
         courses = CourseOverview.objects.filter(Q(id__in=ccx_keys) | ~Q(id__startswith='ccx'))
 
     if not request.user.is_staff:
-        courses.filter(invitation_only=0)
+        courses = courses.filter(invitation_only=0)
 
     return render_to_response(
         "courseware/courses.html",
