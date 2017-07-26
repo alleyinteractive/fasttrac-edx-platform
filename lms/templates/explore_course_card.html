@@ -36,17 +36,24 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
         </header>
         <section class="course-info" aria-hidden="true">
             % if hasattr(course.id, 'ccx'):
+              % if len(ccx.coach.profile.affiliate_organization_name) > 25:
+              <h3 title="${ccx.coach.profile.affiliate_organization_name}" class="affiliate-name">
+                  ${ccx.coach.profile.affiliate_organization_name}
+              </h3>
+              % else:
               <h3 class="affiliate-name">
                   ${ccx.coach.profile.affiliate_organization_name}
               </h3>
+              % endif
             % endif
-            <h2 class="course-name">
+
+            <h2 title="${course.display_name}" class="course-name">
                 ${course.display_name}
             </h2>
             <p class="course-overview">
                 % if hasattr(course.id, 'ccx'):
-                  % if len(ccx.course_description) > 100:
-                    <span>${ccx.course_description[:100] + '...'}</span>
+                  % if len(ccx.course_description) > 120:
+                    <span title="${ccx.course_description}">${ccx.course_description[:120] + '...'}</span>
                   % else:
                       <span>${ccx.course_description}</span>
                   % endif
