@@ -318,6 +318,9 @@ $link-color: #6f6f6f;
         letter-spacing: 0 !important;
         margin-left: 12px;
         text-transform: none;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
       }
 
       .course-overview {
