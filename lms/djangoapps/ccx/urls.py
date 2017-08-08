@@ -3,7 +3,6 @@ URLs for the CCX Feature.
 """
 from django.conf.urls import patterns, url
 
-
 urlpatterns = patterns(
     '',
     url(r'^ccx_coach$',
@@ -33,4 +32,7 @@ urlpatterns = patterns(
         'ccx.views.ccx_grades_csv', name='ccx_grades_csv'),
     url(r'^ccx_set_grading_policy$',
         'ccx.views.set_grading_policy', name='ccx_set_grading_policy'),
+    url(r'^ccx_messages/create/$', 'ccx.views.ccx_messages_create', name='ccx_messages_create'),
+    url(r'^ccx_messages/delete/(?P<message_id>[^/]*)$', 'ccx.views.ccx_messages_delete', name='ccx_messages_delete'),
+    url(r'^ccx_messages$', 'ccx.views.ccx_messages', name='ccx_messages'),
 )

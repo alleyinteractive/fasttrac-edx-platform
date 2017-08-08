@@ -94,7 +94,7 @@ from xmodule.x_module import STUDENT_VIEW
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from ..entrance_exams import user_must_complete_entrance_exam
 from ..module_render import get_module_for_descriptor, get_module, get_module_by_usage_id
-from lms.djangoapps.ccx.models import CustomCourseForEdX
+from lms.djangoapps.ccx.models import CustomCourseForEdX, CourseUpdates
 from openedx.core.djangoapps.bookmarks.models import Bookmark
 from search.api import perform_search
 from ccx.views import get_ccx_schedule
@@ -401,19 +401,22 @@ def course_info(request, course_id):
             else:
                 last_viewed_item = None
 
-        if hasattr(course.id, 'ccx'):
+        if 'ccx' in course_id:
             ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
         else:
             ccx = None
 
         # get course updates
-        location = course_key.make_usage_key('course_info', 'updates')
-        try:
-            course_updates = modulestore().get_item(location)
-        except ItemNotFoundError:
-            course_updates = modulestore().create_item(request.user.id, location.course_key, location.block_type, location.block_id)
+        if ccx:
+            update_items = CourseUpdates.objects.filter(ccx=ccx)
+        else:
+            location = course_key.make_usage_key('course_info', 'updates')
+            try:
+                course_updates = modulestore().get_item(location)
+            except ItemNotFoundError:
+                course_updates = modulestore().create_item(request.user.id, location.course_key, location.block_type, location.block_id)
 
-        update_items = get_course_update_items(course_updates)
+            update_items = get_course_update_items(course_updates)
 
         sections = course.get_children()
 
@@ -491,13 +494,16 @@ def messages(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key, depth=2)
 
-    location = course_key.make_usage_key('course_info', 'updates')
-    try:
-        course_updates = modulestore().get_item(location)
-    except ItemNotFoundError:
-        course_updates = modulestore().create_item(request.user.id, location.course_key, location.block_type, location.block_id)
+    if 'ccx' in course_id:
+        messages = CourseUpdates.objects.filter(ccx_id=course_key.ccx)
+    else:
+        location = course_key.make_usage_key('course_info', 'updates')
+        try:
+            course_updates = modulestore().get_item(location)
+        except ItemNotFoundError:
+            course_updates = modulestore().create_item(request.user.id, location.course_key, location.block_type, location.block_id)
 
-    messages = get_course_update_items(course_updates)
+        messages = get_course_update_items(course_updates)
 
     context = {
         'messages': messages,

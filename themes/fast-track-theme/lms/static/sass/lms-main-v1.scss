@@ -669,7 +669,7 @@ $link-color: #6f6f6f;
 }
 
 .wrapper-profile {
-  .wrapper-profile-field-account-privacy {
+  &-field-account-privacy {
     display: none;
   }
 }
@@ -682,3 +682,48 @@ $link-color: #6f6f6f;
 label.u-field-title {
   width: 100%;
 }
+
+.messages {
+  display: flex;
+  flex-flow: column wrap;
+
+  .message {
+    white-space: pre-line;
+
+    & .message-date {
+      margin-bottom: 0;
+    }
+  }
+
+  form.add-message-form {
+      display: flex;
+      flex-flow: column nowrap;
+      width: 260px;
+      height: 295px;
+      justify-content: space-around;
+      margin: auto;
+      padding: 1rem;
+
+      div.date-picker-wrapper {
+        display: flex;
+        flex-flow: row wrap;
+        align-items: center;
+        justify-content: space-between;
+
+        label {
+          display: inline-block;
+          margin-bottom: 0;
+        }
+
+        input {
+          width: 82%;
+        }
+      }
+
+      textarea#content {
+        flex-basis: 190px;
+        align-self: center;
+      }
+  }
+}
+

@@ -113,7 +113,13 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
         <div class="course-info-header">
           <div class="fa fa-comment"></div>
           MESSAGES
-          <a href="messages">VIEW ALL</a>
+          <%
+            if request.user.is_staff:
+              messages_view = "ccx_messages"
+            else:
+              messages_view = "messages"
+          %>
+          <a href="${messages_view}">VIEW ALL</a>
         </div>
         <div class="course-info-body">
           % for update_item in update_items:
