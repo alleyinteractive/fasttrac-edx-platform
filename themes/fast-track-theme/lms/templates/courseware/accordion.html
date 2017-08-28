@@ -26,7 +26,11 @@ else:
 <div class="chapter-content-container" id="${chapter['display_id']}-child" tabindex="-1" role="group" aria-label="${chapter['display_name']} submenu">
     <div class="chapter-menu">
         % for section in chapter['sections']:
-        <div class="menu-item ${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
+        <div
+            class="menu-item ${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}"
+            data-chapter-name="${chapter['display_name']}"
+            data-section-name="${section['display_name']}"
+        >
             <a class="accordion-nav" href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
                 <p class="accordion-display-name">
                     <div class="icon-container">
@@ -92,7 +96,7 @@ else:
             % if section and section['active']:
                 <ol class="accordion-units">
                     % for unit in section['units']:
-                        <li id="accordion-unit-${unit['idx']}" onclick="handleUnitClick(this)" data-unit='${json.dumps(unit)}'>
+                        <li id="accordion-unit-${unit['idx']}" onclick="handleUnitClick(this)" data-unit='${json.dumps(unit)}' data-unit-name="${unit['display_name']}" class="accordion-unit">
                             <div class="icon-container">
                                 %if unit['is_bookmarked'] == 'True':
                                     <i class="fa fa-bookmark"></i>
@@ -114,12 +118,25 @@ else:
             $('#accordion-unit-' + activeNavUnitId).addClass('active');
         }
 
+        function updateUrlWithUnit(unitName) {
+            var url = window.location.href;
+            var unitParamIndex = url.indexOf(',unit');
+            var newUrl = url.slice(0, unitParamIndex);
+
+            return newUrl + '&unit=' + unitName;
+        }
+
         function handleUnitClick(element) {
             var unitData = element.dataset.unit;
+            var unitName = element.dataset.unitName;
             var unit = JSON.parse(unitData);
             var tabId = '#tab_' + unit.idx;
+            var nextUrl = updateUrlWithUnit(unitName);
+
             $('.accordion-units li').removeClass('active');
             $('#accordion-unit-' + unit.idx).addClass('active');
+            window.history.pushState(null, null, nextUrl)
+
             $(tabId).click();
         }
 

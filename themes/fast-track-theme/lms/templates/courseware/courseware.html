@@ -254,6 +254,20 @@ ${HTML(fragment.foot_html())}
                 $('body.view-in-course .course-wrapper').toggleClass('extended');
             }
         }
+
+        function updateUrlWithCoursePosition() {
+            var menuItem = $('.chapter-menu .menu-item.active');
+            var chapterName = menuItem.data("chapterName");
+            var sectionName = menuItem.data("sectionName");
+            var unitName = $(".accordion-unit.active").data("unitName");
+            var updatedUrl = window.location.href +
+                '?chapter=' + chapterName +
+                '&section=' + sectionName +
+                '&unit=' + unitName;
+
+            window.history.pushState(null, null, updatedUrl);
+        }
+        $(document).ready(updateUrlWithCoursePosition);
     </script>
 </div>
 
