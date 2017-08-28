@@ -120,7 +120,7 @@ else:
 
         function updateUrlWithUnit(unitName) {
             var url = window.location.href;
-            var unitParamIndex = url.indexOf(',unit');
+            var unitParamIndex = url.indexOf('&unit');
             var newUrl = url.slice(0, unitParamIndex);
 
             return newUrl + '&unit=' + unitName;
