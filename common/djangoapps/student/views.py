@@ -57,6 +57,7 @@ from student.models import (
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED,
     LogoutViewConfiguration)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
+from affiliates.models import AffiliateMembership
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 from lms.djangoapps.ccx.models import CustomCourseForEdX
@@ -179,10 +180,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
     else:
         courses = sort_by_announcement(courses)
 
-    public_ccxs = CustomCourseForEdX.objects.raw('\
-        SELECT * FROM ccx_customcourseforedx\
-        WHERE id = original_ccx_id\
-        AND UPPER(enrollment_type) = "PUBLIC"')
+    public_ccxs = CustomCourseForEdX.objects.filter(enrollment_type=CustomCourseForEdX.PUBLIC)
 
     public_ccx_ids = [unicode(ccx.id) for ccx in public_ccxs]
 
@@ -316,141 +314,6 @@ def get_course_enrollments(user, org_to_include, orgs_to_exclude):
         # Else, include the enrollment.
         else:
             yield enrollment
-
-
-def affiliates(request):
-    affiliate_name = request.GET.get('affiliate_name', '')
-    affiliate_city = request.GET.get('affiliate_city', '')
-    affiliate_state = request.GET.get('affiliate_state', '')
-
-    affiliates = fetch_ccx_affiliates(affiliate_name, affiliate_city, affiliate_state)
-
-    return render_to_response('affiliates.html', {
-        'affiliates': affiliates,
-        'affiliate_name': affiliate_name,
-        'affiliate_city': affiliate_city,
-        'affiliate_state': affiliate_state
-    })
-
-
-def fetch_ccx_affiliates(affiliate_name, affiliate_city, affiliate_state):
-    data = []
-    # if we need to update fields, we do it here for both queries
-    db_query_fields = 'SELECT DISTINCT au.username, aup.affiliate_organization_name, aup.state, aup.description '
-
-    # this query returns all ccx creators
-    ccx_query = db_query_fields + 'FROM ccx_customcourseforedx AS ccx\
-        LEFT JOIN auth_user AS au ON ccx.coach_id = au.id\
-        LEFT JOIN auth_userprofile aup ON aup.user_id = au.id\
-        WHERE ccx.original_ccx_id = ccx.id'
-
-    # this query returns all ccx coaches on master courses
-    car_query = db_query_fields + 'FROM student_courseaccessrole as car\
-        LEFT JOIN auth_user AS au ON car.user_id = au.id\
-        LEFT JOIN auth_userprofile aup ON aup.user_id = au.id\
-        WHERE course_id NOT LIKE "ccx-%%"\
-        AND role = "ccx_coach"'
-
-    db_params = []
-
-    if affiliate_name:
-        ccx_query += ' AND aup.affiliate_organization_name LIKE %s'
-        car_query += ' AND aup.affiliate_organization_name LIKE %s'
-        db_params.append('%'+affiliate_name+'%')
-
-    if affiliate_city:
-        ccx_query += ' AND aup.city LIKE %s'
-        car_query += ' AND aup.city LIKE %s'
-        db_params.append('%'+affiliate_city+'%')
-
-    if affiliate_state:
-        ccx_query += ' AND aup.state = %s'
-        car_query += ' AND aup.state = %s'
-        db_params.append(affiliate_state)
-
-    # close the queries
-    ccx_query += ';'
-    car_query += ';'
-
-    with connection.cursor() as cursor:
-        cursor.execute(ccx_query, db_params or None)
-        ccx_rows = cursor.fetchall()
-        cursor.execute(car_query, db_params or None)
-        car_rows = cursor.fetchall()
-
-    rows = set(ccx_rows + car_rows) # set removes duplicates
-
-    for row in rows:
-        user = User.objects.get(username=row[0])
-        image_url = get_profile_image_urls_for_user(user)['full']
-        data.append({
-            'username': row[0],
-            'affiliate_organization_name': row[1],
-            'state': row[2],
-            'description': row[3],
-            'image_url': image_url
-        })
-
-    return data
-
-
-def affiliate(request, affiliate_username):
-    affiliate = User.objects.get(username=affiliate_username)
-    courses = CustomCourseForEdX.objects.filter(coach=affiliate, enrollment_type=CustomCourseForEdX.PUBLIC, id=F('original_ccx_id'))
-
-    return render_to_response('affiliate.html', {
-        'affiliate': affiliate,
-        'courses': courses
-    })
-
-
-def affiliate_edit(request, affiliate_username):
-    affiliate = User.objects.get(username=affiliate_username)
-    courses = CustomCourseForEdX.objects.filter(coach=affiliate)
-
-    allow_access = False
-    for ccx in courses:
-        if ccx.is_staff(request.user):
-            allow_access = True
-
-    if not allow_access:
-        raise Http404
-
-    if request.method == 'GET':
-
-        return render_to_response('affiliate_edit.html', {
-            'affiliate': affiliate,
-            'state_choices': settings.STATE_CHOICES,
-            'countries': countries
-        })
-    elif request.method == 'POST':
-
-        for key in request.POST:
-            if key == 'year_of_birth':
-                setattr(affiliate.profile, key, int(request.POST[key]))
-            else:
-                setattr(affiliate.profile, key, request.POST[key])
-
-        with transaction.atomic():
-            affiliate.profile.save()
-            uploadImageResponse = ProfileImageUploadView().post(request, affiliate_username)
-
-            if uploadImageResponse.status_code == 400:
-                return render_to_response('affiliate_edit.html', {
-                    'affiliate': affiliate,
-                    'state_choices': settings.STATE_CHOICES,
-                    'countries': countries,
-                    'error_message': uploadImageResponse.data['user_message']
-                })
-
-
-        return render_to_response('affiliate_edit.html', {
-            'affiliate': affiliate,
-            'state_choices': settings.STATE_CHOICES,
-            'countries': countries
-        })
-    else:
-        raise Http404
 
 
 def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disable=unused-argument
@@ -723,6 +586,8 @@ def dashboard(request):
     # sort the enrollment pairs by the enrollment date
     course_enrollments.sort(key=lambda x: x.created, reverse=True)
 
+    affiliate_ids = AffiliateMembership.objects.select_related('affiliate').filter(member=request.user, role__in=['staff','instructor']).values_list('affiliate_id', flat=True)
+
     # set progress for each course
     # set author for each course
     for course_enrollment in course_enrollments:
@@ -731,8 +596,7 @@ def dashboard(request):
         # author
         if hasattr(course.id, 'ccx'):
             ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
-            author = ccx.coach
-            course_enrollment.author = author.profile.name
+            course_enrollment.author = ccx.coach.profile.affiliate.name
             course_enrollment.time = ccx.time
         else:
             course_enrollment.coach_on_master_course = is_ccx_coach_on_master_course(user, course)
@@ -877,6 +741,7 @@ def dashboard(request):
         redirect_message = ''
 
     context = {
+        'affiliate_ids': affiliate_ids,
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
         'course_enrollments': course_enrollments,

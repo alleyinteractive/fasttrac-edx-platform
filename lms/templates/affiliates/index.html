@@ -1,0 +1,91 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">Explore Affiliates</%block>
+
+<section class="container explore-affiliates">
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.wrapper-footer').addClass('fixed-footer')
+    })
+  </script>
+
+  <div class="affiliate-sidebar">
+    <div class="header">
+      Refine List
+    </div>
+
+    <div class="sidebar-body">
+      <form action="/affiliates/" method="POST">
+        <a href="/affiliates" class="clear-all"> <span class="fa fa-remove"></span> Clear All</a>
+        <div class="sidebar-filter">
+          <div class="fa fa-user"></div>
+          <span class="filter-label">Affiliate Name</span>
+          <input type="text" name="affiliate_name" placeholder="Search Affiliate" value="${affiliate_name}">
+        </div>
+
+        <div class="sidebar-filter">
+          <div class="fa fa-map-marker"></div>
+          <span class="filter-label">Location</span>
+          <input type="text" name="affiliate_city" placeholder="City" value="${affiliate_city}">
+          <select name="affiliate_state">
+            <option selected disabled> state </option>
+            % for choice in state_choices:
+              <option value="${choice[0]}" ${ 'selected' if affiliate_state == choice[0] else '' }>${choice[1]}</option>
+            % endfor
+          </select>
+        </div>
+
+        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+        <button id="submit-search"> Submit <span class="fa fa-arrow-right"></span></button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function(){
+      $('.explore-header').on('click', function() {
+        $('.hidden-explore-option').toggleClass('hidden');
+      })
+    })
+  </script>
+
+  <div class="affiliate-content">
+    <h1 class="explore-header">
+      Explore Affiliates
+      <div class="fa fa-caret-down"></div>
+      <br>
+      <a href="/courses" class="hidden-explore-option hidden">
+        Explore Courses
+      </a>
+    </h1>
+    <ul>
+      % for affiliate in affiliates:
+        <li class="affiliate-card">
+          <div class="image" style="background-image: url(${affiliate.image_url});"></div>
+          <div class="name" title="${affiliate.name}">
+            ${affiliate.name}
+          </div>
+          <div class="description" title="${affiliate.description}">
+            ${affiliate.description}
+          </div>
+          <div class="card-footer">
+            <span class="skewed-footer-item">
+              <span>
+                <span class="fa fa-map-marker"></span>
+                ${affiliate.state}
+              </span>
+            </span>
+            <span>
+              <a href="/affiliates/${affiliate.slug}">
+                View
+                <span class="fa fa-arrow-circle-o-right"></span>
+              </a>
+            </span>
+          </div>
+        </li>
+      %endfor
+    </ul>
+  </div>
+</section>

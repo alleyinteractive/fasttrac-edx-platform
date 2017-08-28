@@ -376,6 +376,20 @@ class UserProfile(models.Model):
     description = models.CharField(null=True, blank=True, max_length=255, default='')
 
     @property
+    def affiliate_role(self):
+        if self.user.affiliatemembership_set.exists():
+            return self.user.affiliatemembership_set.first().role
+        else:
+            return None
+
+    @property
+    def affiliate(self):
+        if self.user.affiliatemembership_set.exists():
+            return self.user.affiliatemembership_set.first().affiliate
+        else:
+            return None
+
+    @property
     def has_profile_image(self):
         """
         Convenience method that returns a boolean indicating whether or not

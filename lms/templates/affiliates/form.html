@@ -1,0 +1,208 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">
+  % if affiliate.slug:
+    Edit Affiliate Information ${affiliate.name}
+  % else:
+    Create Affiliate
+  % endif
+</%block>
+
+<section class="course-info">
+  % if error_message:
+    <div class="image-upload-error-message">${error_message}</div>
+  % endif
+
+  % if messages:
+    % for message in messages:
+      <p class="image-upload-error-message">${message}</p>
+    % endfor
+  % endif
+
+  % if affiliate.pk:
+    <div class="edit-affiliate-container">
+      <h1 class="explore-header">Staff</h1>
+
+      <form action="${affiliate.slug}/add_member" method="POST" id="add_member_form">
+        <input type="text" name="member_identifier" placeholder="Staff email" required />
+        <select name="role">
+          % for role_choice in role_choices:
+            <option value="${role_choice[0]}">${role_choice[1]}</option>
+          % endfor
+        </select>
+        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+        <input type="submit" value="Add" id="add_member_submit" />
+      </form>
+
+      <table id="affiliate_membership_table">
+        <thead>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th></th>
+        </thead>
+        % for membership in affiliate.memberships.order_by('member__profile__name'):
+          <tr>
+            <td>${membership.member.profile.name}</td>
+            <td>${membership.member.email}</td>
+            <td>${membership.get_role_display()}</td>
+            <td>
+              % if (membership.role == 'staff' and user.is_staff) or membership.role != 'staff':
+                <!-- only global staff can add/remove program directors -->
+                <a href="${affiliate.slug}/remove_member/${membership.member.id}?role=${membership.role}">
+                  <i class="fa fa-times"></i>
+                  Remove
+                </a>
+              % endif
+            </td>
+          </tr>
+        % endfor
+      </table>
+    </div>
+  % endif
+
+  % if is_program_director or not affiliate.pk:
+
+    % if affiliate.slug:
+      <form class="edit-affiliate-container" action="/affiliates/edit/${affiliate.slug}" method="POST" enctype="multipart/form-data">
+    % else:
+      <form class="edit-affiliate-container" action="/affiliates/create" method="POST" enctype="multipart/form-data">
+    % endif
+
+      <br>
+      % if affiliate.slug:
+        <h1 class="explore-header">Affiliate Profile</h1>
+      % else:
+        <h1 class="explore-header">Create Affiliate</h1>
+      % endif
+
+      <br>
+      <div>
+        <label for="">Logo</label>
+        <input class="upload-profile-image" type="file" name="image">
+      </div>
+      <br>
+
+      <br>
+      <div>
+        <label for="">Affiliate Organization</label>
+        <br>
+        <input type="text" value="${affiliate.name}" name="name">
+      </div>
+      <br>
+
+      <br>
+      <div>
+        <label for="">Address</label>
+        <br>
+        <input type="text" value="${affiliate.address}" name="address">
+      </div>
+      <br>
+
+      <br>
+      <div>
+        <label for="">City</label>
+        <br>
+        <input type="text" value="${affiliate.city}" name="city">
+      </div>
+      <br>
+
+      <br>
+      <div>
+        <label for="">State</label>
+        <br>
+        <br>
+        <select name="state">
+          % for choice in state_choices:
+            <option value="${choice[0]}" ${'selected' if affiliate.state == choice[0] else ''}>${choice[1]}</option>
+          % endfor
+        </select>
+      </div>
+      <br>
+
+      <br>
+      <div>
+        <label for="">Zip Code</label>
+        <br>
+        <input type="text" value="${affiliate.zipcode}" name="zipcode">
+      </div>
+      <br>
+
+      <br>
+      <div>
+        <label for="">Country</label>
+        <br>
+        <br>
+        <select name="country">
+          % for country in countries:
+            <option value="${country[0]}" ${'selected' if affiliate.country == country[0] else ''}>${country[1]}</option>
+          % endfor
+        </select>
+      </div>
+      <br>
+
+      <br>
+      <div>
+        <label for="">Public Contact Email</label>
+        <br>
+        <input type="email" value="${affiliate.email}" name="email">
+      </div>
+      <br>
+
+      <br>
+      <div>
+        <label for="">Public Contact Phone Number</label>
+        <br>
+        <input type="text" value="${affiliate.phone_number}" name="phone_number">
+      </div>
+      <br>
+
+      <br>
+      <div>
+        <label for="">Affiliate Website URL</label>
+        <br>
+        <input type="text" value="${affiliate.website}" name="website">
+      </div>
+      <br>
+
+      <br>
+      <div>
+        <label for="">Affiliate Description</label>
+        <br>
+        <textarea name="description">${affiliate.description}</textarea>
+      </div>
+      <br>
+
+      <br>
+      <div>
+        <label for="">Facebook URL</label>
+        <br>
+        <input type="text" value="${affiliate.facebook}" name="facebook">
+      </div>
+      <br>
+
+      <br>
+      <div>
+        <label for="">Twitter URL</label>
+        <br>
+        <input type="text" value="${affiliate.twitter}" name="twitter">
+      </div>
+      <br>
+
+      <br>
+      <div>
+        <label for="">LinkedIn URL</label>
+        <br>
+        <input type="text" value="${affiliate.linkedin}" name="linkedin">
+      </div>
+      <br>
+
+      <br>
+      <br>
+      <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+      <input type="submit" value="Save" />
+    </form>
+  % endif
+</section>

@@ -7,7 +7,9 @@ import decimal
 from datetime import datetime
 
 from django.contrib.auth.models import User
-from django.db import models
+from django.db import models, transaction
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from pytz import utc
 
 from lazy import lazy
@@ -15,8 +17,11 @@ from openedx.core.lib.time_zone_utils import get_time_zone_abbr
 from xmodule_django.models import CourseKeyField, LocationKeyField
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
-from student.models import CourseAccessRole
+from student.models import CourseAccessRole, CourseEnrollment
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from ccx_keys.locator import CCXLocator
+from instructor.access import allow_access
+
 
 
 log = logging.getLogger("edx.ccx")
@@ -47,7 +52,6 @@ class CustomCourseForEdX(models.Model):
     # if not empty, this field contains a json serialized list of
     # the master course modules
     structure_json = models.TextField(verbose_name='Structure JSON', blank=True, null=True)
-    original_ccx_id = models.IntegerField(verbose_name='ID of original CCX course entry', blank=True, null=True)
     delivery_mode = models.CharField(
         default=IN_PERSON,
         max_length=255,
@@ -79,6 +83,29 @@ class CustomCourseForEdX(models.Model):
 
     class Meta(object):
         app_label = 'ccx'
+
+    def delete(self):
+        with transaction.atomic():
+            CourseAccessRole.objects.filter(course_id=self.ccx_course_id).delete()
+            CourseOverview.objects.filter(id=self.ccx_course_id).delete()
+            CourseEnrollment.objects.filter(course_id=self.ccx_course_id).delete()
+
+            super(CustomCourseForEdX, self).delete()
+
+    @property
+    def affiliate(self):
+        return self.coach.profile.affiliate
+
+    @property
+    def ccx_course_id(self):
+        return CCXLocator.from_course_locator(self.course_id, self.id)
+
+    @property
+    def image_url(self):
+        if self.coach.profile.affiliate.image:
+            return self.coach.profile.affiliate.image.url
+        else:
+            return 'https://s3.amazonaws.com/fasttrac-beta/default_full.png'
 
     @lazy
     def course(self):
@@ -172,7 +199,7 @@ class CustomCourseForEdX(models.Model):
         if unicode(self.course_id).startswith('ccx'):
             ccx_locator = self.course_id
         else:
-            ccx_locator = CCXLocator.from_course_locator(self.course_id, unicode(self.original_ccx_id))
+            ccx_locator = CCXLocator.from_course_locator(self.course_id, unicode(self.id))
 
         return CourseAccessRole.objects.filter(course_id=ccx_locator, user=user, role='instructor').exists()
 
@@ -180,7 +207,7 @@ class CustomCourseForEdX(models.Model):
         if unicode(self.course_id).startswith('ccx'):
             ccx_locator = self.course_id
         else:
-            ccx_locator = CCXLocator.from_course_locator(self.course_id, unicode(self.original_ccx_id))
+            ccx_locator = CCXLocator.from_course_locator(self.course_id, unicode(self.id))
 
         return CourseAccessRole.objects.filter(course_id=ccx_locator, user=user, role='staff').exists()
 
@@ -189,7 +216,7 @@ class CcxFieldOverride(models.Model):
     """
     Field overrides for custom courses.
     """
-    ccx = models.ForeignKey(CustomCourseForEdX, db_index=True)
+    ccx = models.ForeignKey(CustomCourseForEdX, db_index=True, on_delete=models.CASCADE)
     location = LocationKeyField(max_length=255, db_index=True)
     field = models.CharField(max_length=255)
 
@@ -207,3 +234,17 @@ class CourseUpdates(models.Model):
 
     def __getitem__(self, item):
         return getattr(self, item)
+
+
+@receiver(post_save, sender=CustomCourseForEdX, dispatch_uid="add_affiliate_course_enrollments")
+def add_affiliate_course_enrollments(sender, instance, created, **kwargs):
+    'Allow all affiliate staff and instructors access to this course.'
+    # do this only for new CCX courses
+    if not created:
+        return
+
+    from courseware.courses import get_course_by_id
+
+    course = get_course_by_id(instance.ccx_course_id)
+    for membership in instance.affiliate.memberships.exclude(role='ccx_coach'):
+        allow_access(course, membership.member, membership.role, False)

@@ -33,6 +33,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from rest_framework import status
+import requests
 from instructor.views.api import require_global_staff
 
 import shoppingcart
@@ -101,6 +102,8 @@ from ccx.views import get_ccx_schedule
 from openedx.core.lib.xblock_utils import get_course_update_items
 from lms.envs.common import STATE_CHOICES
 from ccx_keys.locator import CCXLocator
+from affiliates.models import AffiliateEntity, AffiliateMembership
+from affiliates.views import is_program_director
 
 
 log = logging.getLogger("edx.courseware")
@@ -140,7 +143,15 @@ def courses(request):
     Render "find courses" page.
     """
     ccx_filters = build_ccx_filters(request)
-    ccxs = CustomCourseForEdX.objects.filter(**ccx_filters)
+
+    affiliate_id = request.POST.get('affiliate_id')
+
+    if affiliate_id:
+        affiliate = AffiliateEntity.objects.get(pk=affiliate_id)
+        ccxs = affiliate.courses.filter(**ccx_filters)
+    else:
+        ccxs = CustomCourseForEdX.objects.filter(**ccx_filters)
+
     ccx_keys = []
 
     for ccx in ccxs:
@@ -162,12 +173,13 @@ def courses(request):
         "courseware/courses.html",
         {
             'courses': courses,
-            'affiliates': set([c.coach for c in ccxs]),
+            'affiliates': AffiliateEntity.objects.order_by('name'),
             'state_choices': STATE_CHOICES,
             'delivery_mode_choices': CustomCourseForEdX.DELIVERY_MODE_CHOICES,
             'filter_states': ccx_filters,
             'date_from': request.POST.get('date_from', ''),
-            'date_to': request.POST.get('date_to', '')
+            'date_to': request.POST.get('date_to', ''),
+            'affiliate_id': affiliate_id
         }
     )
 
@@ -175,7 +187,7 @@ def get_should_hide_master_course(request):
     location_city = request.POST.get('location_city')
     location_state = request.POST.get('location_state')
     delivery_mode = request.POST.get('delivery_mode')
-    coach_id = request.POST.get('coach_id')
+    affiliate_id = request.POST.get('affiliate_id')
 
     # the master course needs to be hidden if
     # city isn't Kansas, state isn't Missouri
@@ -185,14 +197,12 @@ def get_should_hide_master_course(request):
     return ((location_city and not location_city.startswith('Kansas'))
         or (location_state and location_state != 'MO')
         or (delivery_mode and delivery_mode != CustomCourseForEdX.ONLINE_ONLY)
-        or coach_id)
+        or affiliate_id)
 
 
 def build_ccx_filters(request):
-    filter_fields = ['location_city', 'location_state', 'delivery_mode', 'coach_id']
-    filters = {
-        'id': F('original_ccx_id')
-    }
+    filter_fields = ['location_city', 'location_state', 'delivery_mode']
+    filters = {}
 
     if not request.user.is_staff:
         filters['enrollment_type'] = CustomCourseForEdX.PUBLIC
@@ -204,6 +214,7 @@ def build_ccx_filters(request):
 
     date_from = request.POST.get('date_from')
     date_to = request.POST.get('date_to')
+    location_zipcode = request.POST.get('location_zipcode')
 
     if date_from:
         filters['time__gte'] = datetime.strptime(date_from, '%m/%d/%Y')
@@ -211,8 +222,62 @@ def build_ccx_filters(request):
     if date_to:
         filters['time__lte'] = datetime.strptime(date_to, '%m/%d/%Y')
 
+    if location_zipcode:
+        affiliate_location_filter = get_affiliate_location_filter(location_zipcode)
+        filters.update(affiliate_location_filter)
+
     return filters
 
+
+def get_affiliate_location_filter(zipcode):
+    """
+    Function receive zipcode by which the affiliate location search should be performed.
+
+    Fetches coordinates from the Google Geocoding API response
+    for the given zipcode.
+
+    Returns filter which looks for all courses of the affiliate members
+    for all affiliates whose location is withing boundaries
+    returned by get_coordinate_boundaries(latitude, longitude).
+    """
+    members = []
+    latitude = None
+    longitude = None
+
+    geocoding_api_key = settings.GEOCODING_API_KEY
+    url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + zipcode + '+US,&key=' + geocoding_api_key
+    json_response = requests.get(url).json()
+
+    if len(json_response['results']) > 0:
+        location = json_response['results'][0]['geometry']['location']
+        latitude = location['lat']
+        longitude = location['lng']
+
+    if latitude and longitude:
+        latitude_boundaries, longitude_boundaries = get_coordinate_boundaries(latitude, longitude)
+
+        nearby_affiliates = AffiliateEntity.objects.filter(
+            location_latitude__range=latitude_boundaries,
+            location_longitude__range=longitude_boundaries
+        )
+
+        for affiliate in nearby_affiliates:
+            for membership in affiliate.memberships:
+                members.append(membership.member)
+
+    return {'coach__in': members}
+
+def get_coordinate_boundaries(latitude, longitude):
+    """
+    Function is used for searching courses by affiliate location.
+    Returns boundaries around the given coordinates (latitude, longitude),
+    inside which affiliate location is searched for.
+    """
+    search_radius = 2
+    latitude_boundaries = (latitude - search_radius, latitude + search_radius)
+    longitude_boundaries = (longitude - search_radius, longitude + search_radius)
+
+    return (latitude_boundaries, longitude_boundaries)
 
 def get_current_child(xmodule, min_depth=None, requested_child=None):
     """
@@ -422,7 +487,7 @@ def course_info(request, course_id):
 
         # ccx can only have subset of sections, so show only ones included in ccx schedule
         if hasattr(course.id, 'ccx'):
-            schedule = get_ccx_schedule(course, course.id.ccx)
+            schedule = get_ccx_schedule(course, ccx)
             ccx_chapter_locations = [s['location'] for s in schedule]
             sections = [s for s in sections if unicode(s.location) in ccx_chapter_locations]
 
@@ -433,6 +498,10 @@ def course_info(request, course_id):
             section_module = get_module_for_descriptor(user, request, section, field_data_cache, course.id, course=course)
             subsection_module = get_current_child(section_module)
             section.last_subsection_url_name = subsection_module.url_name
+
+        is_program_director_or_course_manager = AffiliateMembership.objects.filter(
+            member=request.user, affiliate=ccx.affiliate, role__in=['staff', 'instructor']
+        ).exists()
 
         context = {
             'request': request,
@@ -450,7 +519,8 @@ def course_info(request, course_id):
             'ccx': ccx,
             'update_items': update_items,
             'workspace_url': settings.WORKSPACE_URL,
-            'sections': sections
+            'sections': sections,
+            'is_program_director_or_course_manager': is_program_director_or_course_manager
         }
 
         # Get the URL of the user's last position in order to display the 'where you were last' message
@@ -872,11 +942,13 @@ def course_about(request, course_id):
             can_enroll = bool(has_access(request.user, 'enroll', course))
             invitation_only = course.invitation_only
             ccx = None
+            program_director = None
         else:
             ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
             enrollment_allowed = ccx.enrollment_type.upper() == 'PUBLIC'
             can_enroll = enrollment_allowed
             invitation_only = not enrollment_allowed # invitation_only is a negation of enrollment_allowed
+            program_director = is_program_director(request.user, ccx.affiliate)
 
         is_course_full = CourseEnrollment.objects.is_course_full(course)
 
@@ -923,6 +995,7 @@ def course_about(request, course_id):
             'cart_link': reverse('shoppingcart.views.show_cart'),
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
+            'is_program_director': program_director
         }
         inject_coursetalk_keys_into_context(context, course_key)
 

@@ -27,9 +27,6 @@ urlpatterns = (
 
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
-    url(r'^affiliates$', 'student.views.affiliates', name="affiliates"),
-    url(r'^affiliates/(?P<affiliate_username>[^/]*)$', 'student.views.affiliate', name="affiliate"),
-    url(r'^affiliates/edit/(?P<affiliate_username>[^/]*)$', 'student.views.affiliate_edit', name="affiliate_edit"),
     url(r'^login_ajax$', 'student.views.login_user', name="login"),
     url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),
 
@@ -983,6 +980,11 @@ if settings.FEATURES["CUSTOM_COURSES_EDX"]:
             include('ccx.urls')),
         url(r'^api/ccx/', include('lms.djangoapps.ccx.api.urls', namespace='ccx_api')),
     )
+
+# Affiliates Feature
+urlpatterns += (
+    url(r'^affiliates/', include('lms.djangoapps.affiliates.urls', namespace='affiliates')),
+)
 
 # Access to courseware as an LTI provider
 if settings.FEATURES.get("ENABLE_LTI_PROVIDER"):

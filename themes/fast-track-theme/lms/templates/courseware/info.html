@@ -69,15 +69,15 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
           <div class="fa fa-file-text"></div>
           COURSE INFO.
           % if ccx:
-            <a href="/affiliates/${ccx.coach.username}">VIEW PROFILE</a>
+            <a href="/affiliates/${ccx.coach.profile.affiliate.slug}">VIEW PROFILE</a>
           % endif
         </div>
         <div class="course-info-body">
           % if ccx:
             <div>
               <b>Affiliate:</b>
-              <a href="/affiliates/${ccx.coach.username}">
-                ${ccx.coach.profile.affiliate_organization_name}
+              <a href="/affiliates/${ccx.coach.profile.affiliate.slug}">
+                ${ccx.coach.profile.affiliate.name}
               </a>
             </div>
             <div>
@@ -94,7 +94,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
             </div>
             <div>
               <b>Contact Information:</b>
-              ${'{} / {}'.format(ccx.coach.profile.public_email or '', ccx.coach.profile.phone_number or '')}
+              ${'{} / {}'.format(ccx.coach.profile.affiliate.email or '', ccx.coach.profile.affiliate.phone_number or '')}
             </div>
           % else:
             <div>
@@ -114,7 +114,8 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
           <div class="fa fa-comment"></div>
           MESSAGES
           <%
-            if request.user.is_staff:
+
+            if request.user.is_staff or is_program_director_or_course_manager:
               messages_view = "ccx_messages"
             else:
               messages_view = "messages"

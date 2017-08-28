@@ -4,20 +4,21 @@
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 %>
 <%page args="course" expression_filter="h"/>
+<%
+  if hasattr(course.id, 'ccx'):
+    ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
+  else:
+    ccx = None
+%>
 <article class="course" id="${course.id}" role="region" aria-label="${course.display_name_with_default}">
   <a href="${reverse('about_course', args=[course.id.to_deprecated_string()])}">
     <header class="course-image">
       <div class="cover-image">
-        % if hasattr(course.id, 'ccx'):
-          <%
-            ccx_custom_course = CustomCourseForEdX.objects.get(pk=course.id.ccx)
-            image_url = get_profile_image_urls_for_user(ccx_custom_course.coach)['full']
-          %>
-          <img src="${image_url}" alt="${course.display_name_with_default} ${course.display_number_with_default}" />
+        % if ccx:
+          <img src="${ccx.image_url}" alt="${ccx.display_name}" />
         % else:
           <img src="${course.course_image_url}" alt="${course.display_name_with_default} ${course.display_number_with_default}" />
         % endif
@@ -26,15 +27,23 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
     </header>
     <div class="course-info" aria-hidden="true">
       <h2 class="course-name">
-        <span class="course-organization">${course.display_org_with_default}</span>
-        <span class="course-title">${course.display_name_with_default}</span>
+        % if ccx:
+          <span class="course-organization">${ccx.affiliate.name}</span>
+          <span class="course-title">${ccx.display_name}</span>
+          <p class="course-overview">
+              % if ccx:
+                % if len(ccx.course_description) > 120:
+                  <span title="${ccx.course_description}">${ccx.course_description[:120] + '...'}</span>
+                % else:
+                    <span>${ccx.course_description}</span>
+                % endif
+              % endif
+          </p>
+        % else:
+          <span class="course-organization">${course.display_org_with_default}</span>
+          <span class="course-title">${course.display_name_with_default}</span>
+        % endif
       </h2>
-    </div>
-    <div class="sr">
-      <ul>
-      <li>${course.display_org_with_default}</li>
-      <li>${course.display_number_with_default}</li>
-    </ul>
     </div>
   </a>
 </article>

@@ -14,6 +14,7 @@ from . import (
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
 from student.models import UserProfile, LanguageProficiency
+from affiliates.models import AffiliateMembership
 from .image_helpers import get_profile_image_urls_for_user
 
 
@@ -112,10 +113,23 @@ class UserReadOnlySerializer(serializers.Serializer):
         else:
             fields = _visible_fields(profile, user, self.configuration)
 
-        return self._filter_fields(
+        visible_serialized_account = self._filter_fields(
             fields,
             data
         )
+
+        if profile.affiliate:
+            is_program_director_or_course_manager = AffiliateMembership.objects.filter(
+                member=user, affiliate=profile.affiliate, role__in=['staff', 'instructor']
+            ).exists()
+
+            visible_serialized_account['is_program_director_or_course_manager'] = is_program_director_or_course_manager
+            visible_serialized_account["affiliate_slug"] = profile.affiliate.slug
+
+
+        visible_serialized_account["is_staff"] = user.is_staff
+
+        return visible_serialized_account
 
     def _filter_fields(self, field_whitelist, serialized_account):
         """

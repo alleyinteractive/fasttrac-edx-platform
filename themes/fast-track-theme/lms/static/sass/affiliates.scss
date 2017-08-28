@@ -45,11 +45,17 @@ $ft-orange: #f76b1c;
       margin: 1rem 0;
     }
 
-    input[type=text] {
+    input[type=text], select {
       border-radius: 0;
       padding: .3rem;
       margin: .5rem 1rem;
       width: 80%;
+    }
+
+    select {
+      background: transparent;
+      padding: .3rem;
+      border-color: #ccc;
     }
   }
 
@@ -60,6 +66,13 @@ $ft-orange: #f76b1c;
     font-weight: bold;
     margin-right: 1rem;
     margin-top: 1rem;
+    border: 0 none;
+    letter-spacing: 0;
+
+    &:hover {
+      background: transparent;
+      opacity: .7;
+    }
   }
 }
 
@@ -118,12 +131,20 @@ h1.explore-header {
     margin-right: 1rem;
 
     .image {
-      height: 8rem;
+      height: 11rem;
       border-bottom: 1px solid #aaa;
       width: 20rem;
       background-repeat: no-repeat;
       background-size: 100% 100%;
       display: block;
+    }
+
+    // text ellipsis
+    .name, .description {
+      width: 18rem;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
     }
 
     .name {
@@ -138,6 +159,7 @@ h1.explore-header {
       padding: 1rem;
       color: #555;
       font-size: .9rem;
+      padding-top: 0;
     }
 
     .card-footer {
@@ -186,8 +208,9 @@ h1.explore-header {
 
 .course-info {
   .image-upload-error-message {
-    margin-left: 20%;
-    padding-top: 18px;
+    margin: 2rem 20%;
+    padding: 18px;
+    background: lightcoral;
   }
 
   header.course-profile {
@@ -275,7 +298,7 @@ h1.explore-header {
       text-align: left;
     }
 
-    input, select {
+    input, select, textarea {
       width: 100%;
       border: 0;
       outline: 0;
@@ -286,6 +309,10 @@ h1.explore-header {
       font-style: normal;
       background: transparent;
       color: #999;
+    }
+
+    textarea {
+      height: 8rem;
     }
 
     input:focus {
@@ -311,5 +338,35 @@ h1.explore-header {
       font-weight: bold;
       color: #555;
       font-size: 1.2rem;
+    }
+  }
+
+  #add_member_form {
+    input, select {
+      display: inline-block;
+      width: 40%;
+      vertical-align: bottom;
+      padding: .4rem;
+    }
+
+    #add_member_submit {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0;
+      width: 18%;
+    }
+  }
+
+
+  #affiliate_membership_table {
+    width: 100%;
+    margin: 2rem 0;
+
+    th {
+      height: 3rem;
+    }
+
+    tr {
+      height: 2rem;
     }
   }

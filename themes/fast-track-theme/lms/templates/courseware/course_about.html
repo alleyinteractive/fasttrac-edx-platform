@@ -6,8 +6,8 @@ from courseware.courses import get_course_about_section
 from django.conf import settings
 from edxmako.shortcuts import marketing_link
 from openedx.core.lib.courses import course_image_url
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 from lms.djangoapps.ccx.models import CustomCourseForEdX
+from affiliates.models import AffiliateMembership
 %>
 
 <%inherit file="../main.html" />
@@ -118,7 +118,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
           <h1>
             % if ccx:
               ${ccx.display_name}
-              <a href="/affiliates/${ccx.coach.username}">${ccx.coach.profile.affiliate_organization_name}</a>
+              <a href="/affiliates/${ccx.coach.profile.affiliate.slug}">${ccx.coach.profile.affiliate.name}</a>
             % else:
               ${course.display_name_with_default_escaped}
               <a href="#">${course.display_org_with_default | h}</a>
@@ -194,7 +194,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
       % if get_course_about_section(request, course, "video"):
       <a href="#video-modal" class="media" rel="leanModal">
         % if ccx:
-          <div class="hero" style="background-image: url(${get_profile_image_urls_for_user(ccx.coach)['full']})">
+          <div class="hero" style="background-image: url(${ccx.image_url})">
         % else:
           <div class="hero" style="background-image: url(${course_image_urls['large']})">
         % endif
@@ -204,7 +204,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
       %else:
       <div class="media">
           % if ccx:
-            <div class="hero" style="background-image: url(${get_profile_image_urls_for_user(ccx.coach)['full']})">
+            <div class="hero" style="background-image: url(${ccx.image_url})">
           % else:
             <div class="hero" style="background-image: url(${course_image_urls['large']})">
           % endif
@@ -225,6 +225,12 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
 
       <div class="inner-wrapper">
         % if ccx:
+          % if is_program_director:
+            <a href="delete_ccx">
+              <i class="fa fa-times"></i>
+              Delete this course
+            </a>
+          % endif
           <pre>${ccx.course_description}</pre>
         % else:
           ${get_course_about_section(request, course, "overview")}

@@ -49,7 +49,7 @@ class RoleCache(object):
         """
         return any(
             access_role.role == role and
-            access_role.course_id == course_id and
+            str(access_role.course_id) == str(course_id) and
             access_role.org == org
             for access_role in self._roles
         )

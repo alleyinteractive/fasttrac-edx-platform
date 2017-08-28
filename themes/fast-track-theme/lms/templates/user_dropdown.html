@@ -29,6 +29,17 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
         <ul class="dropdown-menu list-divided is-hidden" id="${_("Usermenu")}" tabindex="-1">
             <%block name="navigation_dropdown_menu_links" >
                 <li class="dropdown-item item has-block-link"><a href="${reverse('learner_profile', kwargs={'username': user.username})}" class="action">${_("Profile")}</a></li>
+             % if user.profile.affiliate_role == 'staff':
+                <li class="dropdown-item item has-block-link">
+                    <a href="${reverse('affiliates:edit', kwargs={'slug': user.profile.affiliate.slug})}" class="action">${_("Edit Affiliate Profile")}</a>
+                </li>
+             % endif
+
+             % if user.is_staff:
+                <li class="dropdown-item item has-block-link">
+                    <a href="${reverse('affiliates:new')}" class="action">${_("Add New Affiliate")}</a>
+                </li>
+             % endif
             </%block>
             <li class="dropdown-item item has-block-link"><a href="${reverse('logout')}" role="menuitem" class="action">${_("Sign Out")}</a></li>
         </ul>

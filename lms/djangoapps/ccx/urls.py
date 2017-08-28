@@ -15,6 +15,8 @@ urlpatterns = patterns(
         'ccx.views.edit_ccx', name='edit_ccx'),
     url(r'^save_ccx$',
         'ccx.views.save_ccx', name='save_ccx'),
+    url(r'^delete_ccx$',
+        'ccx.views.delete_ccx', name='delete_ccx'),
     url(r'^ccx_invite$',
         'ccx.views.ccx_invite', name='ccx_invite'),
     url(r'^ccx_schedule$',

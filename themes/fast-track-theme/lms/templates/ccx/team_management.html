@@ -10,7 +10,7 @@
     2. Confirm the email they registered with and enter it below. Then, use drop down to select role and click "Add"</div>
 <div class="table-wrapper">
     % if is_staff:
-        <a href="/affiliates/edit/${ccx.coach.username}">
+        <a href="/affiliates/edit/${affiliate_entity.slug}">
             <i class="fa fa-edit"></i>
             Edit Affiliate Info
         </a>
@@ -24,30 +24,24 @@
             <th class="thead">Email</th>
             <th class="thead">Actions</th>
         </tr>
-        %for ccx_course in ccx_courses:
+        %for ccx_staff_permission in ccx_staff_permissions:
             <tr>
-                <td>${ccx_course.coach.profile.name}</td>
+                <td>${ccx_staff_permission.user.profile.name}</td>
                 <td>
-                    % if ccx.is_staff(ccx_course.coach):
+                    % if ccx_staff_permission.role == 'staff':
                         Program Director
-                    % elif ccx.is_instructor(ccx_course.coach):
+                    % elif ccx_staff_permission.role == 'instructor':
                         Course Manager
-                    % else:
+                    % elif ccx_staff_permission.role == 'ccx_coach':
                         Facilitator
                     % endif
                 </td>
-                <td>${ccx_course.coach.email}</td>
+                <td>${ccx_staff_permission.user.email}</td>
                 <td>
                     <span class="remove-coach-button"
                         data-remove-url="${modify_access_url}"
-                        data-unique-student-identifier="${ccx_course.coach.username}"
-                        % if ccx.is_staff(ccx_course.coach):
-                            data-rolename="staff"
-                        % elif ccx.is_instructor(ccx_course.coach):
-                            data-rolename="instructor"
-                        % else:
-                            data-rolename="ccx_coach"
-                        % endif
+                        data-unique-student-identifier="${ccx_staff_permission.user.username}"
+                        data-rolename="${ccx_staff_permission.role}"
                         data-action="revoke">
                             <i class="fa fa-times-circle remove-icon"></i>Remove
                     </span>
@@ -60,10 +54,7 @@
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
         <input type="text" name="unique_student_identifier" />
         <input type="hidden" name="action" value="allow" />
-        <select name="rolename">
-            <option value="ccx_coach" selected>Facilitator</option>
-            <option value="instructor">Course Manager</option>
-        </select>
+        <input type="hidden" name="rolename" value="ccx_coach" />
         <button class="add-button" value="submit">Add</button>
     </form>
     <div id="error-modal" class="error hidden">

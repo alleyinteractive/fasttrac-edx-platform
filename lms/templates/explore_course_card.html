@@ -1,7 +1,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 from lms.djangoapps.ccx.models import CustomCourseForEdX
+from affiliates.models import AffiliateMembership
 %>
 
 <%page args="course" expression_filter="h"/>
@@ -16,10 +16,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
     <a href="/courses/${course.id}/about">
         <header class="course-image">
             % if ccx:
-              <%
-                image_url = get_profile_image_urls_for_user(ccx.coach)['full']
-              %>
-              <img src="${image_url}" alt="${ccx.display_name}" />
+              <img src="${ccx.image_url}" alt="${course.display_name}" />
             % else:
               <img src="${course.course_image_url}" alt="${course.display_name}" />
             % endif
@@ -36,15 +33,9 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
         </header>
         <section class="course-info" aria-hidden="true">
             % if ccx:
-              % if len(ccx.coach.profile.affiliate_organization_name) > 28:
-              <h3 title="${ccx.coach.profile.affiliate_organization_name}" class="affiliate-name">
-                  ${ccx.coach.profile.affiliate_organization_name}
+              <h3 title="${ccx.coach.profile.affiliate.name}" class="affiliate-name">
+                  ${ccx.coach.profile.affiliate.name}
               </h3>
-              % else:
-              <h3 class="affiliate-name">
-                  ${ccx.coach.profile.affiliate_organization_name}
-              </h3>
-              % endif
               % if len(ccx.display_name) > 28:
                 <h2 title="${ccx.display_name}" class="course-name">
                   ${ccx.display_name}

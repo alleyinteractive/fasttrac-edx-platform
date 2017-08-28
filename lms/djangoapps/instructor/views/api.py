@@ -888,25 +888,6 @@ def modify_access(request, course_id):
 
         # add CCX table entry
         if hasattr(course.id, 'ccx'):
-            ccx_enrollment_exists = CustomCourseForEdX.objects.filter(original_ccx_id=course.id.ccx, coach_id=user.id).exists()
-
-            if ccx_enrollment_exists:
-                response_payload = {
-                    'unique_student_identifier': user.username,
-                    'rolename': rolename,
-                    'action': action,
-                    'addingExistingCCXCoachOrInstructor': True,
-                }
-                return JsonResponse(response_payload)
-
-            ccx_name = CustomCourseForEdX.objects.get(pk=course.id.ccx).display_name
-            CustomCourseForEdX(
-                course_id=course.id,
-                coach_id=user.id,
-                display_name=ccx_name,
-                original_ccx_id=course.id.ccx
-            ).save()
-
             # send affiliate email KF-261
             # send email only if coach is enrolled into a CCX derived from FastTrac course
             partial_course_key = settings.FASTTRAC_COURSE_KEY.split(':')[1]
@@ -920,14 +901,6 @@ def modify_access(request, course_id):
 
     elif action == 'revoke':
         revoke_access(course, user, rolename, False)
-
-        # delete CCX entry
-        if hasattr(course.id, 'ccx'):
-            CustomCourseForEdX.objects.get(
-                course_id=course.id,
-                coach_id=user.id,
-                original_ccx_id=course.id.ccx
-            ).delete()
     else:
         return HttpResponseBadRequest(strip_tags(
             "unrecognized action '{}'".format(action)

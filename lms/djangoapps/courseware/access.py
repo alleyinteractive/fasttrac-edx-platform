@@ -85,14 +85,7 @@ def has_ccx_coach_role(user, course_key):
         ccx_id = course_key.ccx
         role = CourseCcxCoachRole(course_key)
 
-        if role.has_user(user):
-            list_ccx = CustomCourseForEdX.objects.filter(
-                course_id=course_key.to_course_locator(),
-                coach=user
-            )
-            if list_ccx.exists():
-                coach_ccx = list_ccx[0]
-                return str(coach_ccx.id) == ccx_id
+        return role.has_user(user)
     else:
         raise CCXLocatorValidationException("Invalid CCX key. To verify that "
                                             "user is a coach on CCX, you must provide key to CCX")

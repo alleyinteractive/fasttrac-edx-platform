@@ -22,7 +22,9 @@ ${block_content}
 %  endif
 %  if not disable_staff_debug_info:
 <div class="wrap-instructor-info">
-  <a class="instructor-info-action" href="#${element_id}_debug" id="${element_id}_trig">${_("Staff Debug Info")}</a>
+  % if request.user.is_staff:
+    <a class="instructor-info-action" href="#${element_id}_debug" id="${element_id}_trig">${_("Staff Debug Info")}</a>
+  % endif
 
   %  if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \
     location.category == 'problem':

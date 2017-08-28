@@ -103,7 +103,6 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
           @extend %t-icon4;
           margin: ($baseline*0.25) 0 ($baseline*1.75) 0;
           padding: 0 ($baseline*0.75);
-          height: $course-title-height;
           color: $link-color;
         }
 
