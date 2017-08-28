@@ -499,9 +499,13 @@ def course_info(request, course_id):
             subsection_module = get_current_child(section_module)
             section.last_subsection_url_name = subsection_module.url_name
 
-        is_program_director_or_course_manager = AffiliateMembership.objects.filter(
-            member=request.user, affiliate=ccx.affiliate, role__in=['staff', 'instructor']
-        ).exists()
+        if ccx:
+            is_program_director_or_course_manager = AffiliateMembership.objects.filter(
+                member=request.user, affiliate=ccx.affiliate, role__in=['staff', 'instructor']
+            ).exists()
+        else:
+            is_program_director_or_course_manager = False
+
 
         context = {
             'request': request,
