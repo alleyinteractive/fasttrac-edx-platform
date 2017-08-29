@@ -699,7 +699,7 @@ def ccx_messages(request, course, ccx=None, **kwargs):
         'create_message_url': reverse('ccx_messages_create', kwargs={'course_id': ccx_id}),
         'delete_message_url': 'ccx_messages/delete/',
         'messages': messages,
-        'course': course
+        'course': get_course_by_id(ccx.ccx_course_id, depth=2)
     }
 
     return render_to_response('ccx/ccx_messages_dashboard.html', context)
