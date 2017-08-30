@@ -80,7 +80,7 @@ class AffiliateEntity(models.Model):
             super(AffiliateEntity, self).delete()
 
     def build_full_address(self):
-        return self.address + ',' + self.zipcode + ',' + self.city
+        return '{}, {}, {}'.format(self.address, self.zipcode, self.city)
 
     def get_location_coordinates(self):
         geocoding_api_key = settings.GEOCODING_API_KEY
