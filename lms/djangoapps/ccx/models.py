@@ -77,9 +77,12 @@ class CustomCourseForEdX(models.Model):
         max_length=255,
         choices=ENROLLMENT_TYPE_CHOICES
     )
-    time = models.DateTimeField(default=datetime.now())
+    time = models.DateTimeField(default=datetime.now)
     fee = models.BooleanField(default=False)
     course_description = models.TextField(default='Course description...')
+
+    enrollment_end_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
 
     class Meta(object):
         app_label = 'ccx'
@@ -151,10 +154,11 @@ class CustomCourseForEdX(models.Model):
 
     def has_ended(self):
         """Return True if the CCX due date is set and is in the past"""
-        if self.due is None:
-            return False
+        return self.end_date and self.end_date > datetime.now(utc)
 
-        return datetime.now(utc) > self.due
+    def enrollment_closed(self):
+        """Return True if the CCX due date is set and is in the past"""
+        return self.enrollment_end_date and self.enrollment_end_date > datetime.now(utc)
 
     def start_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
         """Returns the desired text representation of the CCX start datetime

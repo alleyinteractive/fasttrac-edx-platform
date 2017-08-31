@@ -19,15 +19,13 @@
     width: 100%;
   }
 
-  #ccx_course_description,
-  #ccx_dialog_date,
-  #ccx_dialog_time {
+  .ccx-date-field,
+  #ccx_course_description {
     box-shadow: none;
     resize: none;
   }
 
-  #ccx_dialog_date,
-  #ccx_dialog_time,
+  .ccx-date-field,
   #ccx_city,
   #ccx_state {
     width: 250px;
@@ -56,7 +54,7 @@
 }
 
 .edit-create-custom-course-wrapper #ccx_course_description:focus,
-#ccx_dialog_date:focus, #ccx_dialog_time:focus {
+.ccx-date-field:focus {
   outline: none;
 }
 

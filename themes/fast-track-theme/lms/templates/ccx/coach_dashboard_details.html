@@ -43,6 +43,17 @@
 
             <div class="field-row">
                 <div class="field-wrapper">
+                    <p class="field-name">${_('ENROLLMENT CLOSE')}</p>
+                    <p class="field-info">${(ccx.enrollment_end_date and ccx.enrollment_end_date.date()) or '--'}</p>
+                </div>
+                <div class="field-wrapper">
+                    <p class="field-name">${_('END DATE')}</p>
+                    <p class="field-info">${(ccx.end_date and ccx.end_date.date()) or '--'}</p>
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-wrapper">
                     <p class="field-name">${_('CITY')}</p>
                     <p class="field-info">${ccx.location_city}</p>
                 </div>

@@ -76,6 +76,64 @@
         </div>
     </div>
 
+    <div class="horizontal-field-wrapper datepair">
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('ENROLLMENT CLOSE DATE')}</p>
+            <label class="sr form-label"
+                   for="ccx_enrollment_end_date">${_('Date format four digit year dash two digit month dash two digit day')}</label>
+            <input placeholder="${_('select enrollment close date...')}" class="date ccx-input-field ccx-date-field"
+                   value="${(ccx.enrollment_end_date and ccx.enrollment_end_date.date()) or ''}"
+                   type="text"
+                   name="enrollment_end_date"
+                   id="ccx_enrollment_end_date"
+                   size="10"
+                   required />
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+        </div>
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('ENROLLMENT CLOSE TIME')}</p>
+            <label class="sr form-label"
+                   for="ccx_enrollment_end_time">${_('Time format two digit hours colon two digit minutes')}</label>
+            <input placeholder="${_('select enrollment close time...')}" class="time ccx-input-field ccx-date-field"
+                   value="${(ccx.enrollment_end_date and ccx.enrollment_end_date.time()) or ''}"
+                   type="text"
+                   name="enrollment_end_time"
+                   id="ccx_enrollment_end_time"
+                   size=10
+                   required />
+            </br>
+        </div>
+    </div>
+
+    <div class="horizontal-field-wrapper datepair">
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('END DATE')}</p>
+            <label class="sr form-label"
+                   for="ccx_end_date">${_('Date format four digit year dash two digit month dash two digit day')}</label>
+            <input placeholder="${_('select end date...')}" class="date ccx-input-field ccx-date-field"
+                   value="${(ccx.end_date and ccx.end_date.date()) or ''}"
+                   type="text"
+                   name="end_date"
+                   id="ccx_end_date"
+                   size="10"
+                   required/>
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+        </div>
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('END TIME')}</p>
+            <label class="sr form-label"
+                   for="ccx_end_time">${_('Time format two digit hours colon two digit minutes')}</label>
+            <input placeholder="${_('select end time...')}" class="time ccx-input-field ccx-date-field"
+                   value="${(ccx.end_date and ccx.end_date.time()) or ''}"
+                   type="text"
+                   name="end_time"
+                   id="ccx_end_time"
+                   size=10
+                   required/>
+            </br>
+        </div>
+    </div>
+
     <div class="horizontal-field-wrapper">
         <div class="horizontal-field-container">
             <p class="field-name">${_('CITY')}</p>

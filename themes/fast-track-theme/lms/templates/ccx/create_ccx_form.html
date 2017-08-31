@@ -60,7 +60,7 @@
             <p class="field-name">${_('START DATE')}</p>
             <label class="sr form-label"
                    for="ccx_dialog_date">${_('Date format four digit year dash two digit month dash two digit day')}</label>
-            <input placeholder="${_('select a start date...')}" class="date ccx-input-field"
+            <input placeholder="${_('select a start date...')}" class="date ccx-input-field ccx-date-field"
                    type="text"
                    name="date"
                    id="ccx_dialog_date"
@@ -72,10 +72,64 @@
             <p class="field-name">${_('START TIME')}</p>
             <label class="sr form-label"
                    for="ccx_dialog_time">${_('Time format two digit hours colon two digit minutes')}</label>
-            <input placeholder="${_('select a starting time...')}" class="time ccx-input-field"
+            <input placeholder="${_('select a starting time...')}" class="time ccx-input-field ccx-date-field"
                    type="text"
                    name="time"
                    id="ccx_dialog_time"
+                   size=10
+                   required/>
+            </br>
+        </div>
+    </div>
+
+    <div class="horizontal-field-wrapper datepair">
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('ENROLLMENT CLOSE DATE')}</p>
+            <label class="sr form-label"
+                   for="ccx_enrollment_end_date">${_('Date format four digit year dash two digit month dash two digit day')}</label>
+            <input placeholder="${_('select enrollment close date...')}" class="date ccx-input-field ccx-date-field"
+                   type="text"
+                   name="enrollment_end_date"
+                   id="ccx_enrollment_end_date"
+                   size="10"
+                   required />
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+        </div>
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('ENROLLMENT CLOSE TIME')}</p>
+            <label class="sr form-label"
+                   for="ccx_enrollment_end_time">${_('Time format two digit hours colon two digit minutes')}</label>
+            <input placeholder="${_('select enrollment close time...')}" class="time ccx-input-field ccx-date-field"
+                   type="text"
+                   name="enrollment_end_time"
+                   id="ccx_enrollment_end_time"
+                   size=10
+                   required />
+            </br>
+        </div>
+    </div>
+
+    <div class="horizontal-field-wrapper datepair">
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('END DATE')}</p>
+            <label class="sr form-label"
+                   for="ccx_end_date">${_('Date format four digit year dash two digit month dash two digit day')}</label>
+            <input placeholder="${_('select end date...')}" class="date ccx-input-field ccx-date-field"
+                   type="text"
+                   name="end_date"
+                   id="ccx_end_date"
+                   size="10"
+                   required/>
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+        </div>
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('END TIME')}</p>
+            <label class="sr form-label"
+                   for="ccx_end_time">${_('Time format two digit hours colon two digit minutes')}</label>
+            <input placeholder="${_('select end time...')}" class="time ccx-input-field ccx-date-field"
+                   type="text"
+                   name="end_time"
+                   id="ccx_end_time"
                    size=10
                    required/>
             </br>
@@ -123,6 +177,7 @@
             </select>
         </div>
     </div>
+
     <div class="field submit">
         <button id="create-ccx" class="ft-button-action" type="submit">
                 ${_('CREATE COURSE')}<i class="fa fa-plus"></i>

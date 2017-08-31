@@ -314,7 +314,7 @@ from affiliates.models import AffiliateMembership
                     ${ccx.location_state}
                   </span>
               </li>
-              % endif
+            % endif
             <li class="important-dates-item">
               <span class="icon fa fa-money"></span>
               <p class="important-dates-item-title">Fee</p>
@@ -324,6 +324,16 @@ from affiliates.models import AffiliateMembership
               <span class="icon fa fa-clock-o"></span>
               <p class="important-dates-item-title">Start Date</p>
               <span class="important-dates-item-text">${ccx.time.strftime("%B %d, %Y")}</span>
+            </li>
+            <li class="important-dates-item">
+              <span class="icon fa fa-clock-o"></span>
+              <p class="important-dates-item-title">Enrollment Close Date</p>
+              <span class="important-dates-item-text">${(ccx.enrollment_end_date and ccx.enrollment_end_date.strftime("%B %d, %Y")) or '--'}</span>
+            </li>
+            <li class="important-dates-item">
+              <span class="icon fa fa-clock-o"></span>
+              <p class="important-dates-item-title">End Date</p>
+              <span class="important-dates-item-text">${(ccx.end_date and ccx.end_date.strftime("%B %d, %Y")) or '--'}</span>
             </li>
           </ol>
         % endif
