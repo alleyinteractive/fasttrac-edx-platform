@@ -13,7 +13,7 @@ from courseware.courses import get_course_by_id
 from contextlib import contextmanager
 from courseware.courses import get_course_with_access, get_course_by_id
 from opaque_keys.edx.keys import CourseKey
-from student.models import CourseAccessRole
+from student.models import CourseAccessRole, CourseEnrollment
 from django.template.defaultfilters import slugify
 from django.utils.crypto import get_random_string
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -120,6 +120,10 @@ class AffiliateEntity(models.Model):
     def courses(self):
         return CustomCourseForEdX.objects.filter(coach__in=self.members.all())
 
+    @property
+    def enrollments(self):
+        course_ids = [c.ccx_course_id for c in self.courses]
+        return CourseEnrollment.objects.filter(course_id__in=course_ids)
 
 
 class AffiliateMembership(models.Model):

@@ -6,6 +6,7 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns('',
     url(r'^$', 'affiliates.views.index', name='index'),
+    url(r'^admin$', 'affiliates.views.admin', name='admin'),
     url(r'^new$', 'affiliates.views.new', name='new'),
     url(r'^create$', 'affiliates.views.create', name='create'),
     url(r'^(?P<slug>[^/]*)$', 'affiliates.views.show', name="show"),

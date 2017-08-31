@@ -1,0 +1,63 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">Affiliates</%block>
+
+<style>
+  /*
+    This page is a copy of affiliates index and since all is scoped to explore-affiliates class
+    I put a few overrides here in template. This page design will most likely be changed.
+  */
+  .affiliate-content {
+    left: 17.5%;
+    width: 65%;
+  }
+
+  .affiliate-content .affiliate-card .card-footer .skewed-footer-item, .affiliate-courses .affiliate-card .card-footer .skewed-footer-item {
+    border-left: 1px solid #ddd;
+  }
+</style>
+
+<section class="container explore-affiliates">
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.wrapper-footer').addClass('fixed-footer')
+    })
+  </script>
+
+  <div class="affiliate-content">
+    <h1 class="explore-header">
+      Affiliate Admin
+    </h1>
+    <ul>
+      % for affiliate in affiliates:
+        <li class="affiliate-card">
+          <div class="image" style="background-image: url(${affiliate.image_url});"></div>
+          <div class="name" title="${affiliate.name}">
+            ${affiliate.name}
+          </div>
+          <div class="description" title="${affiliate.description}">
+            ${affiliate.description}
+          </div>
+          <div class="card-footer">
+            <span title="Number of affiliate users">
+              <span class="fa fa-users"></span>
+              ${affiliate.members.count()}
+            </span>
+            <span class="skewed-footer-item" title="Number of affiliate courses">
+              <span>
+                <span class="fa fa-book"></span>
+                ${affiliate.courses.count()}
+              </span>
+            </span>
+            <span title="Number of affiliate students">
+              <span class="fa fa-graduation-cap"></span>
+              ${affiliate.enrollments.count()}
+            </span>
+          </div>
+        </li>
+      %endfor
+    </ul>
+  </div>
+</section>

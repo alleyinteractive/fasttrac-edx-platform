@@ -94,6 +94,11 @@ site_status_msg = get_site_status_msg(course_id)
           <li class="ft-header-item">
               <a href="${settings.WORKSPACE_URL}">Workspace</a>
           </li>
+          % if user.is_staff:
+            <li class="ft-header-item">
+                <a href="/affiliates/admin">Affiliate Admin</a>
+            </li>
+          % endif
       </ol>
 
       % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor
