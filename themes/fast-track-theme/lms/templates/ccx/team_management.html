@@ -3,11 +3,11 @@
 
 <h2 class="hd hd-2">${_("Team management")}</h2>
 <div class="team-management-note">
-    Before adding email in box below:
+    Before adding a facilitator to your course below:
     <br>
-    1. Confirm the person you are adding as a Course Manager or Facilitator has registered as a user on the website.
+    1. Confirm the person you are adding as a facilitator has already been added to your organization on your Affiliate Profile page
     <br>
-    2. Confirm the email they registered with and enter it below. Then, use drop down to select role and click "Add"</div>
+    2. Confirm this user's email address and enter it in the box below</div>
 <div class="table-wrapper">
     % if is_staff:
         <a href="/affiliates/edit/${affiliate_entity.slug}">
@@ -24,24 +24,16 @@
             <th class="thead">Email</th>
             <th class="thead">Actions</th>
         </tr>
-        %for ccx_staff_permission in ccx_staff_permissions:
+        %for ccx_coach_permission in ccx_coach_permissions:
             <tr>
-                <td>${ccx_staff_permission.user.profile.name}</td>
-                <td>
-                    % if ccx_staff_permission.role == 'staff':
-                        Program Director
-                    % elif ccx_staff_permission.role == 'instructor':
-                        Course Manager
-                    % elif ccx_staff_permission.role == 'ccx_coach':
-                        Facilitator
-                    % endif
-                </td>
-                <td>${ccx_staff_permission.user.email}</td>
+                <td>${ccx_coach_permission.user.profile.name}</td>
+                <td>Facilitator</td>
+                <td>${ccx_coach_permission.user.email}</td>
                 <td>
                     <span class="remove-coach-button"
                         data-remove-url="${modify_access_url}"
-                        data-unique-student-identifier="${ccx_staff_permission.user.username}"
-                        data-rolename="${ccx_staff_permission.role}"
+                        data-unique-student-identifier="${ccx_coach_permission.user.username}"
+                        data-rolename="${ccx_coach_permission.role}"
                         data-action="revoke">
                             <i class="fa fa-times-circle remove-icon"></i>Remove
                     </span>
@@ -52,10 +44,11 @@
     <br>
     <form id="add-coach-form" action="${modify_access_url}" method="POST">
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+        <label for="unique_student_identifier">Email Address</label>
         <input type="text" name="unique_student_identifier" />
         <input type="hidden" name="action" value="allow" />
         <input type="hidden" name="rolename" value="ccx_coach" />
-        <button class="add-button" value="submit">Add</button>
+        <button class="add-button" value="submit">Add Facilitator</button>
     </form>
     <div id="error-modal" class="error hidden">
         <span class="content"></span>

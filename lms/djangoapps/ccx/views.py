@@ -202,7 +202,7 @@ def dashboard(request, course, ccx=None, **kwargs):
         context['is_instructor'] = ccx.is_instructor(request.user)
         context['is_staff'] = ccx.is_staff(request.user)
 
-        context['ccx_staff_permissions'] = CourseAccessRole.objects.filter(course_id=ccx_locator)
+        context['ccx_coach_permissions'] = CourseAccessRole.objects.filter(course_id=ccx_locator, role='ccx_coach')
 
         context['edit_current'] = False
 
