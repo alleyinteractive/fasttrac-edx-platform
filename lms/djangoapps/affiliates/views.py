@@ -22,14 +22,25 @@ def index(request):
     affiliate_name = request.POST.get('affiliate_name', '')
     affiliate_city = request.POST.get('affiliate_city', '')
     affiliate_state = request.POST.get('affiliate_state', '')
+    location_latitude = request.POST.get('latitude', '')
+    location_longitude = request.POST.get('longitude', '')
+    search_radius = request.POST.get('affiliate_search_radius', '')
 
     filters = {}
     if affiliate_name:
         filters['name__icontains'] = affiliate_name
-    if affiliate_city:
-        filters['city__icontains'] = affiliate_city
-    if affiliate_state:
-        filters['state'] = affiliate_state
+    if location_latitude and location_longitude and search_radius:
+        from courseware.views.views import get_coordinate_boundaries
+        latitude_boundaries, longitude_boundaries = get_coordinate_boundaries(
+            float(location_latitude), float(location_longitude), float(search_radius))
+
+        filters['location_latitude__range'] = latitude_boundaries
+        filters['location_longitude__range'] = longitude_boundaries
+    else:
+        if affiliate_city:
+            filters['city__icontains'] = affiliate_city
+        if affiliate_state:
+            filters['state'] = affiliate_state
 
     affiliates = AffiliateEntity.objects.filter(**filters).order_by('name')
 

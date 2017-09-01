@@ -21,7 +21,7 @@
     <div class="search-facets-lists">
       <a href="/courses" class="clear-all"> <span class="fa fa-remove"></span> Clear All</a>
       <br>
-      <form action="/courses" method="POST">
+      <form class="course-filter-form" action="/courses" method="POST">
         <h3 class="header-facet">
           <i class="fa fa-calendar"></i>
           START DATE
@@ -79,6 +79,23 @@
               % endfor
             </select>
           </li>
+          <br>
+          <li>
+            <input type="text" name="location_zipcode" class="location_zipcode" placeholder="zipcode" />
+          </li>
+          <br>
+          <li>
+            <select name="location_search_radius">
+              <option selected disabled> search radius </option>
+              <option value="5">5 miles</option>
+              <option value="10">10 miles</option>
+              <option value="20">20 miles</option>
+              <option value="50">50 miles</option>
+              <option value="100">100 miles</option>
+            </select>
+          </li>
+          <input class="latitude-field" type="hidden" name="latitude" />
+          <input class="longitude-field" type="hidden" name="longitude" />
         </ul>
 
         <h3 class="header-facet">
@@ -93,10 +110,6 @@
                 <option value="${affiliate.pk}" ${ 'selected' if affiliate_id == unicode(affiliate.pk) else '' }>${affiliate.name}</option>
               % endfor
             </select>
-          </li>
-          <br>
-          <li>
-            <input type="text" name="location_zipcode" placeholder="zipcode" />
           </li>
         </ul>
 
@@ -142,6 +155,41 @@
 </main>
 
 <script>
+  function buildGisApiUrl(zipcode) {
+    var baseUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
+
+    return baseUrl + '+' + zipcode + '+US';
+  }
+
+  function submitFormWithCoordinates(e) {
+    var $form = $('.course-filter-form');
+    var zipcode = $form.find('.location_zipcode').val();
+    var $latitudeField = $form.find('.latitude-field');
+    var $longitudeField = $form.find('.longitude-field');
+    var gisApiUrl = buildGisApiUrl(zipcode);
+
+    if (zipcode) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', gisApiUrl, false);
+      xhr.onload = function () {
+        if (this.status === 200) {
+          var results = JSON.parse(this.responseText).results;
+          if (results.length !== 0) {
+            var location = results[0].geometry.location
+            var latitude = location.lat;
+            var longitude = location.lng;
+
+            $latitudeField.val(latitude);
+            $longitudeField.val(longitude);
+          }
+        }
+      };
+      xhr.send(null);
+    }
+
+    return true;
+  }
+
   $(document).ready(function(){
     $('.wrapper-footer').addClass('relative-footer')
 
@@ -157,6 +205,8 @@
         $(this).prop('checked', true);
       }
     });
+
+    $('.course-filter-form').on('submit', submitFormWithCoordinates);
   });
 </script>
 
