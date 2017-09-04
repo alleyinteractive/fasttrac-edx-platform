@@ -5,59 +5,53 @@
 <%block name="pagetitle">Affiliates</%block>
 
 <style>
-  /*
-    This page is a copy of affiliates index and since all is scoped to explore-affiliates class
-    I put a few overrides here in template. This page design will most likely be changed.
-  */
-  .affiliate-content {
-    left: 17.5%;
-    width: 65%;
-  }
-
-  .affiliate-content .affiliate-card .card-footer .skewed-footer-item, .affiliate-courses .affiliate-card .card-footer .skewed-footer-item {
-    border-left: 1px solid #ddd;
+  .students-table {
+    margin-bottom: 6rem;
   }
 </style>
 
-<section class="container explore-affiliates">
+<section class="container">
   <script type="text/javascript">
     $(document).ready(function() {
       $('.wrapper-footer').addClass('fixed-footer')
     })
   </script>
 
-  <div class="affiliate-content">
+  <div>
     <h1 class="explore-header">
       Affiliate Admin
     </h1>
-    <ul>
-      % for affiliate in affiliates:
-        <li class="affiliate-card">
-          <div class="image" style="background-image: url(${affiliate.image_url});"></div>
-          <div class="name" title="${affiliate.name}">
-            ${affiliate.name}
-          </div>
-          <div class="description" title="${affiliate.description}">
-            ${affiliate.description}
-          </div>
-          <div class="card-footer">
-            <span title="Number of affiliate users">
-              <span class="fa fa-users"></span>
+    <table class="students-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Members count</th>
+          <th>Courses count</th>
+          <th>Enrollments count</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        % for affiliate in affiliates:
+          <tr>
+            <td>
+              ${affiliate.name}
+            </td>
+            <td>
               ${affiliate.members.count()}
-            </span>
-            <span class="skewed-footer-item" title="Number of affiliate courses">
-              <span>
-                <span class="fa fa-book"></span>
-                ${affiliate.courses.count()}
-              </span>
-            </span>
-            <span title="Number of affiliate students">
-              <span class="fa fa-graduation-cap"></span>
+            </td>
+            <td>
+              ${affiliate.courses.count()}
+            </td>
+            <td>
               ${affiliate.enrollments.count()}
-            </span>
-          </div>
-        </li>
-      %endfor
-    </ul>
+            </td>
+            <td>
+              <a href="/affiliates/${affiliate.slug}">View</a>
+            </td>
+          </tr>
+        %endfor
+      </ul>
+    </table>
   </div>
 </section>

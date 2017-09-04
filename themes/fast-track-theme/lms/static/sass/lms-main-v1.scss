@@ -596,13 +596,15 @@ $link-color: #6f6f6f;
 .students-table {
   width: 100%;
 
-  thead td {
+  thead td, th {
     font-weight: bold;
     height: 50px;
+    text-align: left;
   }
 
   tbody tr {
     height: 40px;
+    line-height: 40px;
 
     &:hover {
       background: #ddd;
