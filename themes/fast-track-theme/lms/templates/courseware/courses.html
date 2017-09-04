@@ -132,6 +132,9 @@
         Explore Affiliates
       </a>
     </h1>
+    % for user_message in user_messages:
+      <span class="user-message">${user_message}</span>
+    % endfor
     <div class="courses-container">
       <div class="courses" role="region" aria-label="${_('List of Courses')}">
         <ul class="courses-listing">

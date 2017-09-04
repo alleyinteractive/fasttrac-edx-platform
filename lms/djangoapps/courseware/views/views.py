@@ -40,6 +40,7 @@ import shoppingcart
 import survey.utils
 import survey.views
 from lms.djangoapps.ccx.utils import prep_course_for_grading
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 from certificates import api as certs_api
 from course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.models.course_details import CourseDetails
@@ -145,6 +146,9 @@ def courses(request):
     """
     ccx_filters = build_ccx_filters(request)
     affiliate_id = request.POST.get('affiliate_id')
+    latitude = request.POST.get('latitude', '')
+    longitude = request.POST.get('longitude', '')
+
 
     if affiliate_id:
         affiliate = AffiliateEntity.objects.get(pk=affiliate_id)
@@ -169,6 +173,21 @@ def courses(request):
     if not request.user.is_staff:
         courses = courses.filter(invitation_only=0)
 
+    user_messages = []
+    if latitude and longitude:
+        ordered_ccxs = sorted(ccxs, key=lambda ccx: ccx.distance_from({'latitude': latitude, 'longitude': longitude}))
+        ordered_courses = []
+
+        for ccx in ordered_ccxs:
+            for course in courses:
+                if str(course.id) == str(ccx.ccx_course_id):
+                    ordered_courses.append(course)
+                    break
+
+        courses = ordered_courses
+        if len(courses) > 0:
+            user_messages.append('Courses are sorted by the distance!')
+
     return render_to_response(
         "courseware/courses.html",
         {
@@ -179,7 +198,8 @@ def courses(request):
             'filter_states': ccx_filters,
             'date_from': request.POST.get('date_from', ''),
             'date_to': request.POST.get('date_to', ''),
-            'affiliate_id': affiliate_id
+            'affiliate_id': affiliate_id,
+            'user_messages': user_messages
         }
     )
 
@@ -212,7 +232,8 @@ def build_ccx_filters(request):
 
         filters['location_latitude__range'] = latitude_boundaries
         filters['location_longitude__range'] = longitude_boundaries
-        filter_fields = ['delivery_mode']
+        filters['delivery_mode'] = CustomCourseForEdX.IN_PERSON
+        filter_fields = []
     else:
         filter_fields = ['location_city', 'location_state', 'delivery_mode']
 

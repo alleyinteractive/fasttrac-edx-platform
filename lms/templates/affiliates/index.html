@@ -108,6 +108,9 @@
         Explore Courses
       </a>
     </h1>
+    % for message in user_messages:
+        <span class="user-message">${message}</span>
+    % endfor
     <ul>
       % for affiliate in affiliates:
         <li class="affiliate-card">

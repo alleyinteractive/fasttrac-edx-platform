@@ -23,6 +23,7 @@ from student.models import CourseAccessRole, CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from ccx_keys.locator import CCXLocator
 from instructor.access import allow_access
+from lms.djangoapps.courseware.gis_helpers import coordinates_distance
 
 
 
@@ -253,6 +254,9 @@ class CustomCourseForEdX(models.Model):
         location = json_response['results'][0]['geometry']['location']
 
         return location['lat'], location['lng']
+
+    def distance_from(self, coordinate):
+        return coordinates_distance({'latitude': self.location_latitude, 'longitude': self.location_longitude}, coordinate)
 
 
 class CcxFieldOverride(models.Model):

@@ -18,6 +18,7 @@ from django.template.defaultfilters import slugify
 from django.utils.crypto import get_random_string
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from lms.djangoapps.instructor.enrollment import enroll_email
+from lms.djangoapps.courseware.gis_helpers import coordinates_distance
 import requests
 
 
@@ -48,11 +49,11 @@ class AffiliateEntity(models.Model):
 
     members = models.ManyToManyField(User, through='AffiliateMembership')
 
-    __full_address = None
+    _full_address = None
 
     def __init__(self, *args, **kwargs):
         super(AffiliateEntity, self).__init__(*args, **kwargs)
-        self.__full_address = self.build_full_address()
+        self._full_address = self.build_full_address()
 
     def save(self, *args, **kwargs):
         slug = slugify(self.name)
@@ -66,13 +67,13 @@ class AffiliateEntity(models.Model):
 
         new_full_address = self.build_full_address()
 
-        if self.__full_address != new_full_address:
+        if self._full_address != new_full_address:
             latitude, longitude = self.get_location_coordinates()
             setattr(self, 'location_latitude', latitude)
             setattr(self, 'location_longitude', longitude)
 
         super(AffiliateEntity, self).save(*args, **kwargs)
-        self.__full_address = new_full_address
+        self._full_address = new_full_address
 
     def delete(self):
         with transaction.atomic():
@@ -98,6 +99,8 @@ class AffiliateEntity(models.Model):
 
         return location['lat'], location['lng']
 
+    def distance_from(self, coordinate):
+        return coordinates_distance({ 'latitude': self.location_latitude, 'longitude': self.location_longitude }, coordinate)
 
     class Meta:
         unique_together = ('email', 'name')

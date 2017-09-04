@@ -228,6 +228,11 @@ $link-color: #6f6f6f;
   background: white;
   padding-left: 2rem;
   padding-top: 1rem;
+
+  .user-message {
+    font-size: 0.9rem;
+    font-style: italic;
+  }
 }
 
 .search-facets {

@@ -44,12 +44,21 @@ def index(request):
 
     affiliates = AffiliateEntity.objects.filter(**filters).order_by('name')
 
+    user_messages = []
+    if location_latitude and location_longitude:
+        affiliates = sorted(affiliates, key=lambda affiliate: affiliate.distance_from(
+            {'latitude': location_latitude, 'longitude': location_longitude}))
+
+        if len(affiliates) > 0:
+            user_messages.append('Affiliates are sorted by the distance!')
+
     return render_to_response('affiliates/index.html', {
         'affiliates': affiliates,
         'affiliate_name': affiliate_name,
         'affiliate_city': affiliate_city,
         'affiliate_state': affiliate_state,
-        'state_choices': STATE_CHOICES
+        'state_choices': STATE_CHOICES,
+        'user_messages': user_messages
     })
 
 
