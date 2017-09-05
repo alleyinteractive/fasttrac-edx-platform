@@ -14,6 +14,6 @@ class Command(BaseCommand):
         setattr(affiliate, 'location_latitude', latitude)
         setattr(affiliate, 'location_longitude', longitude)
         affiliate.save()
-        self.stdout.write('{} saved.'.format(affiliate.name))
+        self.stdout.write('{} coordinates saved.'.format(affiliate.name))
       except:
-        self.stdout.write('Failed saving {}.'.format(affiliate.name))
+        self.stdout.write('Failed saving {} coordinates.'.format(affiliate.name))

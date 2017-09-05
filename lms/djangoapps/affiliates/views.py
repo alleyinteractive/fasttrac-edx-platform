@@ -1,6 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.shortcuts import render, redirect
+from django.db.models import Q
 from django.http import Http404
 from lms.envs.common import STATE_CHOICES
 from django_countries import countries
@@ -46,6 +47,7 @@ def index(request):
 
     user_messages = []
     if location_latitude and location_longitude:
+        affiliates = affiliates.exclude(Q(location_longitude=None) | Q(location_latitude=None))
         affiliates = sorted(affiliates, key=lambda affiliate: affiliate.distance_from(
             {'latitude': location_latitude, 'longitude': location_longitude}))
 
