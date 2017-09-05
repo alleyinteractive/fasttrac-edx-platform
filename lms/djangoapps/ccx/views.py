@@ -181,6 +181,8 @@ def dashboard(request, course, ccx=None, **kwargs):
     """
     Display the CCX Coach Dashboard
     """
+    partial_course_key = settings.FASTTRAC_COURSE_KEY.split(':')[1]
+
     context = {
         'course': course,
         'ccx': ccx,
@@ -190,6 +192,7 @@ def dashboard(request, course, ccx=None, **kwargs):
         'is_instructor': False,
         'is_ccx_coach': False,
         'is_staff': False,
+        'is_from_fasttrac_course': partial_course_key in unicode(course.id)
     }
     if ccx:
         context['affiliate_entity'] = AffiliateMembership.find_by_user(ccx.coach).affiliate
