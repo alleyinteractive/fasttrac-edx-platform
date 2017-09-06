@@ -27,9 +27,12 @@
             would an entrepreneur need that is not reflected in the questions below?</p>
         <div class="field custom-course-description">
             <label class="sr" for="ccx_course_description">${_('Course description')}</label>
-            <textarea name="course_description" id="ccx_course_description"
-                        class="ccx-input-field" placeholder="${_('click to start typing...')}"
-                        required
+            <textarea
+              name="course_description"
+              id="ccx_course_description"
+              class="ccx-input-field autosized-textarea"
+              placeholder="${_('click to start typing...')}"
+              required
             >${ccx.course_description}</textarea><br/>
         </div>
     </div>
@@ -207,6 +210,7 @@
     })
 
     $(document).ready(function() {
-      $('.wrapper-footer').addClass('fixed-footer')
+      $('.wrapper-footer').addClass('fixed-footer');
+      autosize($('.autosized-textarea'));
     })
 </script>

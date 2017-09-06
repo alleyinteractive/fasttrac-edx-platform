@@ -30,7 +30,7 @@
                 <textarea
                     name="course_description"
                     id="ccx_course_description"
-                    class="ccx-input-field"
+                    class="ccx-input-field autosized-textarea"
                     placeholder="${_('click to start typing...')}"
                     required
                 ></textarea>
@@ -200,6 +200,7 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      $('.wrapper-footer').addClass('fixed-footer')
+      $('.wrapper-footer').addClass('fixed-footer');
+      autosize($('.autosized-textarea'));
     })
   </script>
