@@ -1,3 +1,4 @@
+import hashlib
 from django.db import models, IntegrityError, transaction
 from django.db.models import Q, F
 from django.db.models.signals import post_save, post_delete
@@ -13,7 +14,7 @@ from courseware.courses import get_course_by_id
 from contextlib import contextmanager
 from courseware.courses import get_course_with_access, get_course_by_id
 from opaque_keys.edx.keys import CourseKey
-from student.models import CourseAccessRole, CourseEnrollment
+from student.models import CourseAccessRole, CourseEnrollment, UserProfile
 from django.template.defaultfilters import slugify
 from django.utils.crypto import get_random_string
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -136,6 +137,12 @@ class AffiliateMembership(models.Model):
         ('staff', 'Program Director'),
     )
 
+    mailchimp_interests = {
+        'ccx_coach': '1b920c7fe2',
+        'instructor': '738d5d6873',
+        'staff': 'c6f38d6306'
+    }
+
     member = models.ForeignKey(User)
     affiliate = models.ForeignKey(AffiliateEntity, on_delete=models.CASCADE)
     role = models.CharField(choices=role_choices, max_length=255)
@@ -144,6 +151,37 @@ class AffiliateMembership(models.Model):
     def find_by_user(self, user):
         return self.objects.get(member=user)
 
+
+def update_mailchimp_interest(affiliate_membership, value):
+    mailchimp_api_key = settings.MAILCHIMP_API_KEY
+    mailing_list_id = settings.MAILCHIMP_LIST_ID
+
+    # skip if mailchimp not configured
+    if mailchimp_api_key and mailing_list_id:
+        email_hash = hashlib.md5(affiliate_membership.member.email.lower()).hexdigest()
+        mailchimp_url = 'https://us15.api.mailchimp.com/3.0/lists/{}/members/{}'.format(mailing_list_id, email_hash)
+
+        interest_id = affiliate_membership.mailchimp_interests[affiliate_membership.role]
+        data = {
+            'email': affiliate_membership.member.email,
+            'interests': {
+                interest_id: value,
+                UserProfile.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not affiliate_membership.member.profile.is_affiliate_user, # Entrepreneur User
+                UserProfile.AFFILIATE_MAILCHIMP_INTEREST_ID: affiliate_membership.member.profile.is_affiliate_user # Affiliate User
+            }
+        }
+
+        # TODO: notify admin if this fails (send email)
+        requests.put(mailchimp_url, auth=('fasttrac', mailchimp_api_key), json=data)
+
+
+@receiver(post_save, sender=AffiliateMembership, dispatch_uid="add_mailchimp_interests")
+def add_mailchimp_interests(sender, instance, **kwargs):
+    update_mailchimp_interest(instance, True)
+
+@receiver(post_delete, sender=AffiliateMembership, dispatch_uid="remove_mailchimp_interests")
+def remove_mailchimp_interests(sender, instance, **kwargs):
+    update_mailchimp_interest(instance, False)
 
 
 @receiver(post_save, sender=AffiliateMembership, dispatch_uid="add_affiliate_course_enrollments")

@@ -20,6 +20,7 @@ import logging
 from pytz import UTC
 from urllib import urlencode
 import uuid
+import requests
 
 import analytics
 
@@ -272,7 +273,7 @@ class UserProfile(models.Model):
         ('m', ugettext_noop('Male')),
         ('f', ugettext_noop('Female')),
         # Translators: 'Other' refers to the student's gender
-        ('o', ugettext_noop('Other/Prefer Not to Say'))
+        ('o', ugettext_noop('Other/Prefer Not To Say'))
     )
     gender = models.CharField(
         blank=True, null=True, max_length=6, db_index=True, choices=GENDER_CHOICES
@@ -375,6 +376,10 @@ class UserProfile(models.Model):
     affiliate_organization_name = models.CharField(null=True, blank=True, default='', max_length=255)
     description = models.CharField(null=True, blank=True, max_length=255, default='')
 
+    # MailChimp interests
+    ENTREPRENEUR_MAILCHIMP_INTEREST_ID = '83d6404c2e'
+    AFFILIATE_MAILCHIMP_INTEREST_ID = 'f6cdcb8e7b'
+
     @property
     def affiliate_role(self):
         if self.user.affiliatemembership_set.exists():
@@ -383,8 +388,12 @@ class UserProfile(models.Model):
             return None
 
     @property
+    def is_affiliate_user(self):
+        return self.user.affiliatemembership_set.exists()
+
+    @property
     def affiliate(self):
-        if self.user.affiliatemembership_set.exists():
+        if self.is_affiliate_user:
             return self.user.affiliatemembership_set.first().affiliate
         else:
             return None
@@ -583,6 +592,54 @@ def enroll_user_into_default_course(sender, instance, created, **kwargs):
     if created:
         course_key = CourseKey.from_string(settings.FASTTRAC_COURSE_KEY)
         CourseEnrollment.enroll(instance, course_key)
+
+
+@receiver(post_save, sender=UserProfile)
+def add_user_to_mailchimp(sender, instance, **kwargs):
+    """
+    Add user to FastTrac Mailchimp list.
+    """
+    mailchimp_api_key = settings.MAILCHIMP_API_KEY
+    mailing_list_id = settings.MAILCHIMP_LIST_ID
+
+    # skip if mailchimp not configured
+    if mailchimp_api_key and mailing_list_id:
+        email_hash = hashlib.md5(instance.user.email.lower()).hexdigest()
+
+        mailchimp_url = 'https://us15.api.mailchimp.com/3.0/lists/{}/members/{}'.format(mailing_list_id, email_hash)
+
+        first_name = instance.name.split(' ')[0]
+        last_name = instance.name.replace('{} '.format(first_name), '')
+
+        data = {
+            'email': instance.user.email,
+            'status': 'subscribed',
+            'merge_fields': {
+                'FNAME': first_name,
+                'LNAME': last_name,
+                'CITY': instance.city,
+                'STATE': instance.state,
+                'ZIP_POSTAL': instance.zipcode,
+                'COUNTRY': unicode(instance.country),
+                'JOB_TITLE': instance.title,
+                'PHONE': instance.phone_number,
+                'P_USERNAME': instance.user.username,
+                'B_STATUS': instance.get_bio_display(),
+                'TWITTER': instance.twitter_link,
+                'FACEBOOK': instance.facebook_link,
+                'LINKED_IN': instance.linkedin_link,
+                'AGE': instance.age_category,
+                'GENDER': instance.get_gender_display()
+            },
+            'interests': {
+                UserProfile.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not instance.is_affiliate_user, # Entrepreneur User
+                UserProfile.AFFILIATE_MAILCHIMP_INTEREST_ID: instance.is_affiliate_user # Affiliate User
+            }
+        }
+
+        # this will create or update a Mailchimp list member
+        # TODO: notify admin if this fails (send email)
+        requests.put(mailchimp_url, auth=('fasttrac', mailchimp_api_key), json=data)
 
 
 class UserSignupSource(models.Model):
