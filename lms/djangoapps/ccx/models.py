@@ -128,6 +128,11 @@ class CustomCourseForEdX(models.Model):
         return self.coach.profile.affiliate
 
     @property
+    def students(self):
+        non_student_user_ids = CourseAccessRole.objects.filter(course_id=self.ccx_course_id).values_list('user_id', flat=True)
+        return CourseEnrollment.objects.filter(course_id=self.ccx_course_id, is_active=True).exclude(user_id__in=non_student_user_ids)
+
+    @property
     def ccx_course_id(self):
         return CCXLocator.from_course_locator(self.course_id, self.id)
 

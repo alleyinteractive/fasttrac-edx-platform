@@ -5,6 +5,10 @@
 <%block name="pagetitle">Affiliates</%block>
 
 <style>
+  .container {
+    max-width: 1400px;
+  }
+
   .students-table {
     margin-bottom: 6rem;
   }
@@ -18,6 +22,47 @@
   </script>
 
   <div>
+    <h1 class="explore-header">
+      Courses
+    </h1>
+
+    <table class="students-table">
+        <thead>
+          <tr>
+            <th><b>Course Name</b></th>
+            <th>Affiliate Name</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Participant Count</th>
+            <th>Delivery Mode</th>
+            <th>Enrollment Type</th>
+            <th>Course Type</th>
+            <th>Fee</th>
+            <th>Facilitator Name</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          % for ccx in ccxs:
+            <tr>
+              <td>${ccx.display_name}</td>
+              <td>${ccx.affiliate.name}</td>
+              <td>${ccx.time.strftime("%B %d, %Y") if ccx.time else '--'}</td>
+              <td>${ccx.end_date.strftime("%B %d, %Y") if ccx.end_date else '--'}</td>
+              <td>${ccx.students.count()}</td>
+              <td>${ccx.get_delivery_mode_display()}</td>
+              <td>${ccx.get_enrollment_type_display()}</td>
+              <td>${ 'FastTrac' if partial_course_key in unicode(ccx.ccx_course_id) else 'Facilitator Guide'}</td>
+              <td>${'Yes' if ccx.fee else 'No'}</td>
+              <td>Which One?</td>
+              <td><a href="/courses/${ccx.ccx_course_id}/about">View</a></td>
+            </tr>
+          %endfor
+        </ul>
+      </table>
+
+
+
     <h1 class="explore-header">
       Affiliate Admin
     </h1>

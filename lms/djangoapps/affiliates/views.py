@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.shortcuts import render, redirect
@@ -6,17 +7,21 @@ from django.http import Http404
 from lms.envs.common import STATE_CHOICES
 from django_countries import countries
 from edxmako.shortcuts import render_to_response, render_to_string
-
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 from .models import AffiliateEntity, AffiliateMembership
 from django.contrib.auth.models import User
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from .decorators import only_program_director, only_staff
 
+@only_staff
 def admin(request):
     affiliates = AffiliateEntity.objects.all().order_by('name')
+    ccxs = CustomCourseForEdX.objects.all().order_by('display_name')
 
     return render_to_response('affiliates/admin.html', {
         'affiliates': affiliates,
+        'ccxs': ccxs,
+        'partial_course_key': settings.FASTTRAC_COURSE_KEY.split(':')[1]
     })
 
 def index(request):
