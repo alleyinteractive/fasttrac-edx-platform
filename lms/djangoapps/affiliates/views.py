@@ -169,6 +169,12 @@ def delete(request, slug):
     return redirect('affiliates:index')
 
 
+def payment(request):
+    return render_to_response('affiliates/payment.html', {
+        'preview': settings.PAYMENT_PREVIEW
+    })
+
+
 @only_staff
 def add_member(request, slug):
     member_identifier = request.POST.get('member_identifier')

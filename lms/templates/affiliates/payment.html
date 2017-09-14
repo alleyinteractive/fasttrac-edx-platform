@@ -1,0 +1,28 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">Affiliate Payment Gateway</%block>
+
+<section class="container">
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.wrapper-footer').addClass('fixed-footer')
+    })
+  </script>
+
+  <h1>
+      FastTrac Payment Gateway
+  </h1>
+
+  <div style="text-align: center">
+    <form target="PreviewWindow" name="PrePage" method="post" action="https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx">
+        <input name="LinkId" value="b93f0760-9a36-4b06-bbd2-1b08c8a739f7" type="hidden">
+        <input value="Send Payment" type="submit">
+        % if preview:
+            <input name="xi_preview" value="1" type="hidden">
+        % endif
+    </form>
+  </div>
+
+</section>
