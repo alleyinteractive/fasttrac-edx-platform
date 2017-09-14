@@ -28,6 +28,7 @@ urlpatterns = (
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
     url(r'^login_ajax$', 'student.views.login_user', name="login"),
+    url(r'^presurvey_status$', 'student.views.update_presurvey_status', name="presurvey_status"),
     url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),
 
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),

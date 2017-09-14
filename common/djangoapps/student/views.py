@@ -2612,3 +2612,14 @@ class LogoutView(TemplateView):
         })
 
         return context
+
+def update_presurvey_status(request):
+    if request.user.is_anonymous():
+        return redirect('%s?next=/presurvey_status' % reverse('signin_user'))
+
+    if not request.user:
+        raise Exception('Missing user.')
+
+    request.user.profile.set_presurvey_status()
+
+    return redirect('dashboard')
