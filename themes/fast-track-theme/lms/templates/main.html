@@ -179,13 +179,13 @@ from pipeline_mako import render_require_js_path_overrides
     % if not request.user.is_anonymous():
       <script type="text/javascript">
         $(document).ready(function () {
-          var presurveyModal = $('.presurvey-modal')
-          var filledPresurveyAt = presurveyModal.data('filledPresurveyAt')
+          var presurveyModal = $('.presurvey-modal');
+          var filledPresurveyAt = presurveyModal.data('filledPresurveyAt');
 
           if (!filledPresurveyAt || filledPresurveyAt === 'None') {
-            presurveyModal.removeClass('hidden')
-            $('body').addClass('no-scroll')
-            $('.content-wrapper').addClass('transparent')
+            presurveyModal.removeClass('hidden');
+            $('body').addClass('no-scroll');
+            $('.content-wrapper').addClass('transparent');
           }
         });
       </script>
