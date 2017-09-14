@@ -12,6 +12,19 @@
   .students-table {
     margin-bottom: 6rem;
   }
+
+  #learner-info span {
+    display: inline-block;
+    width: 33%;
+    box-sizing: border-box;
+    text-align: center;
+    line-height: 0.5rem;
+    padding: 4rem 0;
+  }
+
+  #learner-info span h2 {
+    font-weight: bold;
+  }
 </style>
 
 <section class="container">
@@ -21,7 +34,37 @@
     })
   </script>
 
-  <div>
+  <div id="learner-info">
+    <h1 class="explore-header">
+      Learners
+    </h1>
+
+    <span>
+      <h2>
+        ${total_learners}
+      </h2>
+      <br>
+      Total Learners
+    </span>
+
+    <span>
+      <h2>
+        ${total_affiliate_learners}
+      </h2>
+      <br>
+      Total Affiliate Learners
+    </span>
+
+    <span>
+      <h2>
+        ${total_fasttrac_learners}
+      </h2>
+      <br>
+      Total FastTrac Learners
+    </span>
+  </div>
+
+
     <h1 class="explore-header">
       Learners
     </h1>

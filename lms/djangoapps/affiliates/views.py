@@ -17,7 +17,8 @@ from .decorators import only_program_director, only_staff
 @only_staff
 def admin(request):
     affiliates = AffiliateEntity.objects.all().order_by('name')
-    ccxs = CustomCourseForEdX.objects.all().order_by('display_name')
+    ccxs = CustomCourseForEdX.objects.all()
+    ccxs = sorted(ccxs, key = lambda ccx: ccx.affiliate.name)
     fasttrac_course_key = settings.FASTTRAC_COURSE_KEY
 
     total_learners = CourseEnrollment.objects.filter(is_active=True).count()
