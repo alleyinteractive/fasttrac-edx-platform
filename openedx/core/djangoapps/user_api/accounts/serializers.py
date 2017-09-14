@@ -103,6 +103,13 @@ class UserReadOnlySerializer(serializers.Serializer):
             "year_of_birth": profile.year_of_birth,
             "level_of_education": AccountLegacyProfileSerializer.convert_empty_to_None(profile.level_of_education),
             "mailing_address": profile.mailing_address,
+            "secondary_address": profile.secondary_address,
+            "veteran_status": profile.veteran_status,
+            "immigrant_status": profile.immigrant_status,
+            "education": profile.education,
+            "facebook_link": profile.facebook_link,
+            "twitter_link": profile.twitter_link,
+            "linkedin_link": profile.linkedin_link,
             "requires_parental_consent": profile.requires_parental_consent(),
             "accomplishments_shared": accomplishments_shared,
             "account_privacy": get_profile_visibility(profile, user, self.configuration),
@@ -168,13 +175,10 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
             "name", "gender", "goals", "year_of_birth", "level_of_education", "country",
             "mailing_address", "bio", "profile_image", "requires_parental_consent", "language_proficiencies",
             # FastTrac
-            'state',
-            'zipcode',
-            'company',
-            'title',
-            'city',
-            'phone_number',
-            'newsletter',
+            'state', 'zipcode', 'company', 'title',
+            'city', 'phone_number', 'newsletter',
+            'secondary_address', 'facebook_link', 'twitter_link',
+            'linkedin_link', 'veteran_status', 'immigrant_status', 'education'
         )
         # Currently no read-only field, but keep this so view code doesn't need to know.
         read_only_fields = ()

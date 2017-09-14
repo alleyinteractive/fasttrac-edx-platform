@@ -142,11 +142,18 @@
             :
             {
                 name: 'Full Name',
-                mailing_address: 'Address',
+                mailing_address: 'Street Address 1',
+                secondary_address: 'Street Address 2',
                 city: 'City',
                 zipcode: 'Zip/Postal Code',
                 company: 'Company',
-                phone_number: 'Phone Number'
+                phone_number: 'Phone Number',
+                company: 'Company',
+                title: 'Title',
+                year_of_birth: 'Age',
+                facebook_link: 'Facebook',
+                linkedin_link: 'LinkedIn',
+                twitter_link: 'Twitter'
             };
 
             var sectionTwoDropdownFields = accountSettingsModel.attributes.account_privacy === 'private' ?
@@ -158,7 +165,10 @@
                 state: 'State',
                 newsletter: 'Would you like to receive KF newsletter?',
                 gender: 'Gender',
-                bio: 'Describe yourself'
+                bio: 'Your motivation...',
+                immigrant_status: 'Were you born a citizen of the United States?',
+                veteran_status: 'Have you ever served in any branch of the U.S. Armed Forces, including the Coast Guard, the National Guard, or Reserve component of any service branch? ',
+                education: 'What was the highest degree or level of school you have completed?'
             };
 
             for (var key in sectionTwoFreeTextFields) {
