@@ -165,6 +165,8 @@ body.view-in-course {
       .fa {
         padding-top: 14px;
         font-size: 10px;
+        color: $prev-next-color-dark;
+
         &.fa-arrow-right {
           padding-left: 2px;
         }
