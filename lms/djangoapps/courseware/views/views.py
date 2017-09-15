@@ -12,6 +12,7 @@ import analytics
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, AnonymousUser
+from django.core import serializers
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.core.context_processors import csrf
@@ -188,11 +189,15 @@ def courses(request):
         if len(courses) > 0:
             user_messages.append('Courses are sorted by the distance!')
 
+    affiliates = AffiliateEntity.objects.order_by('name')
+    affiliates_as_json = serializers.serialize('json', affiliates, fields=('name', 'id'))
+
     return render_to_response(
         "courseware/courses.html",
         {
             'courses': courses,
-            'affiliates': AffiliateEntity.objects.order_by('name'),
+            'affiliates': affiliates,
+            'affiliates_as_json': affiliates_as_json,
             'state_choices': STATE_CHOICES,
             'delivery_mode_choices': CustomCourseForEdX.DELIVERY_MODE_CHOICES,
             'filter_states': ccx_filters,

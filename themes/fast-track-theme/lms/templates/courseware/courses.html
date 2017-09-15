@@ -103,13 +103,9 @@
           AFFILIATE
         </h3>
         <ul class="facet-list">
-          <li>
-            <select name="affiliate_id">
-              <option selected disabled> select affiliate </option>
-              % for affiliate in affiliates:
-                <option value="${affiliate.pk}" ${ 'selected' if affiliate_id == unicode(affiliate.pk) else '' }>${affiliate.name}</option>
-              % endfor
-            </select>
+          <li class="affiliate-typeahead-wrapper">
+            <input type="text" name="affiliate_search" class="affiliate-typeahead" autocomplete="off" data-affiliates='${affiliates_as_json}'>
+            <input type="hidden" name="affiliate_id" class="affiliate_typeahead_id">
           </li>
         </ul>
 
@@ -210,6 +206,41 @@
     });
 
     $('.course-filter-form').on('submit', submitFormWithCoordinates);
+
+    var typeAheadOpts = {
+      minLength: 0,
+      limit: true,
+      fulltext: true
+    };
+
+    var typeAheadInput = document.querySelector('.affiliate-typeahead');
+
+    var typeAhead = new TypeAhead(
+      typeAheadInput,
+      $('.affiliate-typeahead').data('affiliates'),
+      typeAheadOpts
+    );
+
+    typeAhead.getItemValue = function (item) {
+      return item.fields.name;
+    }
+
+    TypeAhead.prototype.value = function (value) {
+        this.selected = value;
+        this.element.value = this.getItemValue(value);
+
+        if (document.createEvent) {
+            var e = document.createEvent('HTMLEvents');
+            e.initEvent('change', true, false);
+            this.element.dispatchEvent(e);
+        } else {
+            this.element.fireEvent('onchange');
+        }
+
+        $('.affiliate_typeahead_id').val(value.pk);
+    };
+
+    TypeAhead.prototype.handleFocus = TypeAhead.prototype.handleKeyUp;
   });
 </script>
 

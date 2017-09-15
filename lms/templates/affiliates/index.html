@@ -19,10 +19,11 @@
     <div class="sidebar-body">
       <form class="affiliate-filter-form" action="/affiliates/" method="POST">
         <a href="/affiliates" class="clear-all"> <span class="fa fa-remove"></span> Clear All</a>
-        <div class="sidebar-filter">
+        <div class="sidebar-filter affiliate-typeahead-wrapper">
           <div class="fa fa-user"></div>
           <span class="filter-label">Affiliate Name</span>
-          <input type="text" name="affiliate_name" placeholder="Search Affiliate" value="${affiliate_name}">
+          <input type="text" name="affiliate_search" class="affiliate-typeahead" autocomplete="off" data-affiliates='${affiliates_as_json}'>
+          <input type="hidden" name="affiliate_id" class="affiliate_typeahead_id">
         </div>
 
         <div class="sidebar-filter">
@@ -96,7 +97,42 @@
       })
 
       $('.affiliate-filter-form').on('submit', submitFormWithCoordinates);
-    })
+
+      var typeAheadOpts = {
+      minLength: 0,
+      limit: true,
+      fulltext: true
+    };
+
+    var typeAheadInput = document.querySelector('.affiliate-typeahead');
+
+    var typeAhead = new TypeAhead(
+      typeAheadInput,
+      $('.affiliate-typeahead').data('affiliates'),
+      typeAheadOpts
+    );
+
+    typeAhead.getItemValue = function (item) {
+      return item.fields.name;
+    }
+
+    TypeAhead.prototype.value = function (value) {
+        this.selected = value;
+        this.element.value = this.getItemValue(value);
+
+        if (document.createEvent) {
+            var e = document.createEvent('HTMLEvents');
+            e.initEvent('change', true, false);
+            this.element.dispatchEvent(e);
+        } else {
+            this.element.fireEvent('onchange');
+        }
+
+        $('.affiliate_typeahead_id').val(value.pk);
+    };
+
+    TypeAhead.prototype.handleFocus = TypeAhead.prototype.handleKeyUp;
+    });
   </script>
 
   <div class="affiliate-content">

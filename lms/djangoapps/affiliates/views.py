@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
+from django.core import serializers
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.http import Http404
@@ -35,43 +36,47 @@ def admin(request):
     })
 
 def index(request):
-    affiliate_name = request.POST.get('affiliate_name', '')
+    affiliate_id = request.POST.get('affiliate_id', '')
     affiliate_city = request.POST.get('affiliate_city', '')
     affiliate_state = request.POST.get('affiliate_state', '')
     location_latitude = request.POST.get('latitude', '')
     location_longitude = request.POST.get('longitude', '')
     search_radius = request.POST.get('affiliate_search_radius', '')
-
-    filters = {}
-    if affiliate_name:
-        filters['name__icontains'] = affiliate_name
-    if location_latitude and location_longitude and search_radius:
-        from courseware.views.views import get_coordinate_boundaries
-        latitude_boundaries, longitude_boundaries = get_coordinate_boundaries(
-            float(location_latitude), float(location_longitude), float(search_radius))
-
-        filters['location_latitude__range'] = latitude_boundaries
-        filters['location_longitude__range'] = longitude_boundaries
-    else:
-        if affiliate_city:
-            filters['city__icontains'] = affiliate_city
-        if affiliate_state:
-            filters['state'] = affiliate_state
-
-    affiliates = AffiliateEntity.objects.filter(**filters).order_by('name')
-
     user_messages = []
-    if location_latitude and location_longitude:
-        affiliates = affiliates.exclude(Q(location_longitude=None) | Q(location_latitude=None))
-        affiliates = sorted(affiliates, key=lambda affiliate: affiliate.distance_from(
+
+    if not affiliate_id:
+        filters = {}
+        if location_latitude and location_longitude and search_radius:
+            from courseware.views.views import get_coordinate_boundaries
+            latitude_boundaries, longitude_boundaries = get_coordinate_boundaries(
+                float(location_latitude), float(location_longitude), float(search_radius))
+
+            filters['location_latitude__range'] = latitude_boundaries
+            filters['location_longitude__range'] = longitude_boundaries
+        else:
+            if affiliate_city:
+                filters['city__icontains'] = affiliate_city
+            if affiliate_state:
+                filters['state'] = affiliate_state
+
+        affiliates = AffiliateEntity.objects.filter(**filters).order_by('name')
+        if location_latitude and location_longitude:
+            affiliates = affiliates.exclude(Q(location_longitude=None) | Q(location_latitude=None))
+            affiliates = sorted(affiliates, key=lambda affiliate: affiliate.distance_from(
             {'latitude': location_latitude, 'longitude': location_longitude}))
 
-        if len(affiliates) > 0:
-            user_messages.append('Affiliates are sorted by the distance!')
+
+            if len(affiliates) > 0:
+                user_messages.append('Affiliates are sorted by the distance!')
+    else:
+        affiliates = AffiliateEntity.objects.filter(pk=affiliate_id)
+
+    all_affiliates = AffiliateEntity.objects.all()
+    affiliates_as_json = serializers.serialize('json', all_affiliates, fields=('name', 'id'))
 
     return render_to_response('affiliates/index.html', {
         'affiliates': affiliates,
-        'affiliate_name': affiliate_name,
+        'affiliates_as_json': affiliates_as_json,
         'affiliate_city': affiliate_city,
         'affiliate_state': affiliate_state,
         'state_choices': STATE_CHOICES,

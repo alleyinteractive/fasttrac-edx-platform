@@ -12,6 +12,7 @@
     "jquery.scrollto": "~2.1.2",
     "picturefill": "~3.0.2",
     "requirejs": "~2.1.22",
+    "type-ahead": "^2.1.0",
     "uglify-js": "2.4.24",
     "underscore": "~1.8.3",
     "underscore.string": "~3.3.4"

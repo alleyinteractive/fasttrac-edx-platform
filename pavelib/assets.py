@@ -54,6 +54,7 @@ NPM_INSTALLED_LIBRARIES = [
     'backbone/backbone.js',
     'edx-ui-toolkit/node_modules/backbone.paginator/lib/backbone.paginator.js',
     'autosize/dist/autosize.js',
+    'type-ahead/type-ahead.js',
 ]
 
 # Directory to install static vendor files

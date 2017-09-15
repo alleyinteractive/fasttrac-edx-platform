@@ -108,3 +108,41 @@ $ft-orange: #f76b1c;
     max-height: 160px;
   }
 }
+
+.affiliate-typeahead-wrapper {
+  ul {
+    width: 100%;
+    padding: 0px;
+
+    background: white;
+    border-top: 0.5px solid lightgrey;
+    z-index: 1000;
+  }
+  ul li {
+    display: flex;
+    height: 35px;
+    width: 100%;
+
+    align-items: center;
+    z-index: 1010;
+
+    border: 0.5px solid lightgrey;
+    border-top: none;
+
+    a {
+      padding-left: 6px;
+      color: black;
+    }
+
+    &.active,
+    &:hover {
+      background: $ft-orange;
+      border: 0.5px solid $ft-orange;
+      border-top: none;
+
+      a {
+        text-decoration: none;
+      }
+    }
+  }
+}
