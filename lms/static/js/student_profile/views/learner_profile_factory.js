@@ -148,7 +148,6 @@
                 zipcode: 'Zip/Postal Code',
                 company: 'Company',
                 phone_number: 'Phone Number',
-                company: 'Company',
                 title: 'Title',
                 year_of_birth: 'Age',
                 facebook_link: 'Facebook',
