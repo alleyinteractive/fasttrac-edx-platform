@@ -384,6 +384,14 @@ class UserProfile(models.Model):
     AFFILIATE_MAILCHIMP_INTEREST_ID = 'f6cdcb8e7b'
 
     @property
+    def is_incomplete(self):
+        return not (self.mailing_address and self.secondary_address
+            and self.city and self.state and self.phone_number
+            and self.company and self.title and self.immigrant_status
+            and self.veteran_status and self.education
+            and self.facebook_link and self.linkedin_link and self.twitter_link)
+
+    @property
     def affiliate_role(self):
         if self.user.affiliatemembership_set.exists():
             return self.user.affiliatemembership_set.first().role

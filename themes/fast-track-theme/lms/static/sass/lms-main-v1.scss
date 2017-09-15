@@ -29,6 +29,14 @@ html, body, .window-wrap {
   visibility: visible;
 }
 
+.annoying-message {
+  width: 100%;
+  background: lightblue;
+  color: #555;
+  padding: 1rem;
+  text-align: center;
+}
+
 #global-navigation {
 
   .nav-courseware .btn.btn-login {

@@ -153,6 +153,13 @@ from pipeline_mako import render_require_js_path_overrides
     % endif
 
     <div class="content-wrapper" id="content">
+        % if not user.is_anonymous() and user.profile.is_incomplete and not request.path == '/u/{}'.format(user.username):
+            <div class="annoying-message">
+                <a href="/u/${user.username}">
+                    Your profile is incomplete. <u>Click here</u> to add more details.
+                </a>
+            </div>
+        % endif
         <script>
             $(document).ready(function() {
                 $('.container').addClass('loaded');
