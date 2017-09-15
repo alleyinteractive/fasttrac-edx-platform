@@ -5,7 +5,7 @@
 @import 'course/ccx_coach/dashboard';
 
 $prev-next-color: silver;
-$prev-next-color-light: #d6d6d6;
+$prev-next-color-dark: #333;
 $ft-temp-gray: #efeded;
 
 $ft-font-menu-color: #b5b5b5;
@@ -173,7 +173,7 @@ body.view-in-course {
       div.arrow-text {
         font-size: 12px;
         font-weight: 600;
-        color: $prev-next-color-light;
+        color: $prev-next-color-dark;
         text-decoration: underline;
         text-transform: uppercase;
 
@@ -305,7 +305,7 @@ body.view-in-course .wrapper-course-material .course-material {
   cursor: pointer;
   background-color: #ebebeb;
   text-align: center;
-  color: #969696;
+  color: $prev-next-color-dark;
   font-size: 14px;
   border: 1px solid #dddddd;
 
