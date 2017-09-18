@@ -304,6 +304,8 @@ WORKSPACE_URL = 'http://localhost:3000'
 
 ##############################################################################
 
+SG_PRESURVEY_URL = 'http://www.surveygizmo.com/s3/3821471/FastTrac-Pre-Survey-Full'
+
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.
 # They are used so that URLs with deprecated-format strings still work.
 from lms.envs.common import (

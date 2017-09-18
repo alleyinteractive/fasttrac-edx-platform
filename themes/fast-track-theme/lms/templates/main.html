@@ -169,31 +169,23 @@ from pipeline_mako import render_require_js_path_overrides
           <%block name="bodyextra"/>
     </div>
 
-    % if not request.user.is_anonymous():
-      <div class="presurvey-modal hidden" data-filled-presurvey-at="${request.user.profile.filled_presurvey_at}">
+    % if not request.user.is_anonymous() and not request.user.profile.filled_presurvey_at:
+      <div class="presurvey-modal" data-filled-presurvey-at="${request.user.profile.filled_presurvey_at}">
         <span class="header">
           <h1>Hi ${request.user.first_name}!</h1>
           <h2>You didn't fill out our pre-survey yet.</h2>
         </span>
-        <a href="http://www.surveygizmo.com/s3/3821471/FastTrac-Pre-Survey-Full?sguid=${request.user.email}">
+        <a href="${settings.SG_PRESURVEY_URL}?sguid=${request.user.email}">
           <div class="control-button">
             <h2>Please click here!</h2>
           </div>
         </a>
       </div>
-    % endif
 
-    % if not request.user.is_anonymous():
       <script type="text/javascript">
         $(document).ready(function () {
-          var presurveyModal = $('.presurvey-modal');
-          var filledPresurveyAt = presurveyModal.data('filledPresurveyAt');
-
-          if (!filledPresurveyAt || filledPresurveyAt === 'None') {
-            presurveyModal.removeClass('hidden');
-            $('body').addClass('no-scroll');
-            $('.content-wrapper').addClass('transparent');
-          }
+          $('body').addClass('no-scroll');
+          $('.content-wrapper').addClass('transparent no-click');
         });
       </script>
     % endif

@@ -766,10 +766,6 @@ label.u-field-title {
   border: 1px solid lightgrey;
   border-radius: 4px;
 
-  &.hidden {
-    display: none;
-  }
-
   .header {
     flex-basis: 60%;
   }
@@ -804,6 +800,10 @@ label.u-field-title {
 
 .no-scroll {
   overflow-y: hidden;
+}
+
+.no-click {
+  pointer-events: none;
 }
 
 .transparent {
