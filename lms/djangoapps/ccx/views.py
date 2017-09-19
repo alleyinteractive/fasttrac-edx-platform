@@ -48,7 +48,6 @@ from instructor.enrollment import (
 )
 
 from lms.envs.common import STATE_CHOICES
-from affiliates.models import AffiliateMembership
 from lms.djangoapps.ccx.models import CustomCourseForEdX, CourseUpdates
 from lms.djangoapps.ccx.overrides import (
     get_override_for_ccx,
@@ -194,13 +193,14 @@ def dashboard(request, course, ccx=None, **kwargs):
         'is_staff': False,
         'is_from_fasttrac_course': partial_course_key in unicode(course.id)
     }
-    if ccx:
-        context['affiliate_entity'] = AffiliateMembership.find_by_user(ccx.coach).affiliate
+
     context.update(get_ccx_creation_dict(course))
+
     if ccx:
         context.update(edit_ccx_context(course, ccx, request.user))
         ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.pk))
 
+        context['affiliate_entity'] = ccx.affiliate
         context['is_ccx_coach'] = ccx.coach == request.user
         context['is_instructor'] = ccx.is_instructor(request.user)
         context['is_staff'] = ccx.is_staff(request.user)

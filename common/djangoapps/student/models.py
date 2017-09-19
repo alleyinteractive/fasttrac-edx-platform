@@ -644,8 +644,7 @@ def add_user_to_mailchimp(sender, instance, **kwargs):
                 'FACEBOOK': instance.facebook_link,
                 'LINKED_IN': instance.linkedin_link,
                 'AGE': instance.age_category,
-                'GENDER': instance.get_gender_display(),
-                'LAST_LOGIN': instance.user.last_login
+                'GENDER': instance.get_gender_display()
             },
             'interests': {
                 UserProfile.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not instance.is_affiliate_user, # Entrepreneur User

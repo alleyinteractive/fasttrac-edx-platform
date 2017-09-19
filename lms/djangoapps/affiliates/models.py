@@ -164,9 +164,6 @@ def update_mailchimp_interest(affiliate_membership, value):
         interest_id = affiliate_membership.mailchimp_interests[affiliate_membership.role]
         data = {
             'email': affiliate_membership.member.email,
-            'merge_fields': {
-                'LAST_LOGIN': instance.user.last_login
-            },
             'interests': {
                 interest_id: value,
                 UserProfile.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not affiliate_membership.member.profile.is_affiliate_user, # Entrepreneur User
