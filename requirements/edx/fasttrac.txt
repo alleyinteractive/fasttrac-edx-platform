@@ -6,3 +6,6 @@ git+https://github.com/vukoviciv/ft-input-problem-type-xblock.git#egg=ft-input-p
 
 # Fork poll/survey
 git+https://github.com/vukoviciv/xblock-poll.git#egg=xblock-poll
+
+# Fork Done XBlock
+git+https://github.com/mbareta/DoneXBlock.git#egg=done-xblock
