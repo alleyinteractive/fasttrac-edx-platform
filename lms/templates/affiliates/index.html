@@ -22,7 +22,7 @@
         <div class="sidebar-filter affiliate-typeahead-wrapper">
           <div class="fa fa-user"></div>
           <span class="filter-label">Affiliate Name</span>
-          <input type="text" name="affiliate_search" class="affiliate-typeahead" autocomplete="off" data-affiliates='${affiliates_as_json}'>
+          <input type="text" name="affiliate_search" class="affiliate-typeahead" autocomplete="off">
           <input type="hidden" name="affiliate_id" class="affiliate_typeahead_id">
         </div>
 
@@ -108,7 +108,7 @@
 
     var typeAhead = new TypeAhead(
       typeAheadInput,
-      $('.affiliate-typeahead').data('affiliates'),
+      ${affiliates_as_json|n},
       typeAheadOpts
     );
 

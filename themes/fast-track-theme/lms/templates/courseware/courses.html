@@ -104,7 +104,7 @@
         </h3>
         <ul class="facet-list">
           <li class="affiliate-typeahead-wrapper">
-            <input type="text" name="affiliate_search" class="affiliate-typeahead" autocomplete="off" data-affiliates='${affiliates_as_json}'>
+            <input type="text" name="affiliate_search" class="affiliate-typeahead" autocomplete="off">
             <input type="hidden" name="affiliate_id" class="affiliate_typeahead_id">
           </li>
         </ul>
@@ -217,7 +217,7 @@
 
     var typeAhead = new TypeAhead(
       typeAheadInput,
-      $('.affiliate-typeahead').data('affiliates'),
+      ${affiliates_as_json|n},
       typeAheadOpts
     );
 
