@@ -1,9 +1,27 @@
 $ft-orange: #f76b1c;
 
+.container.explore-affiliates {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-flow: row nowrap;
+  flex-flow: row nowrap;
+
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
 .affiliate-sidebar {
-  position: absolute;
-  left: 0;
-  top: 3rem;
   height: calc(100% - 60px);
   width: 20%;
   border-right: 1px solid #ddd;
@@ -103,10 +121,8 @@ h1.explore-header {
 }
 
 .affiliate-content {
-  position: absolute;
-  left: 25%;
-  top: 4rem;
   width: 65%;
+  padding-top: 1rem;
 
   .user-message {
     font-size: 0.9rem;
