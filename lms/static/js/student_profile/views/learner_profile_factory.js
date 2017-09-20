@@ -135,12 +135,7 @@
                 // })
             ];
 
-            var sectionTwoFreeTextFields = accountSettingsModel.attributes.account_privacy === 'private' ?
-            {
-                // TODO: define limited profile fields
-            }
-            :
-            {
+            var sectionTwoFreeTextFields = {
                 name: 'Full Name',
                 mailing_address: 'Street Address 1',
                 secondary_address: 'Street Address 2',
@@ -155,12 +150,7 @@
                 twitter_link: 'Twitter'
             };
 
-            var sectionTwoDropdownFields = accountSettingsModel.attributes.account_privacy === 'private' ?
-            {
-                // TODO: define limited profile fields
-            }
-            :
-            {
+            var sectionTwoDropdownFields = {
                 state: 'State',
                 newsletter: 'Would you like to receive KF newsletter?',
                 gender: 'Gender',
