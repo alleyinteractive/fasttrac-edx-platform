@@ -2,6 +2,18 @@
 
 .gradebook-wrapper {
   margin: 20px;
+
+  .active-flag {
+    text-align: center;
+  }
+
+  .active {
+    color: green;
+  }
+
+  .inactive {
+    color: red;
+  }
 }
 
 .gradebook-wrapper p a {

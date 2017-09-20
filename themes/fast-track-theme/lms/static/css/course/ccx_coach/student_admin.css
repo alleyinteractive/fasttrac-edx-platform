@@ -1,1 +1,1 @@
-.gradebook-wrapper{margin:20px}.gradebook-wrapper p a{color:#f76b1c}.gradebook-wrapper p a:hover{color:#ff7d34}
+.gradebook-wrapper{margin:20px}.gradebook-wrapper .active-flag{text-align:center}.gradebook-wrapper .active{color:green}.gradebook-wrapper .inactive{color:red}.gradebook-wrapper p a{color:#f76b1c}.gradebook-wrapper p a:hover{color:#ff7d34}

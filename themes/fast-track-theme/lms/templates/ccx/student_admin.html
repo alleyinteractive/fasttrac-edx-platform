@@ -13,7 +13,6 @@
         <tbody>
             % for student_enrollment in ccx_student_enrollments:
                 <tr
-                    style="opacity: ${1 if student_enrollment.is_active else 0.7}"
                     % if not student_enrollment.is_active:
                         title="Student is enrolled but inactive."
                     % endif
@@ -22,6 +21,9 @@
                     <td>${student_enrollment.user.username}</td>
                     <td>${student_enrollment.user.email}</td>
                     <td style="text-align: right">${student_enrollment.created.strftime("%m/%d/%Y")}</td>
+                    <td class="active-flag">
+                        <i class="fa fa-circle ${'active' if student_enrollment.is_active else 'inactive'}" />
+                    </td>
                 </tr>
             % endfor
         </tbody>
