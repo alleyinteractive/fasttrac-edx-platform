@@ -10,6 +10,7 @@
 
 $ft-temp-darkgray: #555;
 $ft-orange: #f76b1c;
+$ft-green: #99c221;
 
 /**
 *   GLOBAL
@@ -31,7 +32,7 @@ html, body, .window-wrap {
 
 .annoying-message {
   width: 100%;
-  background: lightblue;
+  background: $ft-green;;
   color: #555;
   padding: 1rem;
   text-align: center;

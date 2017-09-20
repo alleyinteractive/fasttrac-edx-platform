@@ -156,7 +156,7 @@ from pipeline_mako import render_require_js_path_overrides
         % if not user.is_anonymous() and user.profile.is_incomplete and not request.path == '/u/{}'.format(user.username):
             <div class="annoying-message">
                 <a href="/u/${user.username}">
-                    Your profile is incomplete. <u>Click here</u> to add more details.
+                  Add more details about yourself and your business in <u>your profile</u>.
                 </a>
             </div>
         % endif
