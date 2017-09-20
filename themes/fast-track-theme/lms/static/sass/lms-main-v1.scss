@@ -751,7 +751,7 @@ label.u-field-title {
   display: flex;
   flex-flow: column nowrap;
   height: 300px;
-  width: 686px;
+  width: 609px;
 
   position: fixed;
   top: 50%;
@@ -768,6 +768,12 @@ label.u-field-title {
 
   .header {
     flex-basis: 60%;
+    padding-left: 36px;
+    padding-right: 36px;
+
+    h2 {
+      text-transform: none;
+    }
   }
 
   a:hover {
@@ -779,12 +785,12 @@ label.u-field-title {
     flex-flow: column wrap;
 
     height: 50px;
-    width: 280px;
+    width: 358px;
 
     justify-content: center;
     align-items: center;
 
-    background: green;
+    background: $ft-orange;
     color: white;
 
     &:hover {
