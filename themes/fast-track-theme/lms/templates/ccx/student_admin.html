@@ -9,6 +9,7 @@
             <td>Username</td>
             <td>Email Address</td>
             <td style="text-align: right">Date Enrolled</td>
+            <td>Active/Inactive</td>
         </thead>
         <tbody>
             % for student_enrollment in ccx_student_enrollments:
@@ -23,6 +24,7 @@
                     <td style="text-align: right">${student_enrollment.created.strftime("%m/%d/%Y")}</td>
                     <td class="active-flag">
                         <i class="fa fa-circle ${'active' if student_enrollment.is_active else 'inactive'}" />
+                        ${'Active' if student_enrollment.is_active else 'Inactive'}
                     </td>
                 </tr>
             % endfor

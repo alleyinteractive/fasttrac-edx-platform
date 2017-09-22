@@ -8,9 +8,9 @@
 <div class="batch-enrollment">
     <form method="POST" action="ccx_invite" class="">
         <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-        <label for="student-ids" class="sr">${_("Email Addresses/Usernames")}</label>
+        <label for="student-ids" class="sr">${_("Email Addresses")}</label>
         <p id="label_student_ids" class="text-helper">
-            ${_("Please enter email addresses and/or usernames separated by new lines or commas. You will not get notifications for emails that bounce so please double-check each email.")}
+            ${_("Please enter email addresses separated by new lines or commas. You will not get notifications for emails that bounce so please double-check each email.")}
         </p>
         <textarea name="student-ids" id="student-ids" class="ccx-input-field" aria-describedby="label_student_ids"
                   placeholder="${_("enter email adresses...")}" spellcheck="false"></textarea>
@@ -73,10 +73,10 @@
                 <div class="member-list">
                     <h2 class="hd hd-2"> ${_("Student List Management")}</h2>
                     <div class="bottom-bar">
-                        <label for="student-id" class="sr">${_("Enter username or email")}</label>
+                        <label for="student-id" class="sr">${_("Enter email")}</label>
                         <input name="student-id" id="student-id" class="add-field ccx-input-field"
-                               placeholder="${_("enter username or email...")}" type="text">
-                        <input name="student-action" class="add ft-button-action" value="ADD STUDENT" type="button">
+                               placeholder="${_("enter email...")}" type="text">
+                        <input name="student-action" class="add ft-button-action" value="ENROLL STUDENT" type="button">
                         <div class="enroll-option">
                             <input type="checkbox" name="auto-enroll" id="auto-enroll" value="Auto-Enroll" checked="yes"
                                    aria-describedby="auto-enroll-helper" disabled>
@@ -129,6 +129,7 @@
                         <tr>
                             <td class="label">Name</td>
                             <td class="label">Email</td>
+                            <td class="label">Active/Inactive</td>
                             <td class="label revoke-td">Unenroll</td>
                         </tr>
                         </thead>
@@ -137,6 +138,7 @@
                                 <tr>
                                     <td>${student_enrollment.user.profile.name}</td>
                                     <td>${student_enrollment.user.email}</td>
+                                    <td>${'Active' if student_enrollment.is_active else 'Inactive'}</td>
                                     <td class="revoke-td">
                                         <a class="revoke">
                                             <span class="fa fa-times-circle"
