@@ -21,6 +21,14 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
 <%static:css group='style-course'/>
 </%block>
 
+% if not user.is_anonymous() and user.profile.is_incomplete:
+<div class="annoying-message">
+    <a href="/u/${user.username}">
+      Add more details about yourself and your business in <u>your profile</u>.
+    </a>
+</div>
+% endif
+
 % if show_enroll_banner:
 <div class="wrapper-msg urgency-low" id="failed-verification-banner">
   <div class="msg msg-reverify is-dismissable">

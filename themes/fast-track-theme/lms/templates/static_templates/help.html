@@ -5,6 +5,13 @@
 <%namespace name='static' file='/static_content.html'/>
 <%block name="pagetitle">${_("Help")}</%block>
 
+% if not user.is_anonymous() and user.profile.is_incomplete:
+<div class="annoying-message">
+    <a href="/u/${user.username}">
+      Add more details about yourself and your business in <u>your profile</u>.
+    </a>
+</div>
+% endif
 <main id="main" aria-label="Content" tabindex="-1">
     <section class="container about">
         <h1>FAQ</h1>
