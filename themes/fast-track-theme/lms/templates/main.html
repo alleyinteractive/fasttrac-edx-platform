@@ -168,8 +168,8 @@ from pipeline_mako import render_require_js_path_overrides
           ${self.body()}
           <%block name="bodyextra"/>
     </div>
-
-    % if not request.user.is_anonymous() and not request.user.profile.filled_presurvey_at:
+    <!-- Temporarily disable this modal KF-489 -->
+    % if False and not request.user.is_anonymous() and not request.user.profile.filled_presurvey_at:
       <div class="presurvey-modal" data-filled-presurvey-at="${request.user.profile.filled_presurvey_at}">
         <span class="header">
           <h1>Hi ${request.user.first_name}!</h1>
