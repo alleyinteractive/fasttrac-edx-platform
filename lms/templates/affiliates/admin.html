@@ -66,35 +66,6 @@
 
 
     <h1 class="explore-header">
-      Learners
-    </h1>
-
-    <span>
-      ${total_learners}
-      <br>
-      <h1>
-        Total
-      </h1>
-    </span>
-
-    <span>
-      ${total_affiliate_learners}
-      <br>
-      <h1>
-        Affiliate
-      </h1>
-    </span>
-
-    <span>
-      ${total_fasttrac_learners}
-      <br>
-      <h1>
-        FastTrac
-      </h1>
-    </span>
-
-
-    <h1 class="explore-header">
       Courses
     </h1>
 
@@ -126,7 +97,7 @@
               <td>${ccx.get_enrollment_type_display()}</td>
               <td>${ 'FastTrac' if partial_course_key in unicode(ccx.ccx_course_id) else 'Facilitator Guide'}</td>
               <td>${'Yes' if ccx.fee else 'No'}</td>
-              <td>Which One?</td>
+              <td>${ccx.facilitator_names}</td>
               <td><a href="/courses/${ccx.ccx_course_id}/about">View</a></td>
             </tr>
           %endfor
