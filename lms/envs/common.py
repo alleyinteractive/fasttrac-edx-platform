@@ -2644,6 +2644,10 @@ COUNTRIES_OVERRIDE = {
     'XK': _('Kosovo'),
 }
 
+COUNTRIES_FIRST = {
+    'US'
+}
+
 # which access.py permission name to check in order to determine if a course is visible in
 # the course catalog. We default this to the legacy permission 'see_exists'.
 COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
