@@ -149,6 +149,26 @@
                             %endfor
                         </tbody>
                     </table>
+
+
+                    <h2 class="hd hd-2"> ${_("Invited Students")}</h2>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <td>Email</td>
+                                <td>Invitation Date</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            % for invitation in ccx_student_invitations:
+                                <tr>
+                                    <td>${invitation.email}</td>
+                                    <td>${invitation.created.strftime("%B %d, %Y @ %-I:%M%p")}</td>
+                                </tr>
+                            % endfor
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

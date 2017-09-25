@@ -28,7 +28,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.models import User
-from student.models import CourseAccessRole
+from student.models import CourseAccessRole, CourseEnrollmentAllowed
 from courseware.access import has_access, has_ccx_coach_role
 from courseware.courses import get_course_by_id
 
@@ -198,7 +198,7 @@ def dashboard(request, course, ccx=None, **kwargs):
 
     if ccx:
         context.update(edit_ccx_context(course, ccx, request.user))
-        ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.pk))
+        ccx_locator = ccx.ccx_course_id
 
         context['affiliate_entity'] = ccx.affiliate
         context['is_ccx_coach'] = ccx.coach == request.user
@@ -214,6 +214,9 @@ def dashboard(request, course, ccx=None, **kwargs):
 
         # show students on Student Admin tab
         context['ccx_student_enrollments'] = ccx_student_enrollments
+
+        # show enrolled not existing students on Enrollments tab
+        context['ccx_student_invitations'] = CourseEnrollmentAllowed.objects.filter(course_id=ccx_locator)
     else:
         context['create_ccx_url'] = reverse(
             'create_ccx', kwargs={'course_id': course.id})
