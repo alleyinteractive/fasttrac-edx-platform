@@ -110,18 +110,20 @@ $ft-orange: #f76b1c;
 }
 
 .affiliate-typeahead-wrapper {
+
   ul {
-    width: 100%;
+    max-width: 240px;
     padding: 0px;
+    position: absolute;
 
     background: white;
     border-top: 0.5px solid lightgrey;
     z-index: 1000;
   }
+
   ul li {
     display: flex;
     height: 35px;
-    width: 100%;
 
     align-items: center;
     z-index: 1010;
@@ -130,8 +132,18 @@ $ft-orange: #f76b1c;
     border-top: none;
 
     a {
-      padding-left: 6px;
+      padding: 0 0.375rem 0 0.375rem;
+
       color: black;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      strong {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
 
     &.active,
