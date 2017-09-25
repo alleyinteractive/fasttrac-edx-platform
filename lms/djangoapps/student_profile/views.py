@@ -101,6 +101,7 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'veteran_status_options': UserProfile.YES_NO_CHOICES,
             'immigrant_status_options': UserProfile.YES_NO_CHOICES,
             'education_options': UserProfile.EDUCATION_CHOICES,
+            'ethnicity_options': UserProfile.ETHNICITY_CHOICES
         },
         'disable_courseware_js': True,
     }

@@ -195,7 +195,7 @@ class AccountCreationForm(forms.Form):
                         )
                 else:
                     required = field_value == "required"
-                    min_length = 1 if field_name in ("gender", "level_of_education", "newsletter", "immigrant_status", "veteran_status") else 2
+                    min_length = 1 if field_name in ("gender", "level_of_education", "newsletter", "immigrant_status", "veteran_status", "ethnicity") else 2
                     error_message = error_message_dict.get(
                         field_name,
                         _("You are missing one or more required fields")

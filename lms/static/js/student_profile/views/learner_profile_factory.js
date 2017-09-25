@@ -122,17 +122,6 @@
             ];
 
             var sectionTwoFieldViews = [
-                // new FieldsView.TextareaFieldView({
-                //     model: accountSettingsModel,
-                //     editable: editable,
-                //     showMessages: false,
-                //     title: gettext('About me'),
-                //     placeholderValue: gettext("Tell other learners a little about yourself: where you live, what your interests are, why you're taking courses, or what you hope to learn."),
-                //     valueAttribute: "bio",
-                //     helpMessage: '',
-                //     persistChanges: true,
-                //     messagePosition: 'header'
-                // })
             ];
 
             var sectionTwoFreeTextFields = {
@@ -157,39 +146,69 @@
                 bio: 'Your motivation...',
                 immigrant_status: 'Were you born a citizen of the United States?',
                 veteran_status: 'Have you ever served in any branch of the U.S. Armed Forces, including the Coast Guard, the National Guard, or Reserve component of any service branch? ',
-                education: 'What was the highest degree or level of school you have completed?'
+                education: 'What was the highest degree or level of school you have completed?',
+                ethnicity: 'Race/Ethnicity'
             };
 
-            for (var key in sectionTwoFreeTextFields) {
-                var value = sectionTwoFreeTextFields[key];
-                sectionTwoFieldViews.push(
-                    new FieldsView.TextareaFieldView({
-                        model: accountSettingsModel,
-                        messagePosition: 'header',
-                        editable: editable,
-                        persistChanges: true,
-                        valueAttribute: key,
-                        title: value
-                    })
-                );
-            }
+            var sectionTwoFields = [
+                'name', // TODO: split into first and last name
+                'mailing_address',
+                'secondary_address',
+                'city',
+                'state',
+                'zipcode',
+                'phone_number',
+                'company',
+                'title',
+                'newsletter',
+                'bio',
+                'year_of_birth',
+                'gender',
+                'ethnicity',
+                'immigrant_status',
+                'veteran_status',
+                'education',
+                'facebook_link',
+                'linkedin_link',
+                'twitter_link'
+            ];
 
-            for (var key in sectionTwoDropdownFields) {
-                var value = sectionTwoDropdownFields[key];
-                sectionTwoFieldViews.push(
-                    new FieldsView.DropdownFieldView({
-                        model: accountSettingsModel,
-                        editable: editable,
-                        showMessages: true,
-                        placeholderValue: gettext('Add ' + value),
-                        valueAttribute: key,
-                        options: options[key + '_options'],
-                        helpMessage: value,
-                        persistChanges: true,
-                        titleVisible: true,
-                        title: value
-                    })
-                );
+            for(var i = 0; i < sectionTwoFields.length; i++) {
+                var fieldKey = sectionTwoFields[i];
+                var textField = sectionTwoFreeTextFields[fieldKey];
+                var dropdownField = sectionTwoDropdownFields[fieldKey];
+
+                if(textField) {
+                    sectionTwoFieldViews.push(
+                        new FieldsView.TextareaFieldView({
+                            model: accountSettingsModel,
+                            messagePosition: 'header',
+                            editable: editable,
+                            persistChanges: true,
+                            valueAttribute: fieldKey,
+                            title: textField
+                        })
+                    );
+                }
+                else if (dropdownField) {
+                    sectionTwoFieldViews.push(
+                        new FieldsView.DropdownFieldView({
+                            model: accountSettingsModel,
+                            editable: editable,
+                            showMessages: true,
+                            placeholderValue: gettext('Add ' + dropdownField),
+                            valueAttribute: fieldKey,
+                            options: options[fieldKey + '_options'],
+                            helpMessage: dropdownField,
+                            persistChanges: true,
+                            titleVisible: true,
+                            title: dropdownField
+                        })
+                    );
+                }
+                else {
+                    throw new Error('You done fucked up.')
+                }
             }
 
             var BadgeCollection = PagingCollection.extend({

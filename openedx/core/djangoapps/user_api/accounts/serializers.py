@@ -104,6 +104,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             "level_of_education": AccountLegacyProfileSerializer.convert_empty_to_None(profile.level_of_education),
             "mailing_address": profile.mailing_address,
             "secondary_address": profile.secondary_address,
+            "ethnicity": profile.ethnicity,
             "veteran_status": profile.veteran_status,
             "immigrant_status": profile.immigrant_status,
             "education": profile.education,
@@ -176,7 +177,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
             "mailing_address", "bio", "profile_image", "requires_parental_consent", "language_proficiencies",
             # FastTrac
             'state', 'zipcode', 'company', 'title',
-            'city', 'phone_number', 'newsletter',
+            'city', 'phone_number', 'newsletter', 'ethnicity',
             'secondary_address', 'facebook_link', 'twitter_link',
             'linkedin_link', 'veteran_status', 'immigrant_status', 'education'
         )

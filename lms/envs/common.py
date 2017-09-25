@@ -2763,7 +2763,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'public_email',
         'affiliate_organization_name',
         'secondary_address', 'title',
-        'veteran_status', 'immigrant_status', 'education'
+        'veteran_status', 'immigrant_status', 'education', 'ethnicity'
     ]
 }
 
