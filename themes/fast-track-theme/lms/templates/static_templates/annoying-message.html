@@ -1,0 +1,23 @@
+<div class="annoying-message">
+    <a href="/u/${user.username}">
+        Add more details about yourself and your business in <u>your profile</u>.
+    </a>
+
+    <div class="dismiss">
+        <i class="fa fa-times"></i>
+        Do not show this again
+    </div>
+</div>
+
+<script>
+    $('.annoying-message .dismiss').on('click', function(){
+        localStorage.setItem('annoying-message', 'hide');
+        $('.annoying-message').slideUp();
+    });
+
+    $(document).ready(function() {
+        if(!(localStorage.getItem('annoying-message') === 'hide')) {
+            $('.annoying-message').css('display', 'block');
+        }
+    });
+</script>

@@ -31,6 +31,7 @@ html, body, .window-wrap {
 }
 
 .annoying-message {
+  display: none;
   width: 100%;
   background: $ft-green;
   padding: 1rem;
@@ -38,6 +39,17 @@ html, body, .window-wrap {
 
   a {
     color: white !important;
+  }
+
+  .dismiss {
+    float: right;
+    margin-right: 2rem;
+    color: white;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 

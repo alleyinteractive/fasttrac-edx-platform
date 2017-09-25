@@ -22,11 +22,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
 </%block>
 
 % if not user.is_anonymous() and user.profile.is_incomplete:
-<div class="annoying-message">
-    <a href="/u/${user.username}">
-      Add more details about yourself and your business in <u>your profile</u>.
-    </a>
-</div>
+  <%include file="/static_templates/annoying-message.html" />
 % endif
 
 % if show_enroll_banner:
