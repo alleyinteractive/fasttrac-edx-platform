@@ -1,7 +1,7 @@
 import hashlib
 from django.db import models, IntegrityError, transaction
 from django.db.models import Q, F
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, pre_delete, post_delete
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -237,3 +237,13 @@ def remove_affiliate_course_enrollments(sender, instance, **kwargs):
             course = get_course_by_id(course_id)
 
             revoke_access(course, instance.member, 'ccx_coach', False)
+
+@receiver(pre_delete, sender=AffiliateMembership, dispatch_uid="validate_course_dependency")
+def validate_course_dependency(sender, instance, **kwargs):
+    count_affiliate_memberships_of_member = AffiliateMembership.objects.filter(member=instance.member).count()
+    ccxs_for_member_exist = CustomCourseForEdX.objects.filter(coach=instance.member).exists()
+
+    if ccxs_for_member_exist and count_affiliate_memberships_of_member == 1:
+        raise ValueError('Cannot delete this member because they have affiliate custom courses.')
+    else:
+        super(AffiliateMembership, self).delete()

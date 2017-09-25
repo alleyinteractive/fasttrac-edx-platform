@@ -75,7 +75,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
   <%
       course_target = reverse('info', args=[unicode(course_overview.id)])
 
-      if not is_ccx and enrollment.coach_on_master_course:
+      if not is_ccx and enrollment.coach_on_master_course and user.profile.affiliate:
         button_target = '/courses/{0}/ccx_coach'.format(enrollment.course_id)
         button_label = 'Create Custom Course'
       elif is_ccx and is_staff_or_instructor:

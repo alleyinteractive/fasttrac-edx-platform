@@ -28,6 +28,8 @@ class CcxCourseTab(CourseTab):
         if not settings.FEATURES.get('CUSTOM_COURSES_EDX', False) or not course.enable_ccx:
             # If ccx is not enable do not show ccx coach tab.
             return False
+        if not user.profile.affiliate:
+            return False
         if has_access(user, 'staff', course) or has_access(user, 'instructor', course):
             # if user is staff or instructor then he can always see ccx coach tab.
             return True

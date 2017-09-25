@@ -221,7 +221,10 @@ def remove_member(request, slug, member_id):
         'role': role
     }
 
-    AffiliateMembership.objects.filter(**params).delete()
+    try:
+        AffiliateMembership.objects.filter(**params).delete()
+    except ValueError as e:
+        messages.add_message(request, messages.INFO, e)
 
     return redirect('affiliates:edit', slug=slug)
 

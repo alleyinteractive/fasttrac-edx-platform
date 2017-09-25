@@ -529,7 +529,10 @@ def course_info(request, course_id):
         for section in sections:
             section_module = get_module_for_descriptor(user, request, section, field_data_cache, course.id, course=course)
             subsection_module = get_current_child(section_module)
-            section.last_subsection_url_name = subsection_module.url_name
+            if subsection_module:
+                section.last_subsection_url_name = subsection_module.url_name
+            else:
+                section.last_subsection_url_name = ''
 
         if ccx:
             is_program_director_or_course_manager = AffiliateMembership.objects.filter(
