@@ -820,6 +820,16 @@ label.u-field-title {
   }
 }
 
+.register-text-wrapper {
+  width: 100%;
+  margin-bottom: 10px;
+
+  .register-text {
+    font-size: 1rem;
+    line-height: 1.25rem;
+  }
+}
+
 .no-scroll {
   overflow-y: hidden;
 }
