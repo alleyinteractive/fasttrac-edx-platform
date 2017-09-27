@@ -47,6 +47,7 @@ class AffiliateEntity(models.Model):
     location_latitude = models.FloatField(null=True, blank=True)
     location_longitude = models.FloatField(null=True, blank=True)
     image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
+    active = models.BooleanField(blank=True, default=True)
 
     members = models.ManyToManyField(User, through='AffiliateMembership')
 

@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.core import serializers
 from django.shortcuts import render, redirect
-from django.db.models import Q
+from django.db.models import Q, F
 from django.http import Http404
 from lms.envs.common import STATE_CHOICES
 from django_countries import countries
@@ -225,6 +225,15 @@ def remove_member(request, slug, member_id):
         AffiliateMembership.objects.filter(**params).delete()
     except ValueError as e:
         messages.add_message(request, messages.INFO, e)
+
+    return redirect('affiliates:edit', slug=slug)
+
+
+@only_staff
+def toggle_active_status(request, slug):
+    affiliate = AffiliateEntity.objects.select_for_update().get(slug=slug)
+    affiliate.active = not affiliate.active
+    affiliate.save()
 
     return redirect('affiliates:edit', slug=slug)
 

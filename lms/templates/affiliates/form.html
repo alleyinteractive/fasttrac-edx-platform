@@ -23,8 +23,22 @@
 
   % if affiliate.pk:
     <div class="edit-affiliate-container">
-      <h1 class="explore-header">Staff</h1>
+      <h1 class="explore-header">
+        Staff
 
+        % if request.user.is_staff:
+          <form
+            action="/affiliates/toggle_active_status/${affiliate.slug}"
+            class="affiliate-activation"
+          >
+            <input
+              type="submit"
+              class="affiliate-activation-btn"
+              value="${'Deactivate' if affiliate.active else 'Activate'}"
+            />
+          </form>
+        % endif
+      </h1>
       <form action="${affiliate.slug}/add_member" method="POST" id="add_member_form">
         <input type="text" name="member_identifier" placeholder="Staff email" required />
         <select name="role">

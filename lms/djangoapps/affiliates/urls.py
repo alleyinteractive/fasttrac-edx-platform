@@ -15,4 +15,5 @@ urlpatterns = patterns('',
     url(r'^delete/(?P<slug>[^/]*)$', 'affiliates.views.delete', name='delete'),
     url(r'^edit/(?P<slug>[^/]*)/add_member$', 'affiliates.views.add_member', name='add_member'),
     url(r'^edit/(?P<slug>[^/]*)/remove_member/(?P<member_id>\d+)$', 'affiliates.views.remove_member', name='remove_member'),
+    url(r'^toggle_active_status/(?P<slug>[^/]*)', 'affiliates.views.toggle_active_status', name='toggle_active_status'),
 )

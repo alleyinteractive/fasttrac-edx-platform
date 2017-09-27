@@ -354,6 +354,22 @@ h1.explore-header {
         color: white;
       }
     }
+
+    .affiliate-activation {
+      display: inline-block;
+      float: right;
+
+      &-btn[type=submit] {
+        background: #f76b1c;
+        color: white;
+        vertical-align: bottom;
+        padding: .4rem;
+        margin: 0;
+        letter-spacing: 0;
+        font-size: 1rem;
+      }
+    }
+
     label {
       font-style: normal;
       font-weight: bold;
