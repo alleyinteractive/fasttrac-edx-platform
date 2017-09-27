@@ -99,6 +99,7 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'gender_options': UserProfile.GENDER_CHOICES,
             'bio_options': UserProfile.BIO_CHOICES,
             'veteran_status_options': UserProfile.YES_NO_CHOICES,
+            'age_category_options': UserProfile.AGE_CATEGORY_CHOICES,
             'immigrant_status_options': UserProfile.YES_NO_CHOICES,
             'education_options': UserProfile.EDUCATION_CHOICES,
             'ethnicity_options': UserProfile.ETHNICITY_CHOICES

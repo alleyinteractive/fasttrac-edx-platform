@@ -106,6 +106,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             "secondary_address": profile.secondary_address,
             "ethnicity": profile.ethnicity,
             "veteran_status": profile.veteran_status,
+            "age_category": profile.age_category,
             "immigrant_status": profile.immigrant_status,
             "education": profile.education,
             "facebook_link": profile.facebook_link,
@@ -176,7 +177,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
             "name", "gender", "goals", "year_of_birth", "level_of_education", "country",
             "mailing_address", "bio", "profile_image", "requires_parental_consent", "language_proficiencies",
             # FastTrac
-            'state', 'zipcode', 'company', 'title',
+            'state', 'zipcode', 'company', 'title', 'age_category',
             'city', 'phone_number', 'newsletter', 'ethnicity',
             'secondary_address', 'facebook_link', 'twitter_link',
             'linkedin_link', 'veteran_status', 'immigrant_status', 'education'

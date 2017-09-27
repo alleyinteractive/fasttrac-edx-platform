@@ -627,23 +627,24 @@ def add_user_to_mailchimp(sender, instance, **kwargs):
         last_name = instance.name.replace('{} '.format(first_name), '')
 
         data = {
-            'email': instance.user.email,
+            'email_address': instance.user.email,
             'status': 'subscribed',
             'merge_fields': {
+                'EMAIL': instance.user.email,
                 'FNAME': first_name,
                 'LNAME': last_name,
-                'CITY': instance.city,
-                'STATE': instance.state,
-                'ZIP_POSTAL': instance.zipcode,
-                'COUNTRY': unicode(instance.country),
-                'JOB_TITLE': instance.title,
-                'PHONE': instance.phone_number,
+                'CITY': instance.city or '',
+                'STATE': instance.state or '',
+                'ZIP_POSTAL': instance.zipcode or '',
+                'COUNTRY': unicode(instance.country) or '',
+                'JOB_TITLE': instance.title or '',
+                'PHONE': instance.phone_number or '',
                 'P_USERNAME': instance.user.username,
-                'B_STATUS': instance.get_bio_display(),
-                'TWITTER': instance.twitter_link,
-                'FACEBOOK': instance.facebook_link,
-                'LINKED_IN': instance.linkedin_link,
-                'AGE': instance.age_category,
+                'B_STATUS': instance.get_bio_display() or '',
+                'TWITTER': instance.twitter_link or '',
+                'FACEBOOK': instance.facebook_link or '',
+                'LINKED_IN': instance.linkedin_link or '',
+                'AGE': instance.get_age_category_display() or '',
                 'GENDER': instance.get_gender_display()
             },
             'interests': {
@@ -654,7 +655,10 @@ def add_user_to_mailchimp(sender, instance, **kwargs):
 
         # this will create or update a Mailchimp list member
         # TODO: notify admin if this fails (send email)
-        requests.put(mailchimp_url, auth=('fasttrac', mailchimp_api_key), json=data)
+        r = requests.put(mailchimp_url, auth=('fasttrac', mailchimp_api_key), json=data)
+        if not r.status_code == 200:
+            print('Profile update error')
+            print(r.content)
 
 
 class UserSignupSource(models.Model):

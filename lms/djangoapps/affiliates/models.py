@@ -163,7 +163,8 @@ def update_mailchimp_interest(affiliate_membership, value):
 
         interest_id = affiliate_membership.mailchimp_interests[affiliate_membership.role]
         data = {
-            'email': affiliate_membership.member.email,
+            'email_address': affiliate_membership.member.email,
+            'status': 'subscribed',
             'interests': {
                 interest_id: value,
                 UserProfile.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not affiliate_membership.member.profile.is_affiliate_user, # Entrepreneur User
@@ -172,8 +173,10 @@ def update_mailchimp_interest(affiliate_membership, value):
         }
 
         # TODO: notify admin if this fails (send email)
-        requests.put(mailchimp_url, auth=('fasttrac', mailchimp_api_key), json=data)
-
+        r = requests.put(mailchimp_url, auth=('fasttrac', mailchimp_api_key), json=data)
+        if not r.status_code == 200:
+            print('Affiliate membership update error')
+            print(r.content)
 
 @receiver(post_save, sender=AffiliateMembership, dispatch_uid="add_mailchimp_interests")
 def add_mailchimp_interests(sender, instance, **kwargs):

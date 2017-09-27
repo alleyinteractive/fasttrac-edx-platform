@@ -2766,7 +2766,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'linkedin_link',
         'public_email',
         'affiliate_organization_name',
-        'secondary_address', 'title',
+        'secondary_address', 'title', 'age_category',
         'veteran_status', 'immigrant_status', 'education', 'ethnicity'
     ]
 }
