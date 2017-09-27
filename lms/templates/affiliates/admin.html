@@ -64,7 +64,6 @@
     </span>
   </div>
 
-
     <h1 class="explore-header">
       Courses
     </h1>
@@ -107,7 +106,7 @@
 
 
     <h1 class="explore-header">
-      Affiliate Admin
+      Affiliates
     </h1>
     <table class="students-table">
       <thead>
@@ -116,6 +115,10 @@
           <th>Members count</th>
           <th>Courses count</th>
           <th>Enrollments count</th>
+          <th>Last Course Taught</th>
+          <th>Last Course Date</th>
+          <th>Last Affiliate User Login (name, date)</th>
+          <th>Last Affiliate Learner Login</th>
           <th></th>
         </tr>
       </thead>
@@ -133,6 +136,42 @@
             </td>
             <td>
               ${affiliate.enrollments.count()}
+            </td>
+            <td>
+              % if affiliate.last_course_taught:
+                <a href="/courses/${affiliate.last_course_taught.ccx_course_id}/info">
+                  ${affiliate.last_course_taught.display_name}
+                </a>
+              % else:
+                --
+              % endif
+            </td>
+            <td>
+                % if affiliate.last_course_taught:
+                  ${affiliate.last_course_taught.end_date.strftime("%B %d, %Y")}
+                % else:
+                  --
+                % endif
+            </td>
+            <td>
+              % if affiliate.last_affiliate_user:
+                <a href="/u/${affiliate.last_affiliate_user.username}">
+                  ${affiliate.last_affiliate_user.profile.name},
+                  ${affiliate.last_affiliate_user.last_login.strftime("%B %d, %Y")}
+                </a>
+                % else:
+                --
+                % endif
+              </td>
+              <td>
+                % if affiliate.last_affiliate_learner:
+                  <a href="/u/${affiliate.last_affiliate_learner.username}">
+                    ${affiliate.last_affiliate_learner.profile.name},
+                    ${affiliate.last_affiliate_learner.last_login.strftime("%B %d, %Y")}
+                  </a>
+                % else:
+                  --
+                % endif
             </td>
             <td>
               <a href="/affiliates/${affiliate.slug}">View</a>

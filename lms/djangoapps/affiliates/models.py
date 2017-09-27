@@ -1,4 +1,5 @@
 import hashlib
+import datetime
 from django.db import models, IntegrityError, transaction
 from django.db.models import Q, F
 from django.db.models.signals import post_save, pre_delete, post_delete
@@ -130,6 +131,21 @@ class AffiliateEntity(models.Model):
         course_ids = [c.ccx_course_id for c in self.courses]
         return CourseEnrollment.objects.filter(course_id__in=course_ids)
 
+    @property
+    def last_course_taught(self):
+        today = datetime.datetime.today()
+        return self.courses.filter(end_date__gte=today).order_by('end_date').first()
+
+    @property
+    def last_affiliate_user(self):
+        return self.members.order_by('-last_login').first()
+
+    @property
+    def last_affiliate_learner(self):
+        member_ids = self.members.values_list('id', flat=True)
+        learner_enrollments = self.enrollments.exclude(user_id__in=member_ids)
+        learner_ids = [e.user_id for e in learner_enrollments]
+        return User.objects.filter(id__in=learner_ids).order_by('-last_login').first()
 
 class AffiliateMembership(models.Model):
     role_choices = (
