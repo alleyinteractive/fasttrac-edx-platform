@@ -71,11 +71,11 @@ def index(request):
     else:
         affiliates = AffiliateEntity.objects.filter(pk=affiliate_id)
 
-    all_affiliates = AffiliateEntity.objects.order_by('name')
+    all_affiliates = AffiliateEntity.objects.filter(active=True).order_by('name')
     affiliates_as_json = serializers.serialize('json', all_affiliates, fields=('name', 'id'))
 
     return render_to_response('affiliates/index.html', {
-        'affiliates': affiliates,
+        'affiliates': affiliates.filter(active=True),
         'affiliates_as_json': affiliates_as_json,
         'affiliate_city': affiliate_city,
         'affiliate_state': affiliate_state,

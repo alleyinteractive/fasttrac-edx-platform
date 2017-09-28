@@ -149,12 +149,17 @@ def courses(request):
     affiliate_id = request.POST.get('affiliate_id')
     latitude = request.POST.get('latitude', '')
     longitude = request.POST.get('longitude', '')
+    affiliates = AffiliateEntity.objects.filter(active=True).order_by('name')
+    affiliates_as_json = serializers.serialize('json', affiliates, fields=('name', 'id'))
 
     if affiliate_id:
         affiliate = AffiliateEntity.objects.get(pk=affiliate_id)
         ccxs = affiliate.courses.filter(**ccx_filters)
     else:
         ccxs = CustomCourseForEdX.objects.filter(**ccx_filters)
+
+    # Filter out ccxs that belong to inactive affiliate
+    ccxs = [ccx for ccx in ccxs if ccx.affiliate in affiliates]
 
     ccx_keys = []
 
@@ -188,9 +193,6 @@ def courses(request):
         courses = ordered_courses
         if len(courses) > 0:
             user_messages.append('Courses are sorted by the distance!')
-
-    affiliates = AffiliateEntity.objects.order_by('name')
-    affiliates_as_json = serializers.serialize('json', affiliates, fields=('name', 'id'))
 
     return render_to_response(
         "courseware/courses.html",
