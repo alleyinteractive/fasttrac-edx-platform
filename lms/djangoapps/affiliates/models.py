@@ -266,4 +266,4 @@ def validate_course_dependency(sender, instance, **kwargs):
     if ccxs_for_member_exist and count_affiliate_memberships_of_member == 1:
         raise ValueError('Cannot delete this member because they have affiliate custom courses.')
     else:
-        super(AffiliateMembership, self).delete()
+        super(AffiliateMembership, instance).delete()
