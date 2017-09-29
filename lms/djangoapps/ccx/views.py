@@ -271,7 +271,7 @@ def create_ccx(request, course, ccx=None, **kwargs):
     """
     Create a new CCX
     """
-    if not is_ccx_coach_on_master_course(request.user, course) or not user.profile.affiliate:
+    if not is_ccx_coach_on_master_course(request.user, course) or not request.user.profile.affiliate:
         return HttpResponseForbidden()
 
     name = request.POST.get('name')
