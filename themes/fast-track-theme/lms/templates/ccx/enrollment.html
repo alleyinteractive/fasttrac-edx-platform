@@ -137,7 +137,7 @@
                             %for student_enrollment in ccx_student_enrollments:
                                 <tr>
                                     <td>${student_enrollment.user.profile.name}</td>
-                                    <td>${student_enrollment.user.email}</td>
+                                    <td class="email">${student_enrollment.user.email}</td>
                                     <td>${'Active' if student_enrollment.is_active else 'Inactive'}</td>
                                     <td class="revoke-td">
                                         <a class="revoke">
