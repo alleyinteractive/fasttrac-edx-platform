@@ -146,7 +146,7 @@ class CustomCourseForEdX(models.Model):
         if self.coach.profile.affiliate.image:
             return self.coach.profile.affiliate.image.url
         else:
-            return 'https://s3.amazonaws.com/fasttrac-beta/default_full.png'
+            return 'https://s3-us-west-2.amazonaws.com/fasttrac-edx-prod/default_full.png'
 
     @lazy
     def course(self):

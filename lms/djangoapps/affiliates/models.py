@@ -116,7 +116,7 @@ class AffiliateEntity(models.Model):
         if self.image:
             return self.image.url
         else:
-            return 'https://s3.amazonaws.com/fasttrac-beta/default_full.png'
+            return 'https://s3-us-west-2.amazonaws.com/fasttrac-edx-prod/default_full.png'
 
     @property
     def memberships(self):
