@@ -192,11 +192,11 @@ class CustomCourseForEdX(models.Model):
 
     def has_ended(self):
         """Return True if the CCX due date is set and is in the past"""
-        return self.end_date and self.end_date > datetime.now(utc)
+        return self.end_date and self.end_date < datetime.now(utc)
 
     def enrollment_closed(self):
         """Return True if the CCX due date is set and is in the past"""
-        return self.enrollment_end_date and self.enrollment_end_date > datetime.now(utc)
+        return self.enrollment_end_date and self.enrollment_end_date < datetime.now(utc)
 
     def start_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
         """Returns the desired text representation of the CCX start datetime
