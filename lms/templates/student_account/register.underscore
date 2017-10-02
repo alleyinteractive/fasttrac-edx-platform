@@ -63,6 +63,11 @@
                 <span class="text"><%- gettext("Create a new account") %></span>
             </h2>
         </div>
+        <div class="register-text-wrapper">
+            <span class="register-text">
+                You’re one step closer to receiving practical solutions, anytime access and multiple tools for your business. Get started now by creating your account.
+            </span>
+        </div>
     <% } %>
 
     <%= context.fields %>
