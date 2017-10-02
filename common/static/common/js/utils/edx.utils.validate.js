@@ -114,7 +114,7 @@
                         ),
 
                         valid: function( $el ) {
-                            return $el.attr('type') === 'email' ? _fn.validate.email.format( $el.val() ) : true;
+                            return true;
                         },
 
                         format: function( str ) {
