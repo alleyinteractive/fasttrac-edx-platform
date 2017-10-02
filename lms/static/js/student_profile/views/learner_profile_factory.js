@@ -140,7 +140,7 @@
 
             var sectionTwoDropdownFields = {
                 state: 'State',
-                newsletter: 'Would you like to receive KF newsletter?',
+                newsletter: 'Would you like to receive marketing communication from the Ewing Marion Kauffman Foundation and Kauffman FastTrac?​',
                 gender: 'Gender',
                 bio: 'Your motivation...',
                 age_category: 'Age',
