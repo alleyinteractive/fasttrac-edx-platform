@@ -180,7 +180,6 @@ def courses(request):
 
     user_messages = []
     if latitude and longitude:
-        ccxs = ccxs.exclude(Q(location_latitude=None) | Q(location_longitude=None))
         ordered_ccxs = sorted(ccxs, key=lambda ccx: ccx.distance_from({'latitude': latitude, 'longitude': longitude}))
         ordered_courses = []
 
