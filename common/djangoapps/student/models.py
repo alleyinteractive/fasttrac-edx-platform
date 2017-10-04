@@ -403,9 +403,16 @@ class UserProfile(models.Model):
         return self.user.affiliatemembership_set.exists()
 
     @property
+    def default_affiliate_membership(self):
+        if self.is_affiliate_user:
+            return self.user.affiliatemembership_set.first()
+        else:
+            return None
+
+    @property
     def affiliate(self):
         if self.is_affiliate_user:
-            return self.user.affiliatemembership_set.first().affiliate
+            return self.default_affiliate_membership.affiliate
         else:
             return None
 
@@ -645,7 +652,9 @@ def add_user_to_mailchimp(sender, instance, **kwargs):
                 'FACEBOOK': instance.facebook_link or '',
                 'LINKED_IN': instance.linkedin_link or '',
                 'AGE': instance.get_age_category_display() or '',
-                'GENDER': instance.get_gender_display()
+                'GENDER': instance.get_gender_display(),
+                'AFFILIATE': (instance.affiliate and instance.affiliate.name) or '',
+                'NEWSLETTER': instance.get_newsletter_display()
             },
             'interests': {
                 UserProfile.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not instance.is_affiliate_user, # Entrepreneur User
@@ -659,6 +668,10 @@ def add_user_to_mailchimp(sender, instance, **kwargs):
         if not r.status_code == 200:
             print('Profile update error')
             print(r.content)
+        else:
+            # trigger save so Mailchimp gets the update of user affiliate role
+            if instance.is_affiliate_user:
+                instance.default_affiliate_membership.save()
 
 
 class UserSignupSource(models.Model):
