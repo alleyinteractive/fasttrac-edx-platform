@@ -361,6 +361,29 @@ class StudentFieldOverride(TimeStampedModel):
     value = models.TextField(default='null')
 
 
+class StudentTimeTracker(TimeStampedModel):
+    """
+    This records how many milliseconds did user spend on a particular unit in course.
+    """
+    course_id = CourseKeyField(db_index=True, max_length=255)
+    unit_location = LocationKeyField(max_length=255, db_index=True)
+    student = models.ForeignKey(User, db_index=True)
+    time_duration = models.IntegerField(blank=True, null=True)
+
+    class Meta(object):
+        app_label = "courseware"
+        unique_together = (('course_id', 'unit_location', 'student'),)
+
+    @classmethod
+    def update_time(cls, course_id, unit_location, student, time_duration):
+        student_time_tracker, _ = cls.objects.get_or_create(course_id=course_id, unit_location=unit_location, student=student)
+        if student_time_tracker.time_duration:
+            student_time_tracker.time_duration = student_time_tracker.time_duration + time_duration
+        else:
+            student_time_tracker.time_duration = time_duration
+
+        student_time_tracker.save()
+
 # Signal that indicates that a user's score for a problem has been updated.
 # This signal is generated when a scoring event occurs either within the core
 # platform or in the Submissions module. Note that this signal will be triggered

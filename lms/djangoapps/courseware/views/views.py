@@ -66,7 +66,7 @@ from courseware.courses import (
 )
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, ScoresClient
-from courseware.models import StudentModule, BaseStudentModuleHistory
+from courseware.models import StudentModule, BaseStudentModuleHistory, StudentTimeTracker
 from courseware.url_helpers import get_redirect_url, get_redirect_url_for_global_staff
 from courseware.gis_helpers import change_in_latitude, change_in_longitude
 from courseware.user_state_client import DjangoXBlockUserStateClient
@@ -596,6 +596,26 @@ def bookmarks(request, course_id):
     }
 
     return render_to_response('courseware/bookmarks.html', context)
+
+
+# @ensure_csrf_cookie
+@login_required
+@ensure_valid_course_key
+def time_tracker(request, course_id):
+    unit_location = request.POST.get('unit')
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
+    args = {
+        'course_id': course_key,
+        'unit_location': course_key.make_usage_key_from_deprecated_string(unit_location),
+        'time_duration': request.POST.get('time'),
+        'student': request.user
+    }
+
+    StudentTimeTracker.update_time(**args)
+
+    return HttpResponse(json.dumps({}), content_type='application/json')
+
 
 @ensure_csrf_cookie
 @login_required

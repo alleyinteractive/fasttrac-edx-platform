@@ -399,6 +399,13 @@ urlpatterns += (
         name='course_bookmarks',
     ),
     url(
+        r'^courses/{}/time_tracker$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        'courseware.views.views.time_tracker',
+        name='course_time_tracker',
+    ),
+    url(
         r'^courses/{}/messages$'.format(
             settings.COURSE_ID_PATTERN,
         ),
