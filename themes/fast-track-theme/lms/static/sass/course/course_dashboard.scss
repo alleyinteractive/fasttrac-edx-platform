@@ -115,15 +115,17 @@ body.view-in-course .info-wrapper {
   }
 
   .date-continue-wrapper {
+    display: flex;
+    flex-flow: row wrap;
+
     position: relative;
     height: 2rem;
 
-    .date, a {
-      position: absolute;
-      bottom: 0;
-    }
-    a {
-      right: 0;
+    justify-content: space-between;
+    align-items: center;
+
+    .date {
+      padding: 0;
     }
   }
 }
