@@ -125,6 +125,8 @@
             ];
 
             var sectionTwoFreeTextFields = {
+                first_name: 'First Name',
+                last_name: 'Last Name',
                 name: 'Full Name',
                 mailing_address: 'Street Address 1',
                 secondary_address: 'Street Address 2',
@@ -151,7 +153,9 @@
             };
 
             var sectionTwoFields = [
-                'name', // TODO: split into first and last name
+                'first_name',
+                'last_name',
+                // 'name', // commented out because they don't want it, but cool to have it handy
                 'mailing_address',
                 'secondary_address',
                 'city',

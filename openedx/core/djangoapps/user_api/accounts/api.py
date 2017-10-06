@@ -129,6 +129,20 @@ def update_account_settings(requesting_user, update, username=None):
     if requesting_user.username != username:
         raise UserNotAuthorized()
 
+    if 'first_name' in update or 'last_name' in update:
+        if 'first_name' in update:
+            existing_user.first_name = update['first_name']
+        elif 'last_name' in update:
+            existing_user.last_name = update['last_name']
+
+        update.pop('first_name', '')
+        update.pop('last_name', '')
+
+        existing_user.save()
+
+        update['name'] = ' '.join([existing_user.first_name, existing_user.last_name])
+
+
     # If user has requested to change email, we must call the multi-step process to handle this.
     # It is not handled by the serializer (which considers email to be read-only).
     changing_email = False
@@ -183,7 +197,7 @@ def update_account_settings(requesting_user, update, username=None):
         # If everything validated, go ahead and save the serializers.
 
         # We have not found a way using signals to get the language proficiency changes (grouped by user).
-        # As a workaround, store old and new values here and emit them after save is complete.
+        # As a workaround,first_nam store old and new values here and emit them after save is complete.
         if "language_proficiencies" in update:
             old_language_proficiencies = legacy_profile_serializer.data["language_proficiencies"]
 

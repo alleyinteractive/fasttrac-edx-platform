@@ -91,6 +91,8 @@ class UserReadOnlySerializer(serializers.Serializer):
                 many=True
             ).data,
             "name": profile.name,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
             "gender": AccountLegacyProfileSerializer.convert_empty_to_None(profile.gender),
             "goals": profile.goals,
             "state": profile.state,
@@ -158,7 +160,7 @@ class AccountUserSerializer(serializers.HyperlinkedModelSerializer, ReadOnlyFiel
     """
     class Meta(object):
         model = User
-        fields = ("username", "email", "date_joined", "is_active")
+        fields = ("username", "email", "date_joined", "is_active", "first_name", "last_name")
         read_only_fields = ("username", "email", "date_joined", "is_active")
         explicit_read_only_fields = ()
 
@@ -183,7 +185,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
             'linkedin_link', 'veteran_status', 'immigrant_status', 'education'
         )
         # Currently no read-only field, but keep this so view code doesn't need to know.
-        read_only_fields = ()
+        read_only_fields = ('first_name', 'last_name')
         explicit_read_only_fields = ("profile_image", "requires_parental_consent")
 
     def validate_name(self, new_name):

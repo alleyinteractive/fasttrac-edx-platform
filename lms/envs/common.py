@@ -2755,6 +2755,8 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         "account_privacy",
         "accomplishments_shared",
         # FastTrac
+        'first_name',
+        'last_name',
         'state',
         'zipcode',
         'company',
