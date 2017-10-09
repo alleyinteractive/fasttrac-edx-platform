@@ -127,8 +127,8 @@ else:
         }
 
         // student time tracking
-
         var unitViewStartedAt, lastUnitLocation, windowLoadedAt;
+        var courseId = $('.courseware-results').data('courseId');
 
         $(window).load(function() {
             unitViewStartedAt = (new Date()).getTime();
