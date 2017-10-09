@@ -127,41 +127,40 @@ else:
         }
 
         // student time tracking
-        $(document).ready(function() {
-            var unitViewStartedAt, lastUnitLocation, windowLoadedAt;
-            var courseId = $('.courseware-results').data('courseId');
+        var unitViewStartedAt, lastUnitLocation, windowLoadedAt, courseId;
 
-            $(window).load(function() {
-                unitViewStartedAt = (new Date()).getTime();
-                lastUnitLocation = $('.accordion-unit.active').data('unit').location;
+        $(window).load(function() {
+            courseId = $('.courseware-results').data('courseId');
+            unitViewStartedAt = (new Date()).getTime();
+            lastUnitLocation = $('.accordion-unit.active').data('unit').location;
+        });
+
+        window.onbeforeunload = updateUnitViewTime;
+
+        function updateUnitViewTime(unitLocation) {
+            var timeNow = (new Date()).getTime();
+            var timeSpent = timeNow - unitViewStartedAt;
+
+            $.ajax({
+                type: 'POST',
+                url: '/courses/' + courseId + '/time_tracker',
+                data: {
+                    time: timeSpent,
+                    unit: lastUnitLocation
+                }
             });
 
-            window.onbeforeunload = updateUnitViewTime;
-
-            function updateUnitViewTime(unitLocation) {
-                var timeNow = (new Date()).getTime();
-                var timeSpent = timeNow - unitViewStartedAt;
-
-                $.ajax({
-                    type: 'POST',
-                    url: '/courses/' + courseId + '/time_tracker',
-                    data: {
-                        time: timeSpent,
-                        unit: lastUnitLocation
-                    }
-                });
-
-                if (unitLocation) {
-                    setTimeout(function() {
-                        lastUnitLocation = unitLocation;
-                        unitViewStartedAt = timeNow;
-                    }, 0);
-                }
-
-                // prevent modal triggering on onbeforeunload event
-                return null;
+            if (unitLocation) {
+                setTimeout(function() {
+                    lastUnitLocation = unitLocation;
+                    unitViewStartedAt = timeNow;
+                }, 0);
             }
-        });
+
+            // prevent modal triggering on onbeforeunload event
+            return null;
+        }
+
         // end time tracking
 
         function handleUnitClick(element) {
