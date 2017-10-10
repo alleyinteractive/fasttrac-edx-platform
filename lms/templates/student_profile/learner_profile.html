@@ -13,6 +13,23 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
 
 <%block name="bodyclass">view-profile</%block>
 
+<div class="error-modal hidden">
+</div>
+
+<div class="change-password">
+  <button class="change-password-button">
+    Change password
+  </button>
+  <form class="change-password-popup hidden">
+    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+    <label class="label" for="password">New password</label>
+    <input type="password" name="password">
+    <label class="label" for="password-confirm">Confirm password</label>
+    <input type="password" name="password-confirm">
+    <button class='submit' type="submit" value="submit">Submit</button>
+  </form>
+</div>
+
 <div class="message-banner" aria-live="polite"></div>
 <main id="main" aria-label="Content" tabindex="-1">
     <div class="wrapper-profile">
@@ -21,6 +38,52 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
         </div>
     </div>
 </main>
+
+<script>
+  $(document).ready(function() {
+    var changePasswordPopup = $('.change-password-popup');
+    var errorModal = $('.error-modal');
+    var isErrorModalDisplayed = false;
+
+    $('.change-password-button').on('click', function() {
+      changePasswordPopup.toggleClass('hidden');
+    });
+
+
+    function showErrorMessage(message) {
+      errorModal.append('<span class="error-message">' + message + '</span>');
+      errorModal.removeClass('hidden');
+      isErrorModalDisplayed = true;
+
+      setTimeout(function () {
+        errorModal.addClass('hidden');
+        errorModal.find('.error-message').remove();
+        isErrorModalDisplayed = false;
+      }, 3000);
+    }
+
+
+    changePasswordPopup.on('submit', function(e) {
+      e.preventDefault();
+
+      var url = '/user_api/v1/accounts/change_password/${data.get('profile_user_id')}/';
+      var data = changePasswordPopup.serialize();
+
+      $.post(url, data)
+        .done(function() {
+          changePasswordPopup.removeClass('hidden');
+        })
+        .fail(function(err) {
+          if (isErrorModalDisplayed) {
+            errorModal.addClass('hidden');
+            errorModal.find('.error-message').remove();
+          }
+          showErrorMessage(err.responseText);
+        });
+    });
+  });
+</script>
+
 <%block name="headextra">
     <%static:css group='style-course'/>
 </%block>

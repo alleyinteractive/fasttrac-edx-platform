@@ -719,6 +719,66 @@ label.u-field-title {
   width: 100%;
 }
 
+.error-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 460px;
+  height: 50px;
+
+  margin-left: -195px;
+  margin-top: -150px;
+
+  position: fixed;
+  left: 50%;
+  top: 158px;
+
+  border-radius: 4px;
+
+  background: red;
+  color: white;
+  z-index: 1000;
+}
+
+.change-password {
+  display: flex;
+  flex-flow: column wrap;
+
+  position: absolute;
+  right: 38%;
+  top: 82px;
+
+  align-items: flex-end;
+
+  &-popup {
+    display: flex;
+    flex-flow: column wrap;
+    padding: 9px;
+
+    align-items: flex-start;
+    background: $ft-orange;
+    border-radius: 4px;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  &-button {
+    margin-bottom: 6px;
+  }
+
+  .label {
+    margin-top: 6px;
+    color: white;
+  }
+
+  .submit {
+    margin-top: 6px;
+  }
+}
+
 .messages {
   display: flex;
   flex-flow: column wrap;
