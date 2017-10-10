@@ -1,0 +1,16 @@
+<div class="error-modal hidden"></div>
+
+<script>
+  $(document).ready(function() {
+    var modal = $('.error-modal');
+    var displayTime = 4500;
+
+    window.showErrorMessage = function(message) {
+      modal.text(message).removeClass('hidden');
+
+      setTimeout(function () {
+        modal.addClass('hidden');
+      }, displayTime);
+    };
+  });
+</script>

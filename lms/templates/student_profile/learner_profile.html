@@ -13,8 +13,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
 
 <%block name="bodyclass">view-profile</%block>
 
-<div class="error-modal hidden">
-</div>
+<%include file="/modal/error_modal.html" />
 
 <div class="change-password">
   <button class="change-password-button">
@@ -42,25 +41,10 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
 <script>
   $(document).ready(function() {
     var changePasswordPopup = $('.change-password-popup');
-    var errorModal = $('.error-modal');
-    var isErrorModalDisplayed = false;
 
     $('.change-password-button').on('click', function() {
       changePasswordPopup.toggleClass('hidden');
     });
-
-
-    function showErrorMessage(message) {
-      errorModal.append('<span class="error-message">' + message + '</span>');
-      errorModal.removeClass('hidden');
-      isErrorModalDisplayed = true;
-
-      setTimeout(function () {
-        errorModal.addClass('hidden');
-        errorModal.find('.error-message').remove();
-        isErrorModalDisplayed = false;
-      }, 3000);
-    }
 
 
     changePasswordPopup.on('submit', function(e) {
@@ -74,10 +58,6 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
           changePasswordPopup.removeClass('hidden');
         })
         .fail(function(err) {
-          if (isErrorModalDisplayed) {
-            errorModal.addClass('hidden');
-            errorModal.find('.error-message').remove();
-          }
           showErrorMessage(err.responseText);
         });
     });
