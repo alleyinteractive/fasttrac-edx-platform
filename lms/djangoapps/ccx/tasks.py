@@ -2,6 +2,7 @@
 Asynchronous tasks for the CCX app.
 """
 
+import datetime
 from django.dispatch import receiver
 import logging
 
@@ -10,6 +11,7 @@ from opaque_keys.edx.locator import CourseLocator
 from ccx_keys.locator import CCXLocator
 from xmodule.modulestore.django import SignalHandler
 from lms import CELERY_APP
+from courseware.models import StudentModule
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 
@@ -43,3 +45,22 @@ def send_ccx_course_published(course_key):
         )
         for rec, response in responses:
             log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
+
+
+@CELERY_APP.task(name='ccx.print')
+def send_emails():
+    print("TEST Send emails....!!!")
+
+    # One day after the "course completion date" for all learners enrolled in that course (not affiliates); OR
+    # today_min = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+    # today_max = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
+    # ccxs = CustomCourseForEdX.objects.filter(end_date__range=(today_min, today_max))
+
+    # ccxs = CustomCourseForEdX.objects.all()
+    # learner_enrollments = [enrollment for enrollment in ccx.students for ccx in ccxs]
+
+    # print(len(learner_enrollments))
+
+    # for enrollment in learner_enrollments:
+    #     print(enrollment)
+    # 45 days after a user's last activity in a course in which he/she is still enrolled

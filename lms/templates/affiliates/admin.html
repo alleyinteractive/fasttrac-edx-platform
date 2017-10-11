@@ -34,6 +34,18 @@
     })
   </script>
 
+  % if messages:
+    % for message in messages:
+      <p>${message}</p>
+    % endfor
+  % endif
+
+  <div id="csv-actions">
+    <a href="csv_admin">
+      CSV Downloads
+    </a>
+  </div>
+
   <div id="learner-info">
     <h1 class="explore-header">
       Learners

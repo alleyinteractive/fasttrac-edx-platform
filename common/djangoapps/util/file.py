@@ -98,7 +98,10 @@ def course_filename_prefix_generator(course_id, separator='_'):
         str: A unicode string which can safely be inserted into a
             filename.
     """
-    return get_valid_filename(unicode(separator).join([course_id.org, course_id.course, course_id.run]))
+    if isinstance(course_id, basestring):
+        return get_valid_filename(course_id)
+    else:
+        return get_valid_filename(unicode(separator).join([course_id.org, course_id.course, course_id.run]))
 
 
 # pylint: disable=invalid-name

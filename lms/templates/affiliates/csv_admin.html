@@ -1,0 +1,36 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">Affiliates CSV Actions</%block>
+
+<section class="container">
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.wrapper-footer').addClass('fixed-footer')
+    })
+  </script>
+
+  % if messages:
+    % for message in messages:
+      <p>${message}</p>
+    % endfor
+  % endif
+
+  <div id="csv-actions">
+    <a href="csv_export">
+      Export CSV
+    </a>
+  </div>
+
+  <div id="csv-files">
+    <h1>Download generated CSV files</h1>
+    <ul>
+      % for name, url in csv_files:
+      <li>
+        <a href="${url}">${name} Download</a>
+      </li>
+      % endfor
+    </ul>
+  </div>
+</section>

@@ -14,6 +14,9 @@ from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from .decorators import only_program_director, only_staff
+from .tasks import export_csv_report
+from instructor_task.models import ReportStore
+
 
 @only_staff
 def admin(request):
@@ -34,6 +37,23 @@ def admin(request):
         'total_fasttrac_learners': total_fasttrac_learners,
         'total_affiliate_learners': total_affiliate_learners
     })
+
+
+@only_staff
+def csv_admin(request):
+    report_store = ReportStore.from_config('GRADES_DOWNLOAD')
+
+    return render_to_response('affiliates/csv_admin.html', {
+        'csv_files': report_store.links_for('affiliates')
+    })
+
+
+@only_staff
+def csv_export(request):
+    export_csv_report()
+    messages.add_message(request, messages.INFO, 'Generating report')
+    return redirect('affiliates:csv_admin')
+
 
 def index(request):
     affiliate_id = request.POST.get('affiliate_id', '')

@@ -294,5 +294,10 @@ class DjangoStorageReportStore(ReportStore):
         """
         Return the full path to a given file for a given course.
         """
-        hashed_course_id = hashlib.sha1(course_id.to_deprecated_string()).hexdigest()
+        # FastTrac affiliate reports
+        if isinstance(course_id, basestring):
+            hashed_course_id = hashlib.sha1(course_id).hexdigest()
+        else:
+            hashed_course_id = hashlib.sha1(course_id.to_deprecated_string()).hexdigest()
+
         return os.path.join(hashed_course_id, filename)
