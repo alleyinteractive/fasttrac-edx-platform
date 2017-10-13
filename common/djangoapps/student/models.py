@@ -372,6 +372,10 @@ class UserProfile(models.Model):
     linkedin_link = models.CharField(null=True, blank=True, max_length=255)
     public_email = models.CharField(null=True, blank=True, max_length=255)
 
+    # useful only if settings.MIGRATE_TO_AUTH0
+    # is set to True.
+    migrated_to_auth0 = models.BooleanField(default=False)
+
     # field for affiliate program directors
     affiliate_organization_name = models.CharField(null=True, blank=True, default='', max_length=255)
     description = models.CharField(null=True, blank=True, max_length=255, default='')
@@ -472,6 +476,10 @@ class UserProfile(models.Model):
             SessionStore(session_key=old_login).delete()
         meta['session_id'] = session_id
         self.set_meta(meta)
+        self.save()
+
+    def set_migrated_to_auth0(self):
+        self.migrated_to_auth0 = True
         self.save()
 
     def requires_parental_consent(self, date=None, age_limit=None, default_requires_consent=True):
