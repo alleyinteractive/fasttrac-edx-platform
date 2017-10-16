@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from .decorators import only_program_director, only_staff
-from .tasks import export_csv_report
+from .tasks import export_csv_affiliate_report
 from instructor_task.models import ReportStore
 
 
@@ -50,8 +50,12 @@ def csv_admin(request):
 
 @only_staff
 def csv_export(request):
-    export_csv_report()
-    messages.add_message(request, messages.INFO, 'Generating report')
+    report_type = request.GET.get('report_type')
+
+    if report_type == 'export_csv_affiliate_report':
+        export_csv_affiliate_report()
+        messages.add_message(request, messages.INFO, 'Generating affiliate report CSV... Refresh to see the download link below.')
+
     return redirect('affiliates:csv_admin')
 
 

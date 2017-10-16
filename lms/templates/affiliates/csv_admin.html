@@ -4,6 +4,30 @@
 
 <%block name="pagetitle">Affiliates CSV Actions</%block>
 
+<style>
+  .flash-message {
+    width: 80%;
+    padding: 1rem;
+    margin: 2rem;
+    border: 1px solid #777;
+  }
+
+  #csv-actions {
+    height: 70px;
+  }
+
+  #csv-actions a {
+    border: 1px solid;
+    padding: 1rem;
+    margin-left: 2rem;
+  }
+
+  #csv-files li {
+    height: 30px;
+    line-height: 30px;
+  }
+</style>
+
 <section class="container">
   <script type="text/javascript">
     $(document).ready(function() {
@@ -13,13 +37,13 @@
 
   % if messages:
     % for message in messages:
-      <p>${message}</p>
+      <p class="flash-message">${message}</p>
     % endfor
   % endif
 
   <div id="csv-actions">
-    <a href="csv_export">
-      Export CSV
+    <a href="csv_export?report_type=export_csv_affiliate_report">
+      Export Affiliate Report CSV
     </a>
   </div>
 
