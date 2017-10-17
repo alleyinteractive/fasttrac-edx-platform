@@ -675,7 +675,7 @@ def search(request, course_id):
 
     # filter out content that is not in CCX
     if hasattr(course.id, 'ccx') and len(search_results['results']) > 0:
-        ccx_blocks = get_ccx_block_ids(search_results['results'], ccx, course)
+        ccx_blocks = get_ccx_block_ids(ccx, course)
         search_results = filter_search_results(search_results, ccx_blocks)
 
     # if user wants, filter out content that is not bookmarked
@@ -709,7 +709,7 @@ def transform_block_ids(blocks, original_course_id, ccx_course_id):
 
     return blocks
 
-def get_ccx_block_ids(blocks, ccx, course):
+def get_ccx_block_ids(ccx, course):
     ccx_blocks = []
     schedule = get_ccx_schedule(course, ccx)
 

@@ -5,6 +5,9 @@ from django.conf import settings
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from student.models import UserProfile
 from .models import AffiliateEntity
+from lms.djangoapps.ccx.views import get_ccx_schedule
+from courseware.models import StudentModule, StudentTimeTracker
+from opaque_keys.edx.keys import UsageKey
 
 
 @CELERY_APP.task
@@ -76,4 +79,68 @@ def export_csv_user_report():
         rows.append([profile.user.username, profile.user.email, profile.get_country_display(), profile.user.first_name, profile.user.last_name, profile.mailing_address, profile.city, profile.get_state_display(), profile.zipcode, profile.phone_number, profile.company, profile.title, profile.get_newsletter_display(), profile.get_bio_display(), profile.get_age_category_display(), profile.get_gender_display(), profile.get_ethnicity_display(), profile.get_immigrant_status_display(), profile.get_veteran_status_display(), profile.get_education_display()])
 
     params.update({'rows': rows})
+
+    upload_csv_to_report_store(**params)
+
+
+def export_csv_course_report():
+    ccxs = CustomCourseForEdX.objects.all()
+    rows = []
+
+    for ccx in ccxs:
+        # student_modules = StudentModule.objects.filter(course_id=ccx.ccx_course_id)
+        original_course_id = unicode(ccx.course.id).split(':')[1]
+        ccx_course_id = unicode(ccx.ccx_course_id).split(':')[1]
+
+        students = [student.user for student in ccx.students]
+        student_time_tracker = StudentTimeTracker.objects.filter(course_id=ccx.ccx_course_id, student__in=students)
+
+        header_columns = ['Username', 'Email', 'Course ID', 'Course Name']
+        student_data = {}
+
+        for section in get_ccx_schedule(ccx.course, ccx):
+            for subsection in section['children']:
+                for unit in subsection['children']:
+                    # get location key
+                    ccx_id = 'ccx-' + unit['location']
+                    ccx_unit_location = ccx_id.replace(original_course_id, ccx_course_id)
+                    location = UsageKey.from_string(ccx_unit_location)
+
+                    # headers
+                    header_columns.append(unit['display_name'])
+
+                    for student in students:
+                        # get time tracker object
+                        tracker = student_time_tracker.filter(unit_location=location, student=student).first()
+
+                        student_id = unicode(student.id)
+                        student_time = tracker.time_duration/1000 if tracker else '-'
+
+                        if student_data.get(student_id):
+                            student_data[student_id].append(student_time)
+                        else:
+                            student_data[student_id] = [student_time]
+
+        rows.append(header_columns)
+
+        for student_id in student_data:
+            if student_data.get(student_id):
+                student = filter(lambda s: unicode(s.id) == student_id, students)[0]
+
+                student_data[student_id].insert(0, ccx.display_name)
+                student_data[student_id].insert(0, ccx.ccx_course_id)
+                student_data[student_id].insert(0, student.email)
+                student_data[student_id].insert(0, student.username)
+
+                rows.append(student_data[student_id])
+
+        rows.append([])
+
+    params = {
+        'csv_name': 'courses',
+        'course_id': 'affiliates',
+        'timestamp': datetime.now(),
+        'rows': rows
+    }
+
     upload_csv_to_report_store(**params)
