@@ -471,7 +471,7 @@ def set_grading_policy(request, course, ccx=None, **kwargs):
     return redirect(url)
 
 
-def get_ccx_schedule(course, ccx):
+def get_ccx_schedule(course, ccx, return_xblocks=False):
     """
     Generate a JSON serializable CCX schedule.
     """
@@ -531,6 +531,9 @@ def get_ccx_schedule(course, ccx):
                 if children:
                     visited['children'] = children
                     yield visited
+            elif return_xblocks and depth == 3:
+                visited['children'] = child.children
+                yield visited
             else:
                 yield visited
 

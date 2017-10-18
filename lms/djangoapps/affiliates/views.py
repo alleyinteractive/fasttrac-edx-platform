@@ -60,9 +60,13 @@ def csv_export(request):
         export_csv_user_report()
         messages.add_message(request, messages.INFO, 'Generating user report CSV... Refresh to see the download link below.')
 
-    elif report_type == 'export_csv_course_report':
-        export_csv_course_report()
-        messages.add_message(request, messages.INFO, 'Generating course report CSV... Refresh to see the download link below.')
+    elif report_type == 'export_csv_time_report':
+        export_csv_course_report(time_report=True)
+        messages.add_message(request, messages.INFO, 'Generating course time report CSV... Refresh to see the download link below.')
+
+    elif report_type == 'export_csv_completion_report':
+        export_csv_course_report(time_report=False)
+        messages.add_message(request, messages.INFO, 'Generating course completion report CSV... Refresh to see the download link below.')
 
     return redirect('affiliates:csv_admin')
 

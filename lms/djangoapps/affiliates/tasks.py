@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from lms import CELERY_APP
 from instructor_task.tasks_helper import upload_csv_to_report_store
 from django.conf import settings
@@ -83,43 +84,72 @@ def export_csv_user_report():
     upload_csv_to_report_store(**params)
 
 
-def export_csv_course_report():
+@CELERY_APP.task
+def export_csv_course_report(time_report=True):
     ccxs = CustomCourseForEdX.objects.all()
     rows = []
 
     for ccx in ccxs:
-        # student_modules = StudentModule.objects.filter(course_id=ccx.ccx_course_id)
+        # we need these values for converting unit and xblock location keys
         original_course_id = unicode(ccx.course.id).split(':')[1]
         ccx_course_id = unicode(ccx.ccx_course_id).split(':')[1]
 
         students = [student.user for student in ccx.students]
-        student_time_tracker = StudentTimeTracker.objects.filter(course_id=ccx.ccx_course_id, student__in=students)
+        student_time_tracker = StudentTimeTracker.objects.filter(course_id=ccx.ccx_course_id)
+        student_modules = StudentModule.objects.filter(course_id=ccx.ccx_course_id)
 
         header_columns = ['Username', 'Email', 'Course ID', 'Course Name']
         student_data = {}
 
-        for section in get_ccx_schedule(ccx.course, ccx):
+        for section in get_ccx_schedule(ccx.course, ccx, True):
             for subsection in section['children']:
                 for unit in subsection['children']:
-                    # get location key
+                    # get ccx location key
+                    # get_ccx_schedule returns original course location keys
                     ccx_id = 'ccx-' + unit['location']
                     ccx_unit_location = ccx_id.replace(original_course_id, ccx_course_id)
                     location = UsageKey.from_string(ccx_unit_location)
 
-                    # headers
+                    # csv headers
                     header_columns.append(unit['display_name'])
 
                     for student in students:
-                        # get time tracker object
-                        tracker = student_time_tracker.filter(unit_location=location, student=student).first()
-
                         student_id = unicode(student.id)
-                        student_time = tracker.time_duration/1000 if tracker else '-'
+                        unit_data = '-'
+
+                        # if we are generating a time spent on unit report
+                        if time_report:
+                            # get time tracker object
+                            tracker = student_time_tracker.filter(unit_location=location, student=student).first()
+
+                            if tracker:
+                                unit_data = tracker.time_duration/1000
+
+                        # if we are generating a course completion report
+                        else:
+                            for xblock_id in unit['children']:
+                                xblock_ccx_id = 'ccx-' + unicode(xblock_id)
+                                ccx_xblock_location = xblock_ccx_id.replace(original_course_id, ccx_course_id)
+                                xblock_location = UsageKey.from_string(ccx_xblock_location)
+
+                                module = student_modules.filter(module_state_key=xblock_location, student=student).first()
+                                if module and ('done' in module.state or 'helpful' in module.state):
+                                    module_state = json.loads(module.state)
+
+                                    if module_state.get('done'):
+                                        unit_data = 'done'
+                                    elif module_state.get('helpful') != None:
+                                        if module_state.get('helpful'):
+                                            unit_data = 'helpful'
+                                        else:
+                                            unit_data = 'not helpful'
+
 
                         if student_data.get(student_id):
-                            student_data[student_id].append(student_time)
+                            student_data[student_id].append(unit_data)
                         else:
-                            student_data[student_id] = [student_time]
+                            student_data[student_id] = [unit_data]
+
 
         rows.append(header_columns)
 
@@ -136,8 +166,10 @@ def export_csv_course_report():
 
         rows.append([])
 
+    csv_name = 'time_report' if time_report else 'completion_report'
+
     params = {
-        'csv_name': 'courses',
+        'csv_name': csv_name,
         'course_id': 'affiliates',
         'timestamp': datetime.now(),
         'rows': rows
