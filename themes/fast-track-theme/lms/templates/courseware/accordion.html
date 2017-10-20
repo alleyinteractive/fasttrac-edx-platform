@@ -112,75 +112,6 @@ else:
         </div>
         % endfor
     </div>
-    <script>
-        function highlightActiveUnit() {
-            var activeNavUnitId = $('#sequence-list button.active').attr('data-element') - 1;
-            $('#accordion-unit-' + activeNavUnitId).addClass('active');
-        }
-
-        function updateUrlWithUnit(unitName) {
-            var url = window.location.href;
-            var unitParamIndex = url.indexOf('&unit');
-            var newUrl = url.slice(0, unitParamIndex);
-
-            return newUrl + '&unit=' + unitName;
-        }
-
-        // student time tracking
-        var unitViewStartedAt, lastUnitLocation, windowLoadedAt, courseId;
-
-        $(window).load(function() {
-            courseId = $('.courseware-results').data('courseId');
-            unitViewStartedAt = (new Date()).getTime();
-            lastUnitLocation = $('.accordion-unit.active').data('unit').location;
-        });
-
-        window.onbeforeunload = updateUnitViewTime;
-
-        function updateUnitViewTime(unitLocation) {
-            var timeNow = (new Date()).getTime();
-            var timeSpent = timeNow - unitViewStartedAt;
-
-            $.ajax({
-                type: 'POST',
-                url: '/courses/' + courseId + '/time_tracker',
-                data: {
-                    time: timeSpent,
-                    unit: lastUnitLocation
-                }
-            });
-
-            if (unitLocation) {
-                setTimeout(function() {
-                    lastUnitLocation = unitLocation;
-                    unitViewStartedAt = timeNow;
-                }, 0);
-            }
-
-            // prevent modal triggering on onbeforeunload event
-            return null;
-        }
-
-        // end time tracking
-
-        function handleUnitClick(element) {
-            var unitData = element.dataset.unit;
-            var unitName = element.dataset.unitName;
-            var unit = JSON.parse(unitData);
-            var tabId = '#tab_' + unit.idx;
-            var nextUrl = updateUrlWithUnit(unitName);
-
-            $('.accordion-units li').removeClass('active');
-            $('#accordion-unit-' + unit.idx).addClass('active');
-            window.history.pushState(null, null, nextUrl);
-
-            updateUnitViewTime(unit.location);
-
-            $(tabId).click();
-        }
-
-        $(highlightActiveUnit);
-    </script>
 </div>
 </%def>
 
@@ -195,3 +126,77 @@ else:
     </%static:require_module_async>
 % endif
 
+<script>
+    function highlightActiveUnit() {
+        var activeNavUnitId = $('#sequence-list button.active').attr('data-element') - 1;
+        $('#accordion-unit-' + activeNavUnitId).addClass('active');
+    }
+
+    function updateUrlWithUnit(unitName) {
+        var url = window.location.href;
+        var unitParamIndex = url.indexOf('&unit');
+        var newUrl = url.slice(0, unitParamIndex);
+
+        return newUrl + '&unit=' + unitName;
+    }
+
+    // student time tracking
+    var unitViewStartedAt, lastUnitLocation, windowLoadedAt, courseId;
+
+    $(window).load(function() {
+        courseId = $('.courseware-results').data('courseId');
+        unitViewStartedAt = (new Date()).getTime();
+        lastUnitLocation = $('.accordion-unit.active').data('unit').location;
+    });
+
+    window.onbeforeunload = updateUnitViewTime;
+
+    function updateUnitViewTime(unitLocation) {
+        var timeNow = (new Date()).getTime();
+        var timeSpent = timeNow - unitViewStartedAt;
+
+        $.ajax({
+            type: 'POST',
+            url: '/courses/' + courseId + '/time_tracker',
+            data: {
+                time: timeSpent,
+                unit: lastUnitLocation
+            }
+        });
+
+        if (unitLocation) {
+            setTimeout(function() {
+                lastUnitLocation = unitLocation;
+                unitViewStartedAt = timeNow;
+            }, 0);
+        }
+
+        // prevent modal triggering on onbeforeunload event
+        return null;
+    }
+
+    $(document).ready(function() {
+        $('.sequence-bottom').on('click', '.sequence-nav-button.button-previous, .sequence-nav-button.button-next', function(){
+            var unit = $('.accordion-unit.active').data('unit');
+            updateUnitViewTime(unit.location);
+        });
+    });
+
+    // end time tracking
+
+    function handleUnitClick(element) {
+        var unitData = element.dataset.unit;
+        var unitName = element.dataset.unitName;
+        var unit = JSON.parse(unitData);
+        var tabId = '#tab_' + unit.idx;
+        var nextUrl = updateUrlWithUnit(unitName);
+
+        $('.accordion-units li').removeClass('active');
+        $('#accordion-unit-' + unit.idx).addClass('active');
+        window.history.pushState(null, null, nextUrl);
+
+        updateUnitViewTime(unit.location);
+
+        $(tabId).click();
+    }
+</script>

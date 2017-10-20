@@ -378,7 +378,7 @@ class StudentTimeTracker(TimeStampedModel):
     def update_time(cls, course_id, unit_location, student, time_duration):
         student_time_tracker, _ = cls.objects.get_or_create(course_id=course_id, unit_location=unit_location, student=student)
         if student_time_tracker.time_duration:
-            student_time_tracker.time_duration = student_time_tracker.time_duration + time_duration
+            student_time_tracker.time_duration = student_time_tracker.time_duration + long(time_duration)
         else:
             student_time_tracker.time_duration = time_duration
 
