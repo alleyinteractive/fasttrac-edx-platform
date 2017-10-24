@@ -86,20 +86,44 @@ def export_csv_user_report():
 
 @CELERY_APP.task
 def export_csv_course_report(time_report=True):
-    ccxs = CustomCourseForEdX.objects.all()
-    rows = []
+    fasttrac_course_key = settings.FASTTRAC_COURSE_KEY.split(':')[1]
+    ccxs = CustomCourseForEdX.objects.filter(course_id__icontains=fasttrac_course_key)
+
+    fasttrac_course = ccxs[0].course
+    fasttrac_course_units = []
+
+    for section in fasttrac_course.get_children():
+        for subsection in section.get_children():
+            for unit in subsection.get_children():
+                fasttrac_course_units.append(unit)
+
+    fasttrac_course_units_length = len(fasttrac_course_units)
+
+    original_course_id = unicode(fasttrac_course.id).split(':')[1]
+
+    # build headers
+    header_columns = ['Username', 'Email', 'Course ID', 'Course Name']
+    header_index_padding = len(header_columns)
+
+    for unit in fasttrac_course_units:
+        header_columns.append(unit.display_name)
+
+    rows = [header_columns]
 
     for ccx in ccxs:
         # we need these values for converting unit and xblock location keys
-        original_course_id = unicode(ccx.course.id).split(':')[1]
         ccx_course_id = unicode(ccx.ccx_course_id).split(':')[1]
 
         students = [student.user for student in ccx.students]
         student_time_tracker = StudentTimeTracker.objects.filter(course_id=ccx.ccx_course_id)
         student_modules = StudentModule.objects.filter(course_id=ccx.ccx_course_id)
 
-        header_columns = ['Username', 'Email', 'Course ID', 'Course Name']
         student_data = {}
+
+        # for each student create empty CSV row
+        for student in students:
+            student_id = unicode(student.id)
+            student_data[student_id] = ['/'] * fasttrac_course_units_length
 
         for section in get_ccx_schedule(ccx.course, ccx, True):
             for subsection in section['children']:
@@ -110,11 +134,14 @@ def export_csv_course_report(time_report=True):
                     ccx_unit_location = ccx_id.replace(original_course_id, ccx_course_id)
                     location = UsageKey.from_string(ccx_unit_location)
 
-                    # csv headers
-                    header_columns.append(unit['display_name'])
-
                     for student in students:
                         student_id = unicode(student.id)
+
+                        try:
+                            unit_index = header_columns.index(unit['display_name']) - header_index_padding
+                        except IndexError:
+                            continue
+
                         unit_data = '-'
 
                         # if we are generating a time spent on unit report
@@ -144,14 +171,8 @@ def export_csv_course_report(time_report=True):
                                         else:
                                             unit_data = 'not helpful'
 
+                        student_data[student_id][unit_index] = unit_data
 
-                        if student_data.get(student_id):
-                            student_data[student_id].append(unit_data)
-                        else:
-                            student_data[student_id] = [unit_data]
-
-
-        rows.append(header_columns)
 
         for student_id in student_data:
             if student_data.get(student_id):
@@ -163,8 +184,6 @@ def export_csv_course_report(time_report=True):
                 student_data[student_id].insert(0, student.username)
 
                 rows.append(student_data[student_id])
-
-        rows.append([])
 
     csv_name = 'time_report' if time_report else 'completion_report'
 
