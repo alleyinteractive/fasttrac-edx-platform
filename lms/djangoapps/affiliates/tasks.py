@@ -74,11 +74,11 @@ def export_csv_user_report():
     params = {'csv_name': 'user_report', 'course_id': 'affiliates',
               'timestamp': datetime.now()}
 
-    rows = [['username', 'email', 'country', 'first_name', 'last_name', 'mailing_address', 'city', 'state', 'postal_code', 'phone_number', 'company', 'title', 'Would you like to receive marketing communication from the Ewing Marion Kauffman Foundation and Kauffman FastTrac?', 'Your motivation', 'Age', 'Gender', 'Race/Ethnicity', 'Were you born a citizen of the United States?', 'Have you ever served in any branch of the U.S. Armed Forces, including the Coast Guard, the National Guard, or Reserve component of any service branch?', 'What was the highest degree or level of school you have completed?']]
+    rows = [['Username', 'Email', 'Registration Date', 'Country', 'First Name', 'Last Name', 'Mailing Address', 'City', 'State', 'Postal Code', 'Phone Number', 'Company', 'Title', 'Would you like to receive marketing communication from the Ewing Marion Kauffman Foundation and Kauffman FastTrac?', 'Your motivation', 'Age', 'Gender', 'Race/Ethnicity', 'Were you born a citizen of the United States?', 'Have you ever served in any branch of the U.S. Armed Forces, including the Coast Guard, the National Guard, or Reserve component of any service branch?', 'What was the highest degree or level of school you have completed?']]
 
     profiles = UserProfile.objects.all()
     for profile in profiles:
-        rows.append([profile.user.username, profile.user.email, profile.get_country_display(), profile.user.first_name, profile.user.last_name, profile.mailing_address, profile.city, profile.get_state_display(), profile.zipcode, profile.phone_number, profile.company, profile.title, profile.get_newsletter_display(), profile.get_bio_display(), profile.get_age_category_display(), profile.get_gender_display(), profile.get_ethnicity_display(), profile.get_immigrant_status_display(), profile.get_veteran_status_display(), profile.get_education_display()])
+        rows.append([profile.user.username, profile.user.email, profile.user.date_joined, profile.get_country_display(), profile.user.first_name, profile.user.last_name, profile.mailing_address, profile.city, profile.get_state_display(), profile.zipcode, profile.phone_number, profile.company, profile.title, profile.get_newsletter_display(), profile.get_bio_display(), profile.get_age_category_display(), profile.get_gender_display(), profile.get_ethnicity_display(), profile.get_immigrant_status_display(), profile.get_veteran_status_display(), profile.get_education_display()])
 
     params.update({'rows': rows})
 
