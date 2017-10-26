@@ -90,23 +90,18 @@ def export_csv_course_report(time_report=True):
     ccxs = CustomCourseForEdX.objects.filter(course_id__icontains=fasttrac_course_key)
 
     fasttrac_course = ccxs[0].course
-    fasttrac_course_units = []
-
-    for section in fasttrac_course.get_children():
-        for subsection in section.get_children():
-            for unit in subsection.get_children():
-                fasttrac_course_units.append(unit)
-
-    fasttrac_course_units_length = len(fasttrac_course_units)
-
     original_course_id = unicode(fasttrac_course.id).split(':')[1]
 
     # build headers
     header_columns = ['Username', 'Email', 'Course ID', 'Course Name']
     header_index_padding = len(header_columns)
 
-    for unit in fasttrac_course_units:
-        header_columns.append(unit.display_name)
+    for section in fasttrac_course.get_children():
+        for subsection in section.get_children():
+            for unit in subsection.get_children():
+                header_columns.append("{} - {} - {}".format(section.display_name, subsection.display_name, unit.display_name))
+
+    fasttrac_course_units_length = len(header_columns) - header_index_padding
 
     rows = [header_columns]
 
@@ -138,7 +133,8 @@ def export_csv_course_report(time_report=True):
                         student_id = unicode(student.id)
 
                         try:
-                            unit_index = header_columns.index(unit['display_name']) - header_index_padding
+                            column_name = "{} - {} - {}".format(section['display_name'], subsection['display_name'], unit['display_name'])
+                            unit_index = header_columns.index(column_name) - header_index_padding
                         except IndexError:
                             continue
 
