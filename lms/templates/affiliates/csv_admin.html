@@ -14,12 +14,15 @@
 
   #csv-actions {
     height: 70px;
+    line-height: 40px;
   }
 
   #csv-actions a {
+    display: inline-block;
     border: 1px solid;
-    padding: 1rem;
-    margin-left: 2rem;
+    padding: 0 1rem;
+    margin-top: 1rem;
+    margin-right: 1rem;
   }
 
   #csv-files li {
@@ -43,16 +46,19 @@
 
   <div id="csv-actions">
     <a href="csv_export?report_type=export_csv_affiliate_report">
-      Export Affiliate Report CSV
+      Export Affiliate Report
+    </a>
+    <a href="csv_export?report_type=export_csv_affiliate_course_report">
+      Export Affiliate Course Report
     </a>
     <a href="csv_export?report_type=export_csv_user_report">
-      Export User Report CSV
+      Export User Report
     </a>
     <a href="csv_export?report_type=export_csv_time_report">
-      Export Course Time Report CSV
+      Export Course Time Report
     </a>
     <a href="csv_export?report_type=export_csv_completion_report">
-      Export Course Completion Report CSV
+      Export Course Completion Report
     </a>
   </div>
 

@@ -12,15 +12,13 @@ from opaque_keys.edx.keys import UsageKey
 
 
 @CELERY_APP.task
-def export_csv_affiliate_report():
+def export_csv_affiliate_course_report():
     """
     Celery task for saving affiliate reports as CSV and uploading to S3
     """
     partial_course_key = settings.FASTTRAC_COURSE_KEY.split(':')[1]
     ccxs = CustomCourseForEdX.objects.all()
     ccxs = sorted(ccxs, key=lambda ccx: ccx.affiliate.name)
-    affiliates = AffiliateEntity.objects.all().order_by('name')
-
 
     rows = [['Course Name', 'Course ID', 'Affiliate Name', 'Start Date', 'End Date', 'Participant Count',
          'Delivery Mode', 'Enrollment Type', 'Course Type', 'Fee', 'Facilitator Name']]
@@ -37,12 +35,28 @@ def export_csv_affiliate_report():
             ccx.facilitator_names
         ])
 
-    rows.append([])
+    params = {
+        'csv_name': 'course_report',
+        'course_id': 'affiliates',
+        'timestamp': datetime.now(),
+        'rows': rows
+    }
 
-    rows.append([
+    upload_csv_to_report_store(**params)
+
+
+
+@CELERY_APP.task
+def export_csv_affiliate_report():
+    """
+    Celery task for saving affiliate reports as CSV and uploading to S3
+    """
+    affiliates = AffiliateEntity.objects.all().order_by('name')
+
+    rows = [[
         'Name', 'Members count', 'Courses count', 'Enrollments count', 'Last Course Taught',
         'Last Course Date', 'Last Affiliate User Login (name, date)', 'Last Affiliate Learner Login'
-    ])
+    ]]
 
     for affiliate in affiliates:
         rows.append([
@@ -57,7 +71,7 @@ def export_csv_affiliate_report():
         ])
 
     params = {
-        'csv_name': 'report',
+        'csv_name': 'affiliate_report',
         'course_id': 'affiliates',
         'timestamp': datetime.now(),
         'rows': rows
@@ -74,11 +88,22 @@ def export_csv_user_report():
     params = {'csv_name': 'user_report', 'course_id': 'affiliates',
               'timestamp': datetime.now()}
 
-    rows = [['Username', 'Email', 'Registration Date', 'Country', 'First Name', 'Last Name', 'Mailing Address', 'City', 'State', 'Postal Code', 'Phone Number', 'Company', 'Title', 'Would you like to receive marketing communication from the Ewing Marion Kauffman Foundation and Kauffman FastTrac?', 'Your motivation', 'Age', 'Gender', 'Race/Ethnicity', 'Were you born a citizen of the United States?', 'Have you ever served in any branch of the U.S. Armed Forces, including the Coast Guard, the National Guard, or Reserve component of any service branch?', 'What was the highest degree or level of school you have completed?']]
+    rows = [['Username', 'Email', 'Registration Date', 'Country', 'First Name', 'Last Name',
+             'Mailing Address', 'City', 'State', 'Postal Code', 'Phone Number', 'Company', 'Title',
+             'Would you like to receive marketing communication from the Ewing Marion Kauffman Foundation and Kauffman FastTrac?',
+             'Your motivation', 'Age', 'Gender', 'Race/Ethnicity', 'Were you born a citizen of the United States?',
+             'Have you ever served in any branch of the U.S. Armed Forces, including the Coast Guard, the National Guard, or Reserve component of any service branch?',
+             'What was the highest degree or level of school you have completed?']]
 
     profiles = UserProfile.objects.all()
     for profile in profiles:
-        rows.append([profile.user.username, profile.user.email, profile.user.date_joined, profile.get_country_display(), profile.user.first_name, profile.user.last_name, profile.mailing_address, profile.city, profile.get_state_display(), profile.zipcode, profile.phone_number, profile.company, profile.title, profile.get_newsletter_display(), profile.get_bio_display(), profile.get_age_category_display(), profile.get_gender_display(), profile.get_ethnicity_display(), profile.get_immigrant_status_display(), profile.get_veteran_status_display(), profile.get_education_display()])
+        rows.append([profile.user.username, profile.user.email, profile.user.date_joined,
+                     profile.get_country_display(), profile.user.first_name, profile.user.last_name,
+                     profile.mailing_address, profile.city, profile.get_state_display(), profile.zipcode,
+                     profile.phone_number, profile.company, profile.title, profile.get_newsletter_display(),
+                     profile.get_bio_display(), profile.get_age_category_display(), profile.get_gender_display(),
+                     profile.get_ethnicity_display(), profile.get_immigrant_status_display(),
+                     profile.get_veteran_status_display(), profile.get_education_display()])
 
     params.update({'rows': rows})
 
