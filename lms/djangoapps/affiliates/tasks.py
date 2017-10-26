@@ -188,7 +188,7 @@ def export_csv_course_report(time_report=True):
                                     if module_state.get('done'):
                                         unit_data = 'done'
                                     elif module_state.get('helpful') != None:
-                                        if module_state.get('helpful'):
+                                        if module_state.get('helpful') == 'true':
                                             unit_data = 'helpful'
                                         else:
                                             unit_data = 'not helpful'
