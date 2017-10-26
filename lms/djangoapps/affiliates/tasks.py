@@ -22,12 +22,13 @@ def export_csv_affiliate_report():
     affiliates = AffiliateEntity.objects.all().order_by('name')
 
 
-    rows = [['Course Name', 'Affiliate Name', 'Start Date', 'End Date', 'Participant Count',
-        'Delivery Mode', 'Enrollment Type', 'Course Type', 'Fee', 'Facilitator Name']]
+    rows = [['Course Name', 'Course ID', 'Affiliate Name', 'Start Date', 'End Date', 'Participant Count',
+         'Delivery Mode', 'Enrollment Type', 'Course Type', 'Fee', 'Facilitator Name']]
 
     for ccx in ccxs:
         rows.append([
-            ccx.display_name, ccx.affiliate.name, ccx.time.strftime("%B %d, %Y"),
+            ccx.display_name, ccx.ccx_course_id,
+            ccx.affiliate.name, ccx.time.strftime("%B %d, %Y"),
             (ccx.end_date.strftime("%B %d, %Y") if ccx.end_date else '--'),
             ccx.students.count(), ccx.get_delivery_mode_display(),
             ccx.get_enrollment_type_display(),
