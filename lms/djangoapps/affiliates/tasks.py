@@ -91,7 +91,7 @@ def export_csv_user_report():
     rows = [['Username', 'Email', 'Registration Date', 'Country', 'First Name', 'Last Name',
              'Mailing Address', 'City', 'State', 'Postal Code', 'Phone Number', 'Company', 'Title',
              'Would you like to receive marketing communication from the Ewing Marion Kauffman Foundation and Kauffman FastTrac?',
-             'Your motivation', 'Age', 'Gender', 'Race/Ethnicity', 'Were you born a citizen of the United States?',
+             'Your motivation', 'Age', 'Gender', 'Race/Ethnicity',
              'Have you ever served in any branch of the U.S. Armed Forces, including the Coast Guard, the National Guard, or Reserve component of any service branch?',
              'What was the highest degree or level of school you have completed?']]
 
@@ -102,8 +102,7 @@ def export_csv_user_report():
                      profile.mailing_address, profile.city, profile.get_state_display(), profile.zipcode,
                      profile.phone_number, profile.company, profile.title, profile.get_newsletter_display(),
                      profile.get_bio_display(), profile.get_age_category_display(), profile.get_gender_display(),
-                     profile.get_ethnicity_display(), profile.get_immigrant_status_display(),
-                     profile.get_veteran_status_display(), profile.get_education_display()])
+                     profile.get_ethnicity_display(), profile.get_veteran_status_display(), profile.get_education_display()])
 
     params.update({'rows': rows})
 

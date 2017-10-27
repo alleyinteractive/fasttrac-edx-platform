@@ -169,7 +169,6 @@
                 'age_category',
                 'gender',
                 'ethnicity',
-                'immigrant_status',
                 'veteran_status',
                 'education',
                 'facebook_link',
