@@ -20,13 +20,14 @@ def export_csv_affiliate_course_report():
     ccxs = CustomCourseForEdX.objects.all()
     ccxs = sorted(ccxs, key=lambda ccx: ccx.affiliate.name)
 
-    rows = [['Course Name', 'Course ID', 'Affiliate Name', 'Start Date', 'End Date', 'Participant Count',
+    rows = [['Course Name', 'Course ID', 'Affiliate Name', 'Affiliate Active', 'Start Date', 'End Date', 'Participant Count',
          'Delivery Mode', 'Enrollment Type', 'Course Type', 'Fee', 'Facilitator Name']]
 
     for ccx in ccxs:
         rows.append([
             ccx.display_name, ccx.ccx_course_id,
-            ccx.affiliate.name, ccx.time.strftime("%B %d, %Y"),
+            ccx.affiliate.name, ('Yes' if ccx.affiliate.active else 'No'),
+            ccx.time.strftime("%B %d, %Y"),
             (ccx.end_date.strftime("%B %d, %Y") if ccx.end_date else '--'),
             ccx.students.count(), ccx.get_delivery_mode_display(),
             ccx.get_enrollment_type_display(),
@@ -54,13 +55,14 @@ def export_csv_affiliate_report():
     affiliates = AffiliateEntity.objects.all().order_by('name')
 
     rows = [[
-        'Name', 'Members count', 'Courses count', 'Enrollments count', 'Last Course Taught',
+        'Name', 'Active', 'Members count', 'Courses count', 'Enrollments count', 'Last Course Taught',
         'Last Course Date', 'Last Affiliate User Login (name, date)', 'Last Affiliate Learner Login'
     ]]
 
     for affiliate in affiliates:
         rows.append([
-            affiliate.name, affiliate.members.count(), affiliate.courses.count(), affiliate.enrollments.count(),
+            affiliate.name, ('Yes' if affiliate.active else 'No'),
+            affiliate.members.count(), affiliate.courses.count(), affiliate.enrollments.count(),
             (affiliate.last_course_taught.display_name if affiliate.last_course_taught else '--'),
             (affiliate.last_course_taught.end_date.strftime(
                 "%B %d, %Y") if affiliate.last_course_taught else '--'),

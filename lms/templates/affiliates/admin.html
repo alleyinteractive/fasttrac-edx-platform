@@ -85,6 +85,7 @@
           <tr>
             <th><b>Course Name</b></th>
             <th>Affiliate Name</th>
+            <th>Affiliate Active</th>
             <th>Start Date</th>
             <th>End Date</th>
             <th>Participant Count</th>
@@ -101,6 +102,13 @@
             <tr>
               <td>${ccx.display_name}</td>
               <td>${ccx.affiliate.name}</td>
+              <td>
+                  % if ccx.affiliate.active:
+                    Yes
+                  % else:
+                    No
+                  % endif
+              </td>
               <td>${ccx.time.strftime("%B %d, %Y") if ccx.time else '--'}</td>
               <td>${ccx.end_date.strftime("%B %d, %Y") if ccx.end_date else '--'}</td>
               <td>${ccx.students.count()}</td>
@@ -124,6 +132,7 @@
       <thead>
         <tr>
           <th>Name</th>
+          <th>Active</th>
           <th>Members count</th>
           <th>Courses count</th>
           <th>Enrollments count</th>
@@ -139,6 +148,13 @@
           <tr>
             <td>
               ${affiliate.name}
+            </td>
+            <td>
+              % if affiliate.active:
+                Yes
+              % else:
+                No
+              % endif
             </td>
             <td>
               ${affiliate.members.count()}
