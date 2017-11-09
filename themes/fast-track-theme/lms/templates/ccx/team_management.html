@@ -34,6 +34,7 @@
                         data-remove-url="${modify_access_url}"
                         data-unique-student-identifier="${ccx_coach_permission.user.username}"
                         data-rolename="${ccx_coach_permission.role}"
+                        data-name="${ccx_coach_permission.user.profile.name}"
                         data-action="revoke">
                             <i class="fa fa-times-circle remove-icon"></i>Remove
                     </span>
@@ -44,8 +45,18 @@
     <br>
     <form id="add-coach-form" action="${modify_access_url}" method="POST">
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
-        <label for="unique_student_identifier">Email Address</label>
-        <input type="text" name="unique_student_identifier" />
+
+        <label for="unique_student_identifier">Add Facilitator</label>
+        <select name="unique_student_identifier" autocomplete="off">
+            <option selected disabled> Select affiliate user </option>
+            % for member in facilitator_dropdown_choices:
+                <option value="${member.username}">
+                    ${member.profile.name}
+                </option>
+            % endfor
+        </select>
+
+
         <input type="hidden" name="action" value="allow" />
         <input type="hidden" name="rolename" value="ccx_coach" />
         <button class="add-button" value="submit">Add Facilitator</button>
@@ -65,6 +76,8 @@
             var url = $form.attr('action');
             var data = $form.serialize();
 
+            var $selectedOption = $form.find('select option[value="' + $form.find('select').val() + '"]');
+
             $.ajax({
                 type: 'POST',
                 url: url,
@@ -77,8 +90,8 @@
                         showErrorMessage('Affiliate ' + responseData.unique_student_identifier + ' does not exist.');
                     }
                     else {
-                        addCoachRow(responseData, url);
-                        $form.find('input[type=text]').val('');
+                        addCoachRow(responseData, url, $selectedOption.text());
+                        $selectedOption.remove()
                     }
                 }
             });
@@ -90,6 +103,7 @@
             var action = $button.data('action');
             var uniqueStudentIdentifier = $button.data('unique-student-identifier');
             var rolename = $button.data('rolename');
+            var coachName = $button.data('name');
 
             $.ajax({
                 type: 'POST',
@@ -101,11 +115,12 @@
                 },
                 success: function() {
                     $button.parent().parent().remove();
+                    $('#add-coach-form select').append('<option value="'+ uniqueStudentIdentifier +'">'+ coachName +'</option>')
                 }
             });
         }
 
-        function addCoachRow(coachData, removeUrl) {
+        function addCoachRow(coachData, removeUrl, coachName) {
             var username = coachData.unique_student_identifier;
             var email = coachData.email;
             var rolename = coachData.rolename;
@@ -122,11 +137,12 @@
                     var role = 'Facilitator'
             }
 
-            var newRow = '<tr><td>' + username +
+            var newRow = '<tr><td>' + coachName +
                 '</td><td>' + role +
                 '</td><td>' + email +
                 '</td><td><span class="remove-coach-button" data-remove-url="' + removeUrl +
                     '" data-unique-student-identifier="' + username +
+                    '" data-name="' + coachName +
                     '" data-rolename="' + rolename + '" data-action="revoke"><i class="fa fa-times-circle remove-icon"></i>Remove</span></td></tr>';
 
             $('.team-mgmt-table').find('tbody').append(newRow);

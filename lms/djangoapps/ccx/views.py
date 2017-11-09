@@ -217,6 +217,10 @@ def dashboard(request, course, ccx=None, **kwargs):
 
         # show enrolled not existing students on Enrollments tab
         context['ccx_student_invitations'] = CourseEnrollmentAllowed.objects.filter(course_id=ccx_locator)
+
+        # facilitator dropdown choices
+        facilitator_ids = [ccx_coach_permissions.user.id for ccx_coach_permissions in context['ccx_coach_permissions']]
+        context['facilitator_dropdown_choices'] = ccx.affiliate.members.exclude(id__in=facilitator_ids)
     else:
         context['create_ccx_url'] = reverse(
             'create_ccx', kwargs={'course_id': course.id})
