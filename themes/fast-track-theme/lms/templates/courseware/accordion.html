@@ -100,7 +100,7 @@ else:
                             <div class="icon-container">
                                 %if unit['is_bookmarked'] == 'True':
                                     <i class="fa fa-bookmark"></i>
-                                %elif unit['viewed'] == 'True':
+                                %elif unit['viewed']:
                                     <i class="fa fa-check-circle"></i>
                                 % endif
                             </div>

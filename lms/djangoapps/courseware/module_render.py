@@ -46,7 +46,7 @@ from courseware.masquerade import (
     setup_masquerade,
 )
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache, set_score
-from courseware.models import SCORE_CHANGED
+from courseware.models import SCORE_CHANGED, StudentModule
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
@@ -150,14 +150,8 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
     field_data_cache must include data from the course module and 2 levels of its descendants
     '''
 
-    # get who has seen which block
-    from django.db import connection
-    with connection.cursor() as cursor:
-        cursor.execute(
-            "SELECT module_id, grade FROM courseware_studentmodule WHERE course_id = %s AND student_id = %s;",
-            [course.id, user.id]
-        )
-        view_data = dict(cursor.fetchall())
+    # get studentmodule info for this course
+    view_data = StudentModule.objects.filter(course_id=course.id, student=user)
 
     with modulestore().bulk_operations(course.id):
         course_module = get_module_for_descriptor(
@@ -186,7 +180,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
         # create BookmarksService object for logged user
         bookmarks_service = BookmarksService(user=user)
-        
+
         for chapter in chapters:
             # Only show required content, if there is required content
             # chapter.hide_from_toc is read-only (bool)
@@ -215,27 +209,55 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                 # get data for each unit in current subsection
                 units = list()
 
+                section_viewed = False
+
                 if is_section_active:
                     for index, child in enumerate(section.get_children()):
                         viewed = False
-                        grade = None
 
-                        for grandchild in child.children:
-                            # TODO: check if ALL children that can be graded are graded
-                            # TODO: viewed means nothing since whole subsection is downloaded at once
-                            if view_data.get(unicode(grandchild), False) is not False:
+                        # unit view calc
+                        # last xblock is the one we want to check
+                        check_unit = child.children[-1]
+                        check_unit_view_data = view_data.filter(module_state_key=check_unit).first()
+                        if check_unit_view_data:
+                            if 'helpful' in check_unit_view_data.state:
                                 viewed = True
-                                grade = view_data[unicode(grandchild)]
+
+                            if 'done' in check_unit_view_data.state:
+                                if json.loads(check_unit_view_data.state).get('done'):
+                                    viewed = True
 
                         is_bookmarked = bookmarks_service.is_bookmarked(usage_key=child.scope_ids.usage_id)
                         units.append({
                             'idx': index,
                             'display_name': child.display_name,
                             'location': unicode(child.location),
-                            'viewed': unicode(viewed),
-                            'grade': unicode(grade),
+                            'viewed': viewed,
                             'is_bookmarked': unicode(is_bookmarked)
                         })
+
+                    # determine if subsection is viewed
+                    # last xblock of last unit
+                    last_section_xblock = section.get_children()[-1].children[-1]
+                    check_section_view_data = view_data.filter(
+                        module_state_key=last_section_xblock).first()
+                    if check_section_view_data:
+                        if 'done' in check_section_view_data.state:
+                            if json.loads(check_section_view_data.state).get('done'):
+                                section_viewed = True
+
+                    # if last xblock of last unit wasn't marked,
+                    # check if all other units were marked helpful or not helpful
+                    if not section_viewed:
+                        all_units_checked = True
+                        for unit in units[1:-1]: # filter out "Looking back" and "Looking forward" units
+                            if not unit['viewed']:
+                                all_units_checked = False
+
+                        if all_units_checked:
+                            section_viewed = True
+
+                    # determine if subsection was viewed snippet END
 
                 section_context = {
                     'display_name': section.display_name_with_default_escaped,
@@ -244,7 +266,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                     'due': section.due,
                     'active': is_section_active,
                     'graded': section.graded,
-                    'viewed': view_data.get(unicode(section.location), False) is not False,
+                    'viewed': section_viewed,
                     'units': units
                 }
                 _add_timed_exam_info(user, course, section, section_context)
@@ -268,8 +290,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                 'display_id': display_id,
                 'url_name': chapter.url_name,
                 'sections': sections,
-                'active': chapter.url_name == active_chapter,
-                'viewed': view_data.get(unicode(chapter.location), False) is not False
+                'active': chapter.url_name == active_chapter
             })
         return {
             'chapters': toc_chapters,
