@@ -33,7 +33,7 @@ class AffiliateEntity(models.Model):
 
     email = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
-    description = models.CharField(null=True, blank=True, max_length=255, default='')
+    description = models.TextField(null=True, blank=True, default='')
     phone_number = models.CharField(null=True, blank=True, max_length=255, default='')
     address = models.CharField(null=True, blank=True, max_length=255, default='')
     city = models.CharField(null=True, blank=True, max_length=255, default='')
