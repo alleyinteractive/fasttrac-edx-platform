@@ -171,9 +171,9 @@ def courses(request):
     should_hide_master_course = get_should_hide_master_course(request)
 
     if should_hide_master_course:
-        courses = CourseOverview.objects.filter(id__in=ccx_keys)
+        courses = CourseOverview.objects.filter(id__in=ccx_keys).order_by('-id')
     else:
-        courses = CourseOverview.objects.filter(Q(id__in=ccx_keys) | ~Q(id__startswith='ccx'))
+        courses = CourseOverview.objects.filter(Q(id__in=ccx_keys) | ~Q(id__startswith='ccx')).order_by('-id')
 
     if not request.user.is_staff:
         courses = courses.filter(invitation_only=0)
