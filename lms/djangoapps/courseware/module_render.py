@@ -211,53 +211,52 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
                 section_viewed = False
 
-                if is_section_active:
-                    for index, child in enumerate(section.get_children()):
-                        viewed = False
+                for index, child in enumerate(section.get_children()):
+                    viewed = False
 
-                        # unit view calc
-                        # last xblock is the one we want to check
-                        check_unit = child.children[-1]
-                        check_unit_view_data = view_data.filter(module_state_key=check_unit).first()
-                        if check_unit_view_data:
-                            if 'helpful' in check_unit_view_data.state:
+                    # unit view calc
+                    # last xblock is the one we want to check
+                    check_unit = child.children[-1]
+                    check_unit_view_data = view_data.filter(module_state_key=check_unit).first()
+                    if check_unit_view_data:
+                        if 'helpful' in check_unit_view_data.state:
+                            viewed = True
+
+                        if 'done' in check_unit_view_data.state:
+                            if json.loads(check_unit_view_data.state).get('done'):
                                 viewed = True
 
-                            if 'done' in check_unit_view_data.state:
-                                if json.loads(check_unit_view_data.state).get('done'):
-                                    viewed = True
+                    is_bookmarked = bookmarks_service.is_bookmarked(usage_key=child.scope_ids.usage_id)
+                    units.append({
+                        'idx': index,
+                        'display_name': child.display_name,
+                        'location': unicode(child.location),
+                        'viewed': viewed,
+                        'is_bookmarked': unicode(is_bookmarked)
+                    })
 
-                        is_bookmarked = bookmarks_service.is_bookmarked(usage_key=child.scope_ids.usage_id)
-                        units.append({
-                            'idx': index,
-                            'display_name': child.display_name,
-                            'location': unicode(child.location),
-                            'viewed': viewed,
-                            'is_bookmarked': unicode(is_bookmarked)
-                        })
-
-                    # determine if subsection is viewed
-                    # last xblock of last unit
-                    last_section_xblock = section.get_children()[-1].children[-1]
-                    check_section_view_data = view_data.filter(
-                        module_state_key=last_section_xblock).first()
-                    if check_section_view_data:
-                        if 'done' in check_section_view_data.state:
-                            if json.loads(check_section_view_data.state).get('done'):
-                                section_viewed = True
-
-                    # if last xblock of last unit wasn't marked,
-                    # check if all other units were marked helpful or not helpful
-                    if not section_viewed:
-                        all_units_checked = True
-                        for unit in units[1:-1]: # filter out "Looking back" and "Looking forward" units
-                            if not unit['viewed']:
-                                all_units_checked = False
-
-                        if all_units_checked:
+                # determine if subsection is viewed
+                # last xblock of last unit
+                last_section_xblock = section.get_children()[-1].children[-1]
+                check_section_view_data = view_data.filter(
+                    module_state_key=last_section_xblock).first()
+                if check_section_view_data:
+                    if 'done' in check_section_view_data.state:
+                        if json.loads(check_section_view_data.state).get('done'):
                             section_viewed = True
 
-                    # determine if subsection was viewed snippet END
+                # if last xblock of last unit wasn't marked,
+                # check if all other units were marked helpful or not helpful
+                if not section_viewed:
+                    all_units_checked = True
+                    for unit in units[1:-1]: # filter out "Looking back" and "Looking forward" units
+                        if not unit['viewed']:
+                            all_units_checked = False
+
+                    if all_units_checked:
+                        section_viewed = True
+
+                # determine if subsection was viewed snippet END
 
                 section_context = {
                     'display_name': section.display_name_with_default_escaped,

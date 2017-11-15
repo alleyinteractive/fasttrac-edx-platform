@@ -248,6 +248,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
                   ${section.display_description if section.display_description else 'No description'}
                 </p>
                 <div class="activities">
+                  ${section.completed_subsections} / ${section.total_subsections} modules completed
                 </div>
               </div>
             % endfor

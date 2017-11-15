@@ -526,6 +526,7 @@ def course_info(request, course_id):
 
         # fetch last viewed subsection
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(course.id, request.user, course, depth=2)
+
         # copied functionality from function get_last_accessed_courseware, but looped it for each section
         for section in sections:
             section_module = get_module_for_descriptor(user, request, section, field_data_cache, course.id, course=course)
@@ -534,6 +535,40 @@ def course_info(request, course_id):
                 section.last_subsection_url_name = subsection_module.url_name
             else:
                 section.last_subsection_url_name = ''
+
+
+            section.total_subsections = len(section.children) - 1
+            completed_subsections = 0
+
+            for subsection in section.get_children():
+                # last xblock of last unit is "mark as complete"
+                last_subsection_xblock = subsection.get_children()[-1].get_children()[-1]
+
+                if hasattr(last_subsection_xblock, 'done'):
+                    student_module = StudentModule.objects.filter(course_id=course.id, module_state_key=last_subsection_xblock.location, student=user).first()
+                    if student_module:
+                        student_module_state = json.loads(student_module.state)
+                        if student_module_state.get('done'):
+                            completed_subsections += 1
+                else:
+                    # run through all units and see if they were marked helpful or not helpful
+                    units_completed = True
+                    for unit in subsection.get_children()[1:-1]:
+                        last_unit_xblock = unit.get_children()[-1]
+                        student_module = StudentModule.objects.filter(course_id=course.id, module_state_key=last_unit_xblock.location, student=user).first()
+
+                        if student_module:
+                            student_module_state = json.loads(student_module.state)
+
+                            if student_module_state.get('helpful') is None:
+                                units_completed = False
+
+                    # if no unit wasn't marked helpful/not helpful and it has more than 2 units (not intro unit)
+                    if units_completed and len(subsection.get_children()[1:-1]) > 0:
+                        completed_subsections += 1
+
+            section.completed_subsections = completed_subsections
+
 
         if ccx:
             is_program_director_or_course_manager = AffiliateMembership.objects.filter(
