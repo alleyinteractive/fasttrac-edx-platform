@@ -49,7 +49,7 @@ site_status_msg = get_site_status_msg(course_id)
   <header id="global-navigation" class="header-global ${"slim" if course else ""}" >
     <nav class="wrapper-header" aria-label="${_('Global')}">
     <h1 class="logo">
-      <a href="${marketing_link('ROOT')}">
+      <a href="http://fasttrac.org">
         <%block name="navigation_logo">
             <img src="${static.url(branding_api.get_logo_url())}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
         </%block>
