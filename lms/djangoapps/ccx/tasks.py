@@ -70,7 +70,7 @@ def send_emails():
     ccx_max_date = datetime.combine(yesterday, time.max)
 
     ccxs = CustomCourseForEdX.objects.filter(end_date__range=(ccx_min_date, ccx_max_date))
-    students = [enrollment.user for enrollment in ccx.students for ccx in ccxs]
+    students = [student.user for ccx in ccxs for student in ccx.students]
 
     student_emails = [{'email': student.email, 'name': student.profile.name, 'type': 'to'} for student in students]
 
