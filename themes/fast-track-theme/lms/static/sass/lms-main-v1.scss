@@ -328,17 +328,14 @@ $link-color: #6f6f6f;
     }
 
     .course-info {
-      height: 156px;
+      height: 186px;
+      padding-top: 10px;
 
       .affiliate-name {
         margin-left: 12px;
         margin-bottom: 8px;
         padding-right: 8px;
         color: $ft-font-menu-color;
-
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
       }
 
       .course-name {
@@ -347,9 +344,6 @@ $link-color: #6f6f6f;
         letter-spacing: 0 !important;
         margin-left: 12px;
         text-transform: none;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
       }
 
       .course-overview {

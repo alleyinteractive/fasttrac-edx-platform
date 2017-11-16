@@ -192,6 +192,19 @@ def courses(request):
         courses = ordered_courses
         if len(courses) > 0:
             user_messages.append('Courses are sorted by the distance!')
+    else:
+        ordered_ccxs = sorted(ccxs, key=lambda ccx: ccx.time)
+        ordered_courses = []
+
+        master_courses = [course for course in list(courses) if not unicode(course.id).startswith('ccx-')]
+
+        for ccx in ordered_ccxs:
+            for course in courses:
+                if str(course.id) == str(ccx.ccx_course_id):
+                    ordered_courses.append(course)
+                    break
+
+        courses = master_courses + ordered_courses
 
     return render_to_response(
         "courseware/courses.html",

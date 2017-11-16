@@ -20,37 +20,34 @@ from affiliates.models import AffiliateMembership
             % else:
               <img src="${course.course_image_url}" alt="${course.display_name}" />
             % endif
-            <div class="course-date-wrapper" aria-hidden="true">
-                <p class=course-date>
-                  Start date:
-                  % if ccx:
-                    ${ccx.time.strftime("%B %d, %Y")}
-                  % else:
-                    ${course.start.strftime("%B %d, %Y")}
-                  % endif
-                </p>
-            </div>
         </header>
         <section class="course-info" aria-hidden="true">
             % if ccx:
-              <h3 title="${ccx.coach.profile.affiliate.name}" class="affiliate-name">
+              % if len(ccx.coach.profile.affiliate.name) > 50:
+                <h3 title="${ccx.coach.profile.affiliate.name}" class="affiliate-name">
+                  ${ccx.coach.profile.affiliate.name[0:48]}...
+                </h3>
+              % else:
+                <h3 title="${ccx.coach.profile.affiliate.name}" class="affiliate-name">
                   ${ccx.coach.profile.affiliate.name}
-              </h3>
-              % if len(ccx.display_name) > 28:
+                </h3>
+              % endif
+
+              % if len(ccx.display_name) > 64:
                 <h2 title="${ccx.display_name}" class="course-name">
-                  ${ccx.display_name}
+                  ${ccx.display_name[0:62]}...
                 </h2>
-                % else:
+              % else:
                 <h2 class="course-name">
                   ${ccx.display_name}
                 </h2>
               % endif
             % else:
-              % if len(course.display_name) > 25:
+              % if len(course.display_name) > 64:
                 <h2 title="${course.display_name}" class="course-name">
-                    ${course.display_name}
+                    ${course.display_name[0:62]}...
                 </h2>
-                % else:
+              % else:
                 <h2 class="course-name">
                   ${course.display_name}
                 </h2>
@@ -58,10 +55,11 @@ from affiliates.models import AffiliateMembership
             % endif
             <p class="course-overview">
                 % if ccx:
-                  % if len(ccx.course_description) > 120:
-                    <span title="${ccx.course_description}">${ccx.course_description[:120] + '...'}</span>
+                  Start date:
+                  % if ccx:
+                    ${ccx.time.strftime("%B %d, %Y")}
                   % else:
-                      <span>${ccx.course_description}</span>
+                    ${course.start.strftime("%B %d, %Y")}
                   % endif
                 % endif
             </p>
