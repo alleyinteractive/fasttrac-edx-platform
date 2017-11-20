@@ -4,7 +4,7 @@ from lms import CELERY_APP
 from instructor_task.tasks_helper import upload_csv_to_report_store
 from django.conf import settings
 from lms.djangoapps.ccx.models import CustomCourseForEdX
-from student.models import UserProfile
+from student.models import UserProfile, CourseEnrollment, CourseAccessRole
 from .models import AffiliateEntity
 from lms.djangoapps.ccx.views import get_ccx_schedule
 from courseware.models import StudentModule, StudentTimeTracker
@@ -131,6 +131,84 @@ def export_csv_course_report(time_report=True):
     fasttrac_course_units_length = len(header_columns) - header_index_padding
 
     rows = [header_columns]
+
+    # here goes FT master course
+    non_student_user_ids = CourseAccessRole.objects.filter(
+        course_id=fasttrac_course.id).values_list('user_id', flat=True)
+    student_enrollments = CourseEnrollment.objects.filter(
+        course_id=fasttrac_course.id, is_active=True).exclude(user_id__in=non_student_user_ids)
+    students = [enrollment.user for enrollment in student_enrollments]
+
+    student_time_tracker = StudentTimeTracker.objects.filter(
+        course_id=fasttrac_course.id)
+    student_modules = StudentModule.objects.filter(course_id=fasttrac_course.id)
+
+
+
+    # for each student create empty CSV row
+    student_data = {}
+
+    for student in students:
+        student_id = unicode(student.id)
+        student_data[student_id] = ['/'] * fasttrac_course_units_length
+
+    for section in fasttrac_course.get_children():
+        for subsection in section.get_children():
+            for unit in subsection.get_children():
+                location = unit.location
+
+                for student in students:
+                        student_id = unicode(student.id)
+
+                        try:
+                            column_name = "{} - {} - {}".format(
+                                section.display_name, subsection.display_name, unit.display_name)
+                            unit_index = header_columns.index(
+                                column_name) - header_index_padding
+                        except IndexError:
+                            continue
+
+                        unit_data = '-'
+
+                        # if we are generating a time spent on unit report
+                        if time_report:
+                            # get time tracker object
+                            tracker = student_time_tracker.filter(
+                                unit_location=location, student=student).first()
+
+                            if tracker:
+                                unit_data = tracker.time_duration / 1000
+
+                        # if we are generating a course completion report
+                        else:
+                            for xblock in unit.get_children():
+                                module = student_modules.filter(
+                                    module_state_key=xblock.location, student=student).first()
+                                if module and ('done' in module.state or 'helpful' in module.state):
+                                    module_state = json.loads(module.state)
+
+                                    if module_state.get('done'):
+                                        unit_data = 'done'
+                                    elif module_state.get('helpful') != None:
+                                        if module_state.get('helpful') == 'true':
+                                            unit_data = 'helpful'
+                                        else:
+                                            unit_data = 'not helpful'
+
+                        student_data[student_id][unit_index] = unit_data
+
+    for student_id in student_data:
+        if student_data.get(student_id):
+            student = filter(lambda s: unicode(
+                s.id) == student_id, students)[0]
+
+            student_data[student_id].insert(0, fasttrac_course.display_name)
+            student_data[student_id].insert(0, fasttrac_course.id)
+            student_data[student_id].insert(0, student.email)
+            student_data[student_id].insert(0, student.username)
+
+            rows.append(student_data[student_id])
+    # end master course
 
     for ccx in ccxs:
         # we need these values for converting unit and xblock location keys

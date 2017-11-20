@@ -3021,4 +3021,4 @@ COURSE_DISCOVERY_MEANINGS = {
     },
 }
 
-FASTTRAC_COURSE_KEY = 'course-v1:edX+DemoX+Demo_Course'
+FASTTRAC_COURSE_KEY = 'course-v1:nv+nv+2017_T1'
