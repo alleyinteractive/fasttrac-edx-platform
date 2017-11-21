@@ -960,6 +960,12 @@ class EnrollStaffView(View):
 
 
 @ensure_csrf_cookie
+@login_required
+def student_course_about(request, course_id):
+    return course_about(request, course_id)
+
+
+@ensure_csrf_cookie
 @cache_if_anonymous()
 def course_about(request, course_id):
     """
