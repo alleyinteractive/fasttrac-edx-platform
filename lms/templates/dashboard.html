@@ -94,8 +94,9 @@ from openedx.core.djangolib.markup import HTML, Text
           <ul class="listing-courses">
             <% share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}) %>
             % for dashboard_index, enrollment in enumerate(course_enrollments):
+              <% enrollment_ccx = CustomCourseForEdX.objects.get(pk=enrollment.course.id.ccx) if hasattr(enrollment.course.id, 'ccx') else None %>
 
-              % if not hasattr(enrollment.course.id, 'ccx') or CustomCourseForEdX.objects.get(pk=enrollment.course.id.ccx).end_date >= datetime.datetime.now(UTC()):
+              % if not hasattr(enrollment.course.id, 'ccx') or (not enrollment_ccx.end_date or enrollment_ccx.end_date >= datetime.datetime.now(UTC())):
                 <% show_courseware_link = (enrollment.course_id in show_courseware_links_for) %>
                 <% cert_status = cert_statuses.get(enrollment.course_id) %>
                 <% can_unenroll = (not cert_status) or cert_status.get('can_unenroll') %>
@@ -121,8 +122,12 @@ from openedx.core.djangolib.markup import HTML, Text
           <ul class="listing-courses">
             <% share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}) %>
 
+
+
             % for dashboard_index, enrollment in enumerate(course_enrollments):
-               % if hasattr(enrollment.course.id, 'ccx') and CustomCourseForEdX.objects.get(pk=enrollment.course.id.ccx).end_date < datetime.datetime.now(UTC()):
+              <% enrollment_ccx = CustomCourseForEdX.objects.get(pk=enrollment.course.id.ccx) if hasattr(enrollment.course.id, 'ccx') else None %>
+
+              % if enrollment_ccx and enrollment_ccx.end_date and enrollment_ccx.end_date < datetime.datetime.now(UTC()):
                 <% show_courseware_link = (enrollment.course_id in show_courseware_links_for) %>
                 <% cert_status = cert_statuses.get(enrollment.course_id) %>
                 <% can_unenroll = (not cert_status) or cert_status.get('can_unenroll') %>
