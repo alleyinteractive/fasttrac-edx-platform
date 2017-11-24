@@ -46,6 +46,42 @@ site_status_msg = get_site_status_msg(course_id)
 </div>
 % endif
 </%block>
+
+  <style>
+    @media (max-width: 1024px) {
+      .header-global h1.logo img {
+        max-height: 26px;
+      }
+
+      .header-global .right .ft-header-item {
+        padding-right: 10px;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .header-global h1.logo img {
+        max-height: 38px;
+        margin-top: 10px;
+      }
+
+      .header-global .right {
+        position: relative;
+        right: 0;
+      }
+
+      .header-global .right .ft-header-item {
+        display: inline-block;
+        padding: 0 0 10px;
+        width: 48%;
+      }
+
+      #content {
+        margin-top: 100px;
+      }
+    }
+
+  </style>
+
   <header id="global-navigation" class="header-global ${"slim" if course else ""}" >
     <nav class="wrapper-header" aria-label="${_('Global')}">
     <h1 class="logo">
