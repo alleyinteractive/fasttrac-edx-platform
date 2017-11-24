@@ -4,6 +4,44 @@
 
 <%block name="pagetitle">Explore Affiliates</%block>
 
+<style>
+  .toggle-filter-visibility {
+    display: none;
+    float: right;
+    margin-right: 3px;
+  }
+
+  @media screen and (max-width: 660px) {
+    .sidebar-body {
+      display: none;
+    }
+
+    .affiliate-sidebar, .affiliate-content {
+      width: 100%;
+    }
+
+    h1.explore-header {
+      margin-top: 3rem;
+    }
+
+    .affiliate-content ul, h1.explore-header {
+      padding-left: 1rem;
+    }
+
+    .toggle-filter-visibility {
+      display: inline;
+    }
+  }
+</style>
+
+<script>
+  $(document).ready(function () {
+    $('.toggle-filter-visibility').on('click', function () {
+      $('.sidebar-body').slideToggle();
+    })
+  })
+</script>
+
 <section class="container explore-affiliates">
   <script type="text/javascript">
     $(document).ready(function() {
@@ -14,6 +52,10 @@
   <div class="affiliate-sidebar">
     <div class="header">
       Refine List
+      <a href="#" class="toggle-filter-visibility">
+        <i class="fa fa-search"></i>
+        Toggle filter
+      </a>
     </div>
 
     <div class="sidebar-body">

@@ -13,10 +13,54 @@
 
 <%block name="pagetitle">${_("Courses")}</%block>
 
+<style>
+  .toggle-filter-visibility {
+    display: none;
+    float: right;
+    margin-top: -20px;
+    margin-right: 3px;
+  }
+
+  @media screen and (max-width: 660px) {
+    .find-courses, .search-facets {
+      display: block;
+      width: 100%;
+    }
+
+    .find-courses {
+      padding-left: 1rem;
+    }
+
+    .search-facets-lists {
+      display: none;
+    }
+
+    .toggle-filter-visibility {
+      display: inline;
+    }
+
+    h1.explore-header {
+      margin-top: 3.5rem;
+    }
+  }
+</style>
+
+<script>
+  $(document).ready(function () {
+    $('.toggle-filter-visibility').on('click', function () {
+      $('.search-facets-lists').slideToggle();
+    })
+  })
+</script>
+
 <main id="main" class="explore-courses" aria-label="Content" tabindex="-1">
   <div aria-label="${_('Refine Your Search')}" class="search-facets">
     <div class="header-search-facets-wrapper">
       <h2 class="header-search-facets">${_('Refine Course List')}</h2>
+      <a href="#" class="toggle-filter-visibility">
+        <i class="fa fa-search"></i>
+        Toggle filter
+      </a>
     </div>
     <div class="search-facets-lists">
       <a href="/courses" class="clear-all"> <span class="fa fa-remove"></span> Clear All</a>
