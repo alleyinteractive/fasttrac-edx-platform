@@ -56,6 +56,10 @@ site_status_msg = get_site_status_msg(course_id)
       .header-global .right .ft-header-item {
         padding-right: 10px;
       }
+
+      .ft-card {
+        width: 100%;
+      }
     }
 
     @media (max-width: 680px) {
@@ -77,12 +81,34 @@ site_status_msg = get_site_status_msg(course_id)
 
       #content {
         margin-top: 100px;
+        width: 100%;
+        max-width: 400px;
+        margin-left: 0px;
+      }
+
+      .sidebar-ft, .container.loaded {
+        display: block;
+        width: 100%;
+        margin: 0;
+      }
+
+      .view-course-info #main .container {
+        width: 100%;
+      }
+
+      body.view-in-course .window-wrap {
+        min-width: 400px;
+        max-width: 400px;
+      }
+
+      .ft-card {
+        width: 100%;
       }
     }
 
   </style>
 
-  <header id="global-navigation" class="header-global ${"slim" if course else ""}" >
+  <header id="global-navigation" class="header-global" >
     <nav class="wrapper-header" aria-label="${_('Global')}">
     <h1 class="logo">
       % if user.is_anonymous():
