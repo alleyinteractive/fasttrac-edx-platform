@@ -117,6 +117,27 @@ ${HTML(fragment.foot_html())}
     });
 </script>
 
+<style>
+    @media (max-width: 680px) {
+        .course-wrapper .course-content {
+            padding: 20px 0 40px 0;
+        }
+
+        .course-wrapper .xblock-student_view.xblock-student_view-sequential.xblock-initialized {
+            padding: 0;
+        }
+
+        body.view-in-course div.course-wrapper .sequence {
+            padding: 10px 30px 0 3px;
+        }
+
+        .sequence-nav-button.button-previous,
+        .sequence-nav-button.button-next {
+            display: none !important;
+        }
+    }
+</style>
+
 <div class="container">
 % if disable_accordion is UNDEFINED or not disable_accordion:
     <div class="course-index">
