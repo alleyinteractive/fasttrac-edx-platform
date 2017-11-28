@@ -135,8 +135,38 @@ ${HTML(fragment.foot_html())}
         .sequence-nav-button.button-next {
             display: none !important;
         }
+
+        /* responsive content */
+        body.view-in-course .element-title {
+            margin: 0;
+            line-height: 1.4em !important;
+        }
+
+        body.view-in-course .element-title span {
+            width: 100%;
+            line-height: 1.4em !important;
+        }
+
+        body.view-in-course div.course-wrapper,
+        .element-title span::before,
+        .element-title span::after {
+            display: none;
+        }
+
+        body.view-in-course div.course-wrapper.extended {
+            display: inline-block;
+        }
     }
 </style>
+
+<script>
+    // hide sidebar on mobile devices
+    $(document).ready(function () {
+        if(window.innerWidth < 680) {
+            toggleSidebar();
+        }
+    })
+</script>
 
 <div class="container">
 % if disable_accordion is UNDEFINED or not disable_accordion:
@@ -268,9 +298,7 @@ ${HTML(fragment.foot_html())}
             $('.course-material').toggleClass('with-sidebar');
 
             if($('div.course-index').hasClass('retracted')) {
-                setTimeout(function() {
-                    $('body.view-in-course .course-wrapper').toggleClass('extended');
-                }, 400);
+                $('body.view-in-course .course-wrapper').toggleClass('extended');
             } else {
                 $('body.view-in-course .course-wrapper').toggleClass('extended');
             }
