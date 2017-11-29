@@ -52,6 +52,9 @@ site_status_msg = get_site_status_msg(course_id)
       display: none;
     }
 
+    .sign-in-button-container {
+      margin-top: -5px;
+    }
 
     @media (max-width: 1024px) {
       .header-global h1.logo img {
@@ -141,6 +144,23 @@ site_status_msg = get_site_status_msg(course_id)
       .dashboard .my-courses .wrapper-header-courses .header-courses {
         margin-left: 1rem;
       }
+
+      .sign-in-button-container {
+        float: left !important;
+        margin-top: 5px;
+        margin-bottom: 5px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-global h1.logo img {
+        max-height: 30px;
+        margin-top: 8px;
+      }
+
+      .toggle-nav-button {
+        font-size: 20px;
+      }
     }
   </style>
 
@@ -224,21 +244,6 @@ site_status_msg = get_site_status_msg(course_id)
         </ol>
       % endif
     % else:
-
-      <ol class="right nav-courseware list-inline">
-        <%block name="navigation_sign_in">
-          <li class="item nav-courseware-01">
-            % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
-              % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-                <a class="btn btn-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
-              % else:
-                <a class="btn btn-login" href="/login${login_query()}">${_("Sign in")}</a>
-              % endif
-            % endif
-          </li>
-        </%block>
-      </ol>
-
       <ol class="left list-inline nav-global">
         <%block name="navigation_global_links">
           % if static.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
@@ -270,6 +275,11 @@ site_status_msg = get_site_status_msg(course_id)
                 <a class="btn-neutral" href="/register${login_query()}">${_("Register")}</a>
               </li>
             % endif
+            <span class="sign-in-button-container nav-courseware">
+              <li class="item nav-global-05">
+                <a class="btn btn-login" href="/login${login_query()}">${_("Sign in")}</a>
+              </li>
+            </span>
           % endif
         </%block>
       </ol>
