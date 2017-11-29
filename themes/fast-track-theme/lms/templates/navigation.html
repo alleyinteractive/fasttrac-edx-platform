@@ -48,6 +48,11 @@ site_status_msg = get_site_status_msg(course_id)
 </%block>
 
   <style>
+    .toggle-nav-button {
+      display: none;
+    }
+
+
     @media (max-width: 1024px) {
       .header-global h1.logo img {
         max-height: 26px;
@@ -63,6 +68,10 @@ site_status_msg = get_site_status_msg(course_id)
     }
 
     @media (max-width: 680px) {
+      .header-global, .header-global .wrapper-header {
+        height: auto;
+      }
+
       .header-global h1.logo img {
         max-height: 38px;
         margin-top: 10px;
@@ -75,12 +84,18 @@ site_status_msg = get_site_status_msg(course_id)
 
       .header-global .right .ft-header-item {
         display: inline-block;
-        padding: 0 0 10px;
+        padding: 0 0 15px;
         width: 48%;
       }
 
+      .header-global .right .ft-header-item::before {
+        content: ">";
+        display: inline;
+        color: #b5b5b5;
+        font-weight: 500;
+      }
+
       #content {
-        margin-top: 100px;
         width: 100%;
         max-width: 400px;
         margin-left: 0px;
@@ -105,21 +120,52 @@ site_status_msg = get_site_status_msg(course_id)
       .ft-card {
         width: 100%;
       }
-    }
 
+      .header-global h1.logo {
+        z-index: 10;
+      }
+
+      .header-global .right {
+        display: none;
+      }
+
+      .header-global h1.logo a,
+      .toggle-nav-button {
+        display: inline-block;
+      }
+
+      .dashboard {
+        padding: 20px 0 20px 0;
+      }
+
+      .dashboard .my-courses .wrapper-header-courses .header-courses {
+        margin-left: 1rem;
+      }
+    }
   </style>
+
+  <script>
+    $(document).ready(function(){
+      $('.toggle-nav-button').on('click', function () {
+        $('.right').fadeToggle();
+      })
+    })
+  </script>
 
   <header id="global-navigation" class="header-global" >
     <nav class="wrapper-header" aria-label="${_('Global')}">
     <h1 class="logo">
+      <div class="toggle-nav-button">
+        <i class="fa fa-bars"></i>
+      </div>
       % if user.is_anonymous():
         <a href="http://fasttrac.org">
       % else:
         <a href="/">
       % endif
-        <%block name="navigation_logo">
-            <img src="${static.url(branding_api.get_logo_url())}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
-        </%block>
+      <%block name="navigation_logo">
+        <img src="${static.url(branding_api.get_logo_url())}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
+      </%block>
       </a>
     </h1>
       % if user.is_authenticated():
