@@ -48,11 +48,15 @@ site_status_msg = get_site_status_msg(course_id)
 </%block>
 
   <style>
+    .courses-container .courses .courses-listing .courses-listing-item {
+      vertical-align: top;
+    }
+
     .toggle-nav-button {
       display: none;
     }
 
-    .sign-in-button-container {
+    .header-global .nav-courseware.sign-in-button-container {
       margin-top: -5px;
     }
 
@@ -145,7 +149,7 @@ site_status_msg = get_site_status_msg(course_id)
         margin-left: 1rem;
       }
 
-      .sign-in-button-container {
+      .header-global .nav-courseware.sign-in-button-container {
         float: left !important;
         margin-top: 5px;
         margin-bottom: 5px;
