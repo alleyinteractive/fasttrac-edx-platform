@@ -157,16 +157,56 @@ ${HTML(fragment.foot_html())}
             display: inline-block;
         }
     }
+
+    .scroll-to-top {
+        display: none;
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        width: 50px;
+        height: 50px;
+        border-radius: 25px;
+        background-color: #aaa;
+        z-index: 1;
+        line-height: 3rem;
+        text-align: center;
+        cursor: pointer;
+        box-shadow: 1px 1px 5px #777;
+    }
+
+    .scroll-to-top .fa {
+        color: white;
+    }
 </style>
 
 <script>
-    // hide sidebar on mobile devices
     $(document).ready(function () {
+        // hide sidebar on mobile devices
         if(window.innerWidth < 680) {
             toggleSidebar();
         }
+
+        // set up scroll to top functionality
+        $(window).on('scroll', function () {
+            if($(window).scrollTop() > 50) {
+                $('.scroll-to-top').fadeIn();
+            }
+            else {
+                $('.scroll-to-top').fadeOut();
+            }
+        })
+
+        $('.scroll-to-top').on('click', function scrollToTop() {
+            if ($(window).scrollTop() != 0) {
+                $(window).animate({ scrollTop: 0 }, 500);
+            }
+        });
     })
 </script>
+
+<div class="scroll-to-top">
+    <i class="fa fa-chevron-up"></i>
+</div>
 
 <div class="container">
 % if disable_accordion is UNDEFINED or not disable_accordion:
