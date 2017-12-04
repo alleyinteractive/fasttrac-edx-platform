@@ -136,18 +136,6 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
           <% time_zone = get_user_time_zone(user) %>
           % if is_ccx:
               ${enrollment.time.strftime("%B %d, %Y")}
-          % else:
-              % if course_overview.has_ended():
-                ${_("Ended - {end_date}").format(end_date=course_overview.end_datetime_text("SHORT_DATE", time_zone))}
-              % elif course_overview.has_started():
-                ${_("Started - {start_date}").format(start_date=course_overview.start_datetime_text("SHORT_DATE", time_zone))}
-              % elif course_overview.start_date_is_still_default: # Course start date TBD
-                ${_("Coming Soon")}
-              % elif course_overview.starts_within(days=5):   # hasn't started yet
-                ${_("Starts - {start_date}").format(start_date=course_overview.start_datetime_text("DAY_AND_TIME", time_zone))}
-              % else:   # hasn't started yet
-                ${_("Starts - {start_date}").format(start_date=course_overview.start_datetime_text("SHORT_DATE", time_zone))}
-              % endif
           % endif
           </span>
           <span class="info-author">
