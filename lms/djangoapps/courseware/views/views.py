@@ -251,7 +251,7 @@ def build_ccx_filters(request):
 
         filters['location_latitude__range'] = latitude_boundaries
         filters['location_longitude__range'] = longitude_boundaries
-        filters['delivery_mode'] = CustomCourseForEdX.IN_PERSON
+        # filters['delivery_mode'] = CustomCourseForEdX.IN_PERSON
         filter_fields = []
     else:
         filter_fields = ['location_city', 'location_state', 'delivery_mode']
