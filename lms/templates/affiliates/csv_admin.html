@@ -32,12 +32,6 @@
 </style>
 
 <section class="container">
-  <script type="text/javascript">
-    $(document).ready(function() {
-      $('.wrapper-footer').addClass('fixed-footer')
-    })
-  </script>
-
   % if messages:
     % for message in messages:
       <p class="flash-message">${message}</p>

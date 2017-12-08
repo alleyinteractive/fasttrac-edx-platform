@@ -43,8 +43,6 @@ from openedx.core.djangolib.markup import HTML, Text
   }
 
   $(document).ready(function() {
-    $('.wrapper-footer').addClass('fixed-footer')
-
     $('#bookmarkedFilter, #recentlyViewedFilter').on('click', function(event){
       $(event.target).toggleClass('active');
       setTimeout(handleSearch, 1000);
