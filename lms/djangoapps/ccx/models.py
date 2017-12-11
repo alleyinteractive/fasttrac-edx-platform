@@ -36,9 +36,11 @@ class CustomCourseForEdX(models.Model):
     """
     IN_PERSON = 'IN_PERSON'
     ONLINE_ONLY = 'ONLINE_ONLY'
+    BLENDED = 'BLENDED'
     DELIVERY_MODE_CHOICES = (
         (IN_PERSON, 'In-Person'),
         (ONLINE_ONLY, 'Online'),
+        (BLENDED, 'Blended'),
     )
 
     PRIVATE = 'PRIVATE'

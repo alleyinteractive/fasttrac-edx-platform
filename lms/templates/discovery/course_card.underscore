@@ -32,6 +32,9 @@
                 <% if (course.slice(0,3) === 'ccx' && delivery_mode && delivery_mode.match('\\bIn Person\\b')) { %>
                     <i class="fa fa-users"></i>
                     In-Person
+                <% else if (course.slice(0,3) === 'ccx' && delivery_mode && delivery_mode.match('\\bBlended\\b')) { %>
+                    <i class="fa fa-retweet"></i>
+                    Blended
                 <% } else { %>
                     <i class="fa fa-globe"></i>
                     Online

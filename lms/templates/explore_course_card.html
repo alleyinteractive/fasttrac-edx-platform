@@ -68,6 +68,9 @@ from affiliates.models import AffiliateMembership
                   % if ccx and ccx.delivery_mode == CustomCourseForEdX.IN_PERSON:
                       <i class="fa fa-users"></i>
                       In-Person
+                  % if ccx and ccx.delivery_mode == CustomCourseForEdX.BLENDED:
+                      <i class="fa fa-retweet"></i>
+                      In-Person
                   % else:
                       <i class="fa fa-globe"></i>
                       Online

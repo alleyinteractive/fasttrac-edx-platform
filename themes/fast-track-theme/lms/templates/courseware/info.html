@@ -90,7 +90,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
             </div>
             <div>
               <b>Meeting Location:</b>
-              % if ccx.delivery_mode == CustomCourseForEdX.IN_PERSON:
+              % if ccx.delivery_mode == CustomCourseForEdX.IN_PERSON or ccx.delivery_mode == CustomCourseForEdX.BLENDED:
                 ${'{}, {} {}'.format(ccx.location_city or '', ccx.location_state or '', ccx.location_postal_code or '')}
               % else:
                 Online
