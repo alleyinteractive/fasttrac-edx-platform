@@ -384,6 +384,7 @@ h1.explore-header {
       width: 40%;
       vertical-align: bottom;
       padding: .4rem;
+      margin-bottom: 1rem;
     }
 
     #add_member_submit {
@@ -395,7 +396,8 @@ h1.explore-header {
   }
 
 
-  #affiliate_membership_table {
+
+  #affiliate_membership_table, #affiliate_invites_table {
     width: 100%;
     margin: 2rem 0;
 

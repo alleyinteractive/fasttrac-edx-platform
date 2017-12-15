@@ -625,6 +625,25 @@ def enroll_user_into_default_course(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=UserProfile)
+def enroll_user_into_default_course(sender, instance, created, **kwargs):
+    """
+    Check and add member to affiliate entity.
+
+    """
+    if created:
+        from affiliates.models import AffiliateInvite, AffiliateMembership
+
+        invite = AffiliateInvite.objects.filter(email=instance.user.email).first()
+
+        if invite:
+            AffiliateMembership.objects.create(
+                affiliate=invite.affiliate,
+                role=invite.role,
+                member=instance.user
+            )
+
+
+@receiver(post_save, sender=UserProfile)
 def add_user_to_mailchimp(sender, instance, **kwargs):
     """
     Add user to FastTrac Mailchimp list.

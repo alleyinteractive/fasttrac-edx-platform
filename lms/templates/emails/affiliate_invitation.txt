@@ -1,0 +1,9 @@
+Hello - you have been added to the {{ affiliate_name }} affiliate as a {{ role }}.
+
+Click here to register and get started: http://{{ site_name }}/register
+
+If you have any questions, or aren't sure why you're receiving this email, please don't hesitate to contact us at info@fasttrac.org.
+
+
+Thank you,
+The FastTrac Team

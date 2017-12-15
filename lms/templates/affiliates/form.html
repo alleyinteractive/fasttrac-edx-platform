@@ -50,6 +50,8 @@
         <input type="submit" value="Add" id="add_member_submit" />
       </form>
 
+
+      <h2>Affiliate Users</h2>
       <table id="affiliate_membership_table">
         <thead>
           <th>Name</th>
@@ -72,6 +74,32 @@
               % endif
             </td>
           </tr>
+        % endfor
+      </table>
+
+      <h2>Invited Users</h2>
+      <table id="affiliate_invites_table">
+        <thead>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Invited At</th>
+          <th></th>
+        </thead>
+        % for invite in affiliate.invites:
+        <tr>
+          <td>${invite.email}</td>
+          <td>${invite.get_role_display()}</td>
+          <td>${invite.invited_at.strftime("%B %d, %Y")}</td>
+          <td>
+            % if (membership.role == 'staff' and user.is_staff) or membership.role != 'staff':
+            <!-- only global staff can add/remove program directors -->
+            <a href="${affiliate.slug}/remove_invite/${invite.id}">
+              <i class="fa fa-times"></i>
+              Remove Invite
+            </a>
+            % endif
+          </td>
+        </tr>
         % endfor
       </table>
     </div>

@@ -125,6 +125,10 @@ class AffiliateEntity(models.Model):
         return AffiliateMembership.objects.filter(affiliate=self)
 
     @property
+    def invites(self):
+        return AffiliateInvite.objects.filter(affiliate=self)
+
+    @property
     def courses(self):
         return CustomCourseForEdX.objects.filter(coach__in=self.members.all())
 
@@ -170,6 +174,14 @@ class AffiliateMembership(models.Model):
     def find_by_user(self, user):
         return self.objects.get(member=user)
 
+class AffiliateInvite(models.Model):
+    email = models.CharField(max_length=255)
+    role = models.CharField(choices=AffiliateMembership.role_choices, max_length=255)
+    affiliate = models.ForeignKey(AffiliateEntity, on_delete=models.CASCADE)
+
+    invited_by = models.ForeignKey(User)
+    invited_at = models.DateTimeField(auto_now=True)
+
 
 def update_mailchimp_interest(affiliate_membership, value):
     mailchimp_api_key = settings.MAILCHIMP_API_KEY
@@ -202,6 +214,26 @@ def update_mailchimp_interest(affiliate_membership, value):
             print('Affiliate membership update error')
             print(r.content)
 
+
+@receiver(post_save, sender=AffiliateInvite, dispatch_uid="send_invite_email")
+def send_invite_email(sender, instance, created, **kwargs):
+    if created:
+        from django.core.mail import send_mail
+        from django.template import loader
+
+
+        context = {
+            'site_name': settings.SITE_NAME,
+            'role': instance.get_role_display(),
+            'affiliate_name': instance.affiliate.name
+        }
+
+        from_address = settings.DEFAULT_FROM_EMAIL
+        subject = 'FastTrac Affiliate Invite'
+        message = loader.render_to_string('emails/affiliate_invitation.txt', context)
+
+        send_mail(subject, message, from_address, [
+                    instance.email], fail_silently=False)
 
 @receiver(post_save, sender=AffiliateMembership, dispatch_uid="add_mailchimp_interests")
 def add_mailchimp_interests(sender, instance, **kwargs):

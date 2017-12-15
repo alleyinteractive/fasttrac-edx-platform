@@ -9,7 +9,7 @@ from lms.envs.common import STATE_CHOICES
 from django_countries import countries
 from edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.ccx.models import CustomCourseForEdX
-from .models import AffiliateEntity, AffiliateMembership
+from .models import AffiliateEntity, AffiliateMembership, AffiliateInvite
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
@@ -225,6 +225,7 @@ def payment(request):
 def add_member(request, slug):
     member_identifier = request.POST.get('member_identifier')
     role = request.POST.get('role')
+    affiliate = AffiliateEntity.objects.get(slug=slug)
 
     if role == 'staff' and not request.user.is_staff:
         messages.add_message(request, messages.INFO, 'You are not allowed to do that.')
@@ -233,11 +234,14 @@ def add_member(request, slug):
     try:
         member = get_student_from_identifier(member_identifier)
     except ObjectDoesNotExist:
-        messages.add_message(request, messages.INFO, 'User "{}" does not exist.'.format(member_identifier))
+        # create a user invite if the user does not exist
+        invite_new_user(affiliate, member_identifier, role, request.user)
+
+        messages.add_message(request, messages.INFO, 'User "{}" does not exist. They will be invited.'.format(member_identifier))
         return redirect('affiliates:edit', slug=slug)
 
     params = {
-        'affiliate': AffiliateEntity.objects.get(slug=slug),
+        'affiliate': affiliate,
         'member': member,
         'role': role,
     }
@@ -270,6 +274,16 @@ def remove_member(request, slug, member_id):
 
 
 @only_staff
+def remove_invite(request, slug, invite_id):
+    try:
+        AffiliateInvite.objects.get(id=invite_id).delete()
+    except ValueError as e:
+        messages.add_message(request, messages.INFO, e)
+
+    return redirect('affiliates:edit', slug=slug)
+
+
+@only_staff
 def toggle_active_status(request, slug):
     affiliate = AffiliateEntity.objects.select_for_update().get(slug=slug)
     affiliate.active = not affiliate.active
@@ -283,3 +297,7 @@ def is_program_director(user, affiliate):
         return False
     else:
         return user.is_staff or AffiliateMembership.objects.filter(member=user, affiliate=affiliate, role='staff').exists()
+
+
+def invite_new_user(affiliate, user_email, role, current_user):
+    AffiliateInvite.objects.create(affiliate=affiliate, email=user_email, role=role, invited_by=current_user)
