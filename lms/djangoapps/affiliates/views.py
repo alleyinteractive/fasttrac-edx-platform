@@ -76,12 +76,12 @@ def csv_export(request):
 
 
 def index(request):
-    affiliate_id = request.POST.get('affiliate_id', '')
-    affiliate_city = request.POST.get('affiliate_city', '')
-    affiliate_state = request.POST.get('affiliate_state', '')
-    location_latitude = request.POST.get('latitude', '')
-    location_longitude = request.POST.get('longitude', '')
-    search_radius = request.POST.get('affiliate_search_radius', '')
+    affiliate_id = request.GET.get('affiliate_id', '')
+    affiliate_city = request.GET.get('affiliate_city', '')
+    affiliate_state = request.GET.get('affiliate_state', '')
+    location_latitude = request.GET.get('latitude', '')
+    location_longitude = request.GET.get('longitude', '')
+    search_radius = request.GET.get('affiliate_search_radius', '')
     user_messages = []
 
     if not affiliate_id:

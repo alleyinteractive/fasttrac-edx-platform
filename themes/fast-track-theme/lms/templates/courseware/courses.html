@@ -65,7 +65,7 @@
     <div class="search-facets-lists">
       <a href="/courses" class="clear-all"> <span class="fa fa-remove"></span> Clear All</a>
       <br>
-      <form class="course-filter-form" action="/courses" method="POST">
+      <form class="course-filter-form" action="/courses" method="GET">
         <h3 class="header-facet">
           <i class="fa fa-calendar"></i>
           START DATE
@@ -152,8 +152,6 @@
             <input type="hidden" name="affiliate_id" class="affiliate_typeahead_id">
           </li>
         </ul>
-
-        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
 
         <button>
           SUBMIT

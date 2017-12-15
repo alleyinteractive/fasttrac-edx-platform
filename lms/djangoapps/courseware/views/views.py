@@ -146,9 +146,9 @@ def courses(request):
     Render "find courses" page.
     """
     ccx_filters = build_ccx_filters(request)
-    affiliate_id = request.POST.get('affiliate_id')
-    latitude = request.POST.get('latitude', '')
-    longitude = request.POST.get('longitude', '')
+    affiliate_id = request.GET.get('affiliate_id')
+    latitude = request.GET.get('latitude', '')
+    longitude = request.GET.get('longitude', '')
     affiliates = AffiliateEntity.objects.filter(active=True).order_by('name')
     affiliates_as_json = serializers.serialize('json', affiliates, fields=('name', 'id'))
 
@@ -215,18 +215,18 @@ def courses(request):
             'state_choices': STATE_CHOICES,
             'delivery_mode_choices': CustomCourseForEdX.DELIVERY_MODE_CHOICES,
             'filter_states': ccx_filters,
-            'date_from': request.POST.get('date_from', ''),
-            'date_to': request.POST.get('date_to', ''),
+            'date_from': request.GET.get('date_from', ''),
+            'date_to': request.GET.get('date_to', ''),
             'affiliate_id': affiliate_id,
             'user_messages': user_messages
         }
     )
 
 def get_should_hide_master_course(request):
-    location_city = request.POST.get('location_city')
-    location_state = request.POST.get('location_state')
-    delivery_mode = request.POST.get('delivery_mode')
-    affiliate_id = request.POST.get('affiliate_id')
+    location_city = request.GET.get('location_city')
+    location_state = request.GET.get('location_state')
+    delivery_mode = request.GET.get('delivery_mode')
+    affiliate_id = request.GET.get('affiliate_id')
 
     # the master course needs to be hidden if
     # city isn't Kansas, state isn't Missouri
@@ -240,9 +240,13 @@ def get_should_hide_master_course(request):
 
 
 def build_ccx_filters(request):
-    search_radius = request.POST.get('location_search_radius')
-    latitude = request.POST.get('latitude', '')
-    longitude = request.POST.get('longitude', '')
+    search_radius = request.GET.get('location_search_radius')
+    latitude = request.GET.get('latitude', '')
+    longitude = request.GET.get('longitude', '')
+
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+
     filters = {}
 
     if latitude and longitude and search_radius:
@@ -251,7 +255,6 @@ def build_ccx_filters(request):
 
         filters['location_latitude__range'] = latitude_boundaries
         filters['location_longitude__range'] = longitude_boundaries
-        # filters['delivery_mode'] = CustomCourseForEdX.IN_PERSON
         filter_fields = []
     else:
         filter_fields = ['location_city', 'location_state', 'delivery_mode']
@@ -260,12 +263,9 @@ def build_ccx_filters(request):
         filters['enrollment_type'] = CustomCourseForEdX.PUBLIC
 
     for field in filter_fields:
-        value = request.POST.get(field)
+        value = request.GET.get(field)
         if value:
             filters[field] = value
-
-    date_from = request.POST.get('date_from')
-    date_to = request.POST.get('date_to')
 
     if date_from:
         filters['time__gte'] = datetime.strptime(date_from, '%m/%d/%Y')

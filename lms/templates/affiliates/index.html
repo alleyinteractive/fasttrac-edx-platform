@@ -53,7 +53,7 @@
     </div>
 
     <div class="sidebar-body">
-      <form class="affiliate-filter-form" action="/affiliates/" method="POST">
+      <form class="affiliate-filter-form" action="/affiliates/" method="GET">
         <a href="/affiliates" class="clear-all"> <span class="fa fa-remove"></span> Clear All</a>
         <div class="sidebar-filter affiliate-typeahead-wrapper">
           <div class="fa fa-user"></div>
@@ -85,7 +85,6 @@
           <input class="longitude-field" type="hidden" name="longitude">
         </div>
 
-        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
         <button id="submit-search"> Submit <span class="fa fa-arrow-right"></span></button>
       </form>
     </div>
