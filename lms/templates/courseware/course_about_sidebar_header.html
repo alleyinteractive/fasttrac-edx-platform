@@ -29,6 +29,8 @@ from django.conf import settings
         ).replace(u" ", u"+")
         tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text)
 
+        tweet_action = u"https://twitter.com/{}".format(settings.PLATFORM_TWITTER_ACCOUNT)
+
         facebook_link = static.get_value('course_about_facebook_link', settings.PLATFORM_FACEBOOK_ACCOUNT)
 
         email_subject = u"mailto:?subject={subject}&body={body}".format(
