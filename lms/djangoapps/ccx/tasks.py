@@ -104,8 +104,7 @@ def send_emails():
             "to": student_emails,
             "from_email": "info@fasttrac.org",
             "from_name": "Fasttrac",
-            "signing_domain": "fasttrac.org",
-            "subject": "You completed a FastTrac course"
+            "signing_domain": "fasttrac.org"
         }
     }
 
