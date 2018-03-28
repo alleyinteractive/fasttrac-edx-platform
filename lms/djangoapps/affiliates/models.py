@@ -121,6 +121,13 @@ class AffiliateEntity(models.Model):
             return 'https://s3-us-west-2.amazonaws.com/fasttrac-edx-prod/default_full.png'
 
     @property
+    def website_url(self):
+        if self.website.startswith('http'):
+            return self.website
+        else:
+            return 'http://{}'.format(self.website)
+
+    @property
     def memberships(self):
         return AffiliateMembership.objects.filter(affiliate=self)
 
