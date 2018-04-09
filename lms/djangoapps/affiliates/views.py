@@ -16,6 +16,8 @@ from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from .decorators import only_program_director, only_staff
 from .tasks import export_csv_user_report, export_csv_affiliate_course_report, export_csv_affiliate_report, export_csv_course_report
 from instructor_task.models import ReportStore
+import django.contrib.auth as auth
+
 
 
 @only_staff
@@ -292,6 +294,17 @@ def toggle_active_status(request, slug):
     return redirect('affiliates:edit', slug=slug)
 
 
+def login_as_user(request):
+    if request.user.is_staff:
+        user = User.objects.filter(pk=87).first()
+
+        if not hasattr(request.user, 'backend'):
+            user.backend = _get_path_of_arbitrary_backend_for_user(user)
+
+        auth.login(request, user)
+
+    return redirect('/')
+
 def is_program_director(user, affiliate):
     if user.is_anonymous():
         return False
@@ -301,3 +314,13 @@ def is_program_director(user, affiliate):
 
 def invite_new_user(affiliate, user_email, role, current_user):
     AffiliateInvite.objects.create(affiliate=affiliate, email=user_email, role=role, invited_by=current_user)
+
+
+def _get_path_of_arbitrary_backend_for_user(user):
+        """
+        Return the path to the first found authentication backend that recognizes the given user.
+        """
+        for backend_path in settings.AUTHENTICATION_BACKENDS:
+            backend = auth.load_backend(backend_path)
+            if backend.get_user(user.id):
+                return backend_path

@@ -40,6 +40,25 @@
     </a>
   </div>
 
+  <hr />
+
+  <div id="impersonate">
+    <a href="#">
+      Impersonate a user
+    </a>
+    <form action="login_as_user" method="POST" style="display: none;">
+      <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+      <input type="email" placeholder="Email of user to impersonate" />
+      <input type="submit" value="Impersonate" />
+    </form>
+  </div>
+
+  <script>
+    $('#impersonate a').on('click', function () {
+      $('#impersonate form').slideToggle();
+    });
+  </script>
+
   <div id="learner-info">
     <h1 class="explore-header">
       Learners
