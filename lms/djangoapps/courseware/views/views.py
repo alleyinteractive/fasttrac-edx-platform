@@ -146,7 +146,6 @@ def courses(request):
     Render "find courses" page.
     """
     ccx_filters = build_ccx_filters(request)
-    print ccx_filters
     affiliate_id = request.GET.get('affiliate_id')
     latitude = request.GET.get('latitude', '')
     longitude = request.GET.get('longitude', '')
