@@ -1881,15 +1881,21 @@ def _enroll_user_in_pending_courses(student):
     ceas = CourseEnrollmentAllowed.objects.filter(email=student.email)
     for cea in ceas:
         if cea.auto_enroll:
-            enrollment = CourseEnrollment.enroll(student, cea.course_id)
-            manual_enrollment_audit = ManualEnrollmentAudit.get_manual_enrollment_by_email(student.email)
-            if manual_enrollment_audit is not None:
-                # get the enrolled by user and reason from the ManualEnrollmentAudit table.
-                # then create a new ManualEnrollmentAudit table entry for the same email
-                # different transition state.
-                ManualEnrollmentAudit.create_manual_enrollment_audit(
-                    manual_enrollment_audit.enrolled_by, student.email, ALLOWEDTOENROLL_TO_ENROLLED,
-                    manual_enrollment_audit.reason, enrollment
+            try:
+                enrollment = CourseEnrollment.enroll(student, cea.course_id)
+                manual_enrollment_audit = ManualEnrollmentAudit.get_manual_enrollment_by_email(student.email)
+                if manual_enrollment_audit is not None:
+                    # get the enrolled by user and reason from the ManualEnrollmentAudit table.
+                    # then create a new ManualEnrollmentAudit table entry for the same email
+                    # different transition state.
+                    ManualEnrollmentAudit.create_manual_enrollment_audit(
+                        manual_enrollment_audit.enrolled_by, student.email, ALLOWEDTOENROLL_TO_ENROLLED,
+                        manual_enrollment_audit.reason, enrollment
+                    )
+            except Exception:
+                log.error(
+                    u'Error when trying to enroll user {0} in {1}'.format(student.email, cea.course_id),
+                    exc_info=True
                 )
 
 
