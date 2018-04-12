@@ -1059,9 +1059,8 @@ def course_about(request, course_id):
             program_director = None
         else:
             ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
-            enrollment_allowed = ccx.enrollment_type.upper() == 'PUBLIC' and not ccx.enrollment_closed()
-            can_enroll = enrollment_allowed
-            invitation_only = not enrollment_allowed # invitation_only is a negation of enrollment_allowed
+            can_enroll = ccx.enrollment_type.upper() == 'PUBLIC' and not ccx.enrollment_closed()
+            invitation_only = ccx.enrollment_type.upper() == 'PRIVATE'
             program_director = is_program_director(request.user, ccx.affiliate)
 
         is_course_full = CourseEnrollment.objects.is_course_full(course)
