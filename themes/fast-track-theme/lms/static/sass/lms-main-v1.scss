@@ -775,12 +775,19 @@ label.u-field-title {
 .messages {
   display: flex;
   flex-flow: column wrap;
+  width: 50%;
+  padding: 0;
 
   .message {
     white-space: pre-line;
 
     & .message-date {
       margin-bottom: 0;
+    }
+
+    &.error {
+      background-color: #b20610;
+      color: #fff;
     }
   }
 

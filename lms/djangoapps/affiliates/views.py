@@ -294,16 +294,20 @@ def toggle_active_status(request, slug):
     return redirect('affiliates:edit', slug=slug)
 
 
+@only_staff
 def login_as_user(request):
-    if request.user.is_staff:
-        user = User.objects.filter(pk=87).first()
-
+    email = request.POST.get('email')
+    try:
+        user = User.objects.get(email=email)
         if not hasattr(request.user, 'backend'):
             user.backend = _get_path_of_arbitrary_backend_for_user(user)
 
         auth.login(request, user)
+        return redirect('/')
+    except User.DoesNotExist:
+        messages.error(request, 'User "{}" does not exist'.format(email))
+        return redirect(request.META['HTTP_REFERER'])
 
-    return redirect('/')
 
 def is_program_director(user, affiliate):
     if user.is_anonymous():

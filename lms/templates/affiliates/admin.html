@@ -29,9 +29,11 @@
 
 <section class="container">
   % if messages:
-    % for message in messages:
-      <p>${message}</p>
-    % endfor
+    <ul class="messages">
+      % for message in messages:
+        <p class="message ${message.tags}">${message}</p>
+      % endfor
+    </ul>
   % endif
 
   <div id="csv-actions">
@@ -48,7 +50,7 @@
     </a>
     <form action="login_as_user" method="POST" style="display: none;">
       <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
-      <input type="email" placeholder="Email of user to impersonate" />
+      <input type="email" name="email" placeholder="Email of user to impersonate" />
       <input type="submit" value="Impersonate" />
     </form>
   </div>
