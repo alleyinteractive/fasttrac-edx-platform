@@ -5,7 +5,7 @@ git+https://github.com/mbareta/edx-search@fasttrac#egg=edx-search==0.1.3
 git+https://github.com/vukoviciv/ft-input-problem-type-xblock.git#egg=ft-input-problem-type-xblock
 
 # Fork poll/survey
-git+https://github.com/vukoviciv/xblock-poll.git#egg=xblock-poll
+git+https://github.com/ExtensionEngine/xblock-poll.git@FT-1.0#egg=xblock-poll==FT-1.0
 
 # Fork Done XBlock
 git+https://github.com/mbareta/DoneXBlock.git#egg=done-xblock
