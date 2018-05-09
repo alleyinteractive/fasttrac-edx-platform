@@ -8,4 +8,4 @@ git+https://github.com/vukoviciv/ft-input-problem-type-xblock.git#egg=ft-input-p
 git+https://github.com/ExtensionEngine/xblock-poll.git@FT-1.0#egg=xblock-poll==FT-1.0
 
 # Fork Done XBlock
-git+https://github.com/mbareta/DoneXBlock.git#egg=done-xblock
+git+https://github.com/ExtensionEngine/DoneXBlock.git@FT-1.1#egg=done-xblock==FT-1.1
