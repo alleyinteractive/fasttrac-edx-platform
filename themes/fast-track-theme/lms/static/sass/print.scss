@@ -1,0 +1,78 @@
+#content {
+  .course-index {
+    display: none;
+  }
+
+  .course-wrapper {
+    display: block;
+    width: 1024px;
+    border: unset;
+  }
+
+  &.course-wrapper {
+    max-width: unset;
+  }
+}
+
+#global-navigation {
+  .toggle-nav-button {
+    display: none;
+  }
+
+  &.header-global {
+    border: unset;
+    border-bottom: 0.5px solid #efeded;
+
+    .user {
+      display: none;
+    }
+  }
+}
+
+body.view-in-course {
+  .window-wrap {
+    max-width: unset!important;
+    min-width: unset!important;
+  }
+
+  .course-wrapper {
+    width: 100%;
+    border: unset;
+
+    .sequence {
+      padding: unset;
+    }
+
+    .xmodule_display.xmodule_SequenceModule nav.sequence-bottom {
+      display: none;
+    }
+  }
+}
+
+.next-unit-footer {
+  display: none;
+}
+
+.course-wrapper .course-content {
+  padding: unset;
+  margin: unset;
+}
+
+.view-in-course #main:not(.explore-courses) {
+  padding: unset;
+}
+
+#bugmuncher_button {
+  display: none !important;
+}
+
+body.view-in-course .bookmark-button-wrapper {
+  display: none;
+}
+
+.xblock {
+  &.xblock-student_view-done,
+  &.xblock-student_view-video {
+    display: none;
+  }
+}

@@ -145,6 +145,7 @@ from pipeline_mako import render_require_js_path_overrides
   })();
 </script>
 
+<link rel="stylesheet" href="${static.url('css/print.css')}" type="text/css" media="print" />
 </head>
 
 <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
