@@ -712,7 +712,7 @@ label.u-field-title {
   width: 100%;
 }
 
-.error-modal {
+%confirmation-modal {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -729,9 +729,18 @@ label.u-field-title {
 
   border-radius: 4px;
 
-  background: red;
   color: white;
   z-index: 1000;
+}
+
+.error-modal {
+  @extend %confirmation-modal;
+  background: red;
+}
+
+.success-modal {
+  @extend %confirmation-modal;
+  background: greenyellow;
 }
 
 .change-password {

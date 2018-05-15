@@ -1,0 +1,16 @@
+<div class="success-modal hidden"></div>
+
+<script>
+  $(document).ready(function () {
+    var $modal = $('.success-modal');
+    var displayTime = 4500;
+
+    window.showSuccessMessage = function(message) {
+      $modal.text(message).removeClass('hidden');
+
+      setTimeout(function () {
+        $modal.addClass('hidden');
+      }, displayTime);
+    };
+  });
+</script>
