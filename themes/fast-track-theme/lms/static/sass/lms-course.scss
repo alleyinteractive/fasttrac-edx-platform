@@ -321,3 +321,13 @@ body.view-in-course .wrapper-course-material .course-material {
 .course-wrapper .course-content .vert-mod .vert > .xblock-student_view {
   border-bottom: none;
 }
+
+.xmodule_display.xmodule_VideoModule .video.is-touch .tc-wrapper .video-wrapper iframe {
+  width: 100% !important;
+}
+
+@media screen and (max-width: 640px) {
+  .xmodule_display.xmodule_HtmlModule table {
+    width: 100% !important;
+  }
+}
