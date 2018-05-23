@@ -130,6 +130,14 @@ html, body, .window-wrap {
       max-height: 34px;
     }
   }
+
+  .user {
+    .dropdown {
+      @media screen and (max-width: 640px) {
+        height: 38px;
+      }
+    }
+  }
 }
 
 $break-smaller: 1366px;
@@ -909,4 +917,10 @@ label.u-field-title {
 
 .transparent {
   opacity: 0.2;
+}
+
+@media (max-width: 680px) {
+  nav.courseware.wrapper-course-material {
+    display: none;
+  }
 }
