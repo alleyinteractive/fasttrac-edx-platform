@@ -910,3 +910,9 @@ label.u-field-title {
 .transparent {
   opacity: 0.2;
 }
+
+@media (max-width: 680px) {
+  nav.courseware.wrapper-course-material {
+    display: none;
+  }
+}
