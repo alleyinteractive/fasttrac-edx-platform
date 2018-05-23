@@ -286,6 +286,7 @@ site_status_msg = get_site_status_msg(course_id)
             </li>
           % endif
       </ol>
+      % if course:
       <div class="header-course-links right">
         <%
           tab_list = get_course_tab_list(request, course)
@@ -323,7 +324,7 @@ site_status_msg = get_site_status_msg(course_id)
           % endif
       </ol>
       </div>
-
+      % endif
       % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor
         <ol class="user">
           <li class="primary">
