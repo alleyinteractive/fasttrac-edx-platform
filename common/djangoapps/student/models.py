@@ -383,10 +383,6 @@ class UserProfile(models.Model):
     # presurvey info
     filled_presurvey_at = models.DateTimeField(null=True, blank=True)
 
-    # MailChimp interests
-    ENTREPRENEUR_MAILCHIMP_INTEREST_ID = '83d6404c2e'
-    AFFILIATE_MAILCHIMP_INTEREST_ID = 'f6cdcb8e7b'
-
     @property
     def is_incomplete(self):
         return not (self.mailing_address and self.secondary_address
@@ -681,11 +677,12 @@ def add_user_to_mailchimp(sender, instance, **kwargs):
                 'AGE': instance.get_age_category_display() or '',
                 'GENDER': instance.get_gender_display(),
                 'AFFILIATE': (instance.affiliate and instance.affiliate.name) or '',
-                'NEWSLETTER': instance.get_newsletter_display()
+                'NEWSLETTER': instance.get_newsletter_display(),
+                'SURV_SPLIT': 'B' if instance.id % 2 == 0 else 'A'
             },
             'interests': {
-                UserProfile.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not instance.is_affiliate_user, # Entrepreneur User
-                UserProfile.AFFILIATE_MAILCHIMP_INTEREST_ID: instance.is_affiliate_user # Affiliate User
+                settings.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not instance.is_affiliate_user, # Entrepreneur User
+                settings.AFFILIATE_MAILCHIMP_INTEREST_ID: instance.is_affiliate_user # Affiliate User
             }
         }
 
@@ -693,8 +690,8 @@ def add_user_to_mailchimp(sender, instance, **kwargs):
         # TODO: notify admin if this fails (send email)
         r = requests.put(mailchimp_url, auth=('fasttrac', mailchimp_api_key), json=data)
         if not r.status_code == 200:
-            print('Profile update error')
-            print(r.content)
+            AUDIT_LOG.error('Error during MailChimp subscription:')
+            AUDIT_LOG.error(r.content)
         else:
             # trigger save so Mailchimp gets the update of user affiliate role
             if instance.is_affiliate_user:

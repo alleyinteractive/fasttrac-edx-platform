@@ -210,8 +210,8 @@ def update_mailchimp_interest(affiliate_membership, value):
             },
             'interests': {
                 interest_id: value,
-                UserProfile.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not affiliate_membership.member.profile.is_affiliate_user, # Entrepreneur User
-                UserProfile.AFFILIATE_MAILCHIMP_INTEREST_ID: affiliate_membership.member.profile.is_affiliate_user # Affiliate User
+                settings.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not affiliate_membership.member.profile.is_affiliate_user, # Entrepreneur User
+                settings.AFFILIATE_MAILCHIMP_INTEREST_ID: affiliate_membership.member.profile.is_affiliate_user # Affiliate User
             }
         }
 

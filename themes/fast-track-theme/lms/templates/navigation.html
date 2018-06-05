@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from context_processors import doc_url
+from courseware.tabs import get_course_tab_list
 from lms.djangoapps.ccx.overrides import get_current_ccx
 from openedx.core.djangolib.markup import HTML, Text
 
@@ -62,6 +63,10 @@ site_status_msg = get_site_status_msg(course_id)
 
     .header-global .nav-global {
       float: right;
+    }
+
+    .header-global .header-course-links {
+      display: none;
     }
 
     @media (min-width: 1024px) {
@@ -130,7 +135,7 @@ site_status_msg = get_site_status_msg(course_id)
       }
 
       body.view-in-course .window-wrap {
-        min-width: 400px;
+        min-width: unset;
         max-width: 400px;
       }
 
@@ -164,6 +169,39 @@ site_status_msg = get_site_status_msg(course_id)
         width: 100px;
         margin-top: 5px;
         margin-bottom: 5px;
+      }
+
+      .header-global .header-course-links {
+        border-top: 0.5px solid #efeded;
+        padding: 15px 0;
+      }
+      .header-global .header-course-links li.course-search {
+        position: relative;
+      }
+      .header-global .header-course-links li.course-search #courseware-search-bar {
+        width: 100%;
+      }
+      .header-global .header-course-links li.course-search .search-button {
+        font-size: 25px;
+      }
+
+      .header-global .header-course-links li.course-search .search-field::-webkit-input-placeholder {
+        font-style: italic;
+      }
+      .header-global .header-course-links li.course-search .search-field:-moz-placeholder {
+        font-style: italic;
+      }
+      .header-global .header-course-links li.course-search .search-field::-moz-placeholder {
+        font-style: italic;
+      }
+      .header-global .header-course-links li.course-search .search-field:-ms-input-placeholder {
+        font-style: italic;
+      }
+    }
+
+    @media screen and (min-width: 681px) {
+      .header-global .header-course-links {
+        display: none!important;
       }
     }
 
@@ -248,7 +286,45 @@ site_status_msg = get_site_status_msg(course_id)
             </li>
           % endif
       </ol>
+      % if course:
+      <div class="header-course-links right">
+        <%
+          tab_list = get_course_tab_list(request, course)
+          tabs_tmpl = static.get_template_path('/courseware/tabs.html')
+        %>
+        <ol class="tabs course-tabs">
+          <%include file="${tabs_tmpl}" args="tab_list=tab_list,active_page=None,default_tab=None,tab_image=None,in_global_nav=True" />
+          <%block name="extratabs" />
+          % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+              <li class="course-search">
+                  <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
+                    <form>
+                      <label for="course-search-input" class="sr">${_('Course Search')}</label>
+                      <div class="search-field-wrapper">
+                        <input id="course-search-input" type="text" class="search-field" placeholder="SEARCH" onkeyup="handleCourseSearch(event)"/>
+                        <button type="submit" class="search-button">
+                            <span class="icon fa fa-search" aria-hidden="true"></span>
+                        </button>
+                        <button type="button" class="cancel-button" title="${_('Clear search')}">
+                          <span class="icon fa fa-remove" aria-hidden="true"></span>
+                        </button>
+                      </div>
+                    </form>
 
+                    <script>
+                      var courseId = "${course.id}";
+                      function handleCourseSearch(event) {
+                          if(event.keyCode === 13) {
+                              window.location = '/courses/' + courseId + '/search?query=' + event.target.value;
+                          }
+                      }
+                    </script>
+                  </div>
+              </li>
+          % endif
+      </ol>
+      </div>
+      % endif
       % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor
         <ol class="user">
           <li class="primary">

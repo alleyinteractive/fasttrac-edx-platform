@@ -5,7 +5,7 @@
  from django.utils.translation import ugettext as _
  from django.core.urlresolvers import reverse
  %>
-<%page args="tab_list, active_page, default_tab, tab_image" expression_filter="h" />
+<%page args="tab_list, active_page, default_tab, tab_image, in_global_nav=False" expression_filter="h" />
 
 <%
 def url_class(is_active):
@@ -13,12 +13,17 @@ def url_class(is_active):
     return "active"
   return ""
 %>
+
+<%
+  extra_tab_class = 'ft-header-item' if in_global_nav else ''
+%>
+
 % for tab in tab_list:
   <%
     tab_is_active = tab.tab_id in (active_page, default_tab)
     tab_class = url_class(tab_is_active)
   %>
-  <li class="tab">
+  <li class="tab ${extra_tab_class}">
   <a href="${tab.link_func(course, reverse)}" class="${tab_class} ${_(tab.name)}">
   ${_(tab.name)}
   % if tab_is_active:
