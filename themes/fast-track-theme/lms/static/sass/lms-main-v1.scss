@@ -663,7 +663,8 @@ $link-color: #6f6f6f;
 .dashboard .my-courses .course .details .enter-course,
 .login-register .register-form .register-button,
 .login-register .login-button,
-.login-register .nav-btn.form-toggle {
+.login-register .nav-btn.form-toggle,
+.login-register .password-reset-form button {
   background: $ft-orange;
   color: white;
   border: none;
