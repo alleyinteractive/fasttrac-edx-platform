@@ -90,6 +90,11 @@ def export_csv_user_report():
     """
     Celery task for saving user reports as CSV and uploading to S3
     """
+
+    def list_to_csv(values):
+        """Convert list to string of CSV's."""
+        return '{}'.format(', '.join(values))
+
     params = {'csv_name': 'user_report', 'course_id': 'affiliates',
               'timestamp': datetime.now()}
 
@@ -108,7 +113,7 @@ def export_csv_user_report():
         course_id_list = [
             str(course_id) for course_id in user.courseenrollment_set.all().values_list('course_id', flat=True)
         ]
-        course_ids = '{}'.format(', '.join(course_id_list))
+        course_ids = list_to_csv(course_id_list)
 
         affiliate_org_list = []
         affiliate_role_list = []
@@ -116,8 +121,8 @@ def export_csv_user_report():
             affiliate_org_list.append(affiliate_membership.affiliate.name)
             affiliate_role_list.append(AffiliateMembership.ROLES[affiliate_membership.role])
 
-        affiliate_orgs = '{}'.format(', '.join(affiliate_org_list))
-        affiliate_roles = '{}'.format(', '.join(affiliate_role_list))
+        affiliate_orgs = list_to_csv(affiliate_org_list)
+        affiliate_roles = list_to_csv(affiliate_role_list)
 
         rows.append([
             user.username, user.email, user.date_joined,
