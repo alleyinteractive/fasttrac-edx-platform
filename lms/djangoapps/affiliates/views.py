@@ -14,7 +14,13 @@ from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from .decorators import only_program_director, only_staff
-from .tasks import export_csv_user_report, export_csv_affiliate_course_report, export_csv_affiliate_report, export_csv_course_report
+from .tasks import (
+    export_csv_user_report,
+    export_csv_affiliate_course_report,
+    export_csv_affiliate_report,
+    export_csv_course_report,
+    export_csv_interactives_completion_report
+)
 from instructor_task.models import ReportStore
 import django.contrib.auth as auth
 
@@ -73,6 +79,10 @@ def csv_export(request):
     elif report_type == 'export_csv_completion_report':
         export_csv_course_report.delay(time_report=False)
         messages.add_message(request, messages.INFO, 'Generating course completion report CSV... Refresh to see the download link below.')
+
+    elif report_type == 'export_completion_report':
+        export_csv_interactives_completion_report.delay()
+        messages.add_message(request, messages.INFO, 'Generating course interactives completion report CSV... Refresh to see the download link below.')
 
     return redirect('affiliates:csv_admin')
 
