@@ -664,7 +664,8 @@ $link-color: #6f6f6f;
 .login-register .register-form .register-button,
 .login-register .login-button,
 .login-register .nav-btn.form-toggle,
-.login-register .password-reset-form button {
+.login-register .password-reset-form button,
+#csv-actions a.csv-action-btn {
   background: $ft-orange;
   color: white;
   border: none;

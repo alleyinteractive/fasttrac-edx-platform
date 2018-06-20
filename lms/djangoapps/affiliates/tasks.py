@@ -1,7 +1,11 @@
 import json
+from collections import OrderedDict, defaultdict
 from datetime import datetime
 
+import requests
 from django.conf import settings
+from ccx_keys.locator import CCXBlockUsageLocator
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from instructor_task.tasks_helper import upload_csv_to_report_store
 from lms import CELERY_APP
@@ -9,9 +13,10 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.utils import get_ccx_from_ccx_locator
 from lms.djangoapps.ccx.views import get_ccx_schedule
 from student.models import UserProfile, CourseEnrollment, CourseAccessRole
-from .models import AffiliateEntity, AffiliateMembership
 from courseware.models import StudentModule, StudentTimeTracker
-from opaque_keys.edx.keys import UsageKey
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure
+from .models import AffiliateEntity, AffiliateMembership
+from xmodule.modulestore.django import modulestore
 
 
 @CELERY_APP.task
@@ -318,6 +323,144 @@ def export_csv_course_report(time_report=True):
 
     params = {
         'csv_name': csv_name,
+        'course_id': 'affiliates',
+        'timestamp': datetime.now(),
+        'rows': rows
+    }
+
+    upload_csv_to_report_store(**params)
+
+
+FASTTRAC_COURSE_KEY = CourseKey.from_string(settings.FASTTRAC_COURSE_KEY)
+INTERACTIVES_TYPES = {
+    'survey': 'Reality Check (survey)',
+    'ftinputxblock': 'Reality Check (text)',
+    'lti_consumer': 'Workspace Tool',
+}
+
+
+def course_interactives_csv_data():
+    """
+    Information about the interactives in the FastTrac course for the CSV.
+    Returns:
+    * a list of columns (strings) indicating the location of each interactive in format:
+        <chapter_name> - <section_name> - <subsection_name> - <interactive_type>
+    * list of unit IDs and types
+    """
+    structure = CourseStructure.objects.get(course_id=FASTTRAC_COURSE_KEY).ordered_blocks
+    units = []
+    columns = []
+
+    for chapter in structure.items()[0][1]['children']:
+        for section in structure[chapter]['children']:
+            for subsection in structure[section]['children']:
+                for unit in structure[subsection]['children']:
+                    value = structure[unit]
+                    unit_type = value['block_type']
+                    if unit_type in INTERACTIVES_TYPES:
+                        units.append({
+                            'id': unit,
+                            'type': unit_type
+                        })
+                        columns.append(
+                            '{} - {} - {} - {}'.format(
+                                structure[chapter]['display_name'],
+                                structure[section]['display_name'],
+                                structure[subsection]['display_name'],
+                                INTERACTIVES_TYPES.get(unit_type, unit_type),
+                            )
+                        )
+    return columns, units
+
+
+def create_ccx_usage_key(course_id, unit_id):
+    """Create a CCXBlockUsageLocator instance from a course block usage location."""
+    unit_usage_key = UsageKey.from_string(unit_id)
+    return CCXBlockUsageLocator(course_id, unit_usage_key.block_type, unit_usage_key.block_id)
+
+
+def is_lti_done(completion_list, unit_id):
+    """Determine if the workspace form contains data (is done)."""
+    usage_key = UsageKey.from_string(unit_id)
+    item = modulestore().get_item(usage_key)
+    name = item.launch_url.split('/')[-1]  # last part of the LTI URL is the name of the form
+    for el in completion_list:
+        if name in el:
+            return el[name]
+    return False
+
+
+def get_lti_completion():
+    """
+    Retrieve the full workspace forms / LTI completion list from the workspace app.
+    Returns a dictionary of format:
+        user_email:
+            lti_name: completed_bool
+    """
+    response = requests.get(
+        settings.WORKSPACE_URL + '/api/completion',
+        headers={'Authorization': settings.WORKSPACE_API_KEY}
+    )
+    data = defaultdict(list)
+    for item in response.json():
+        data[item['email']].append({item['name']: item['completed']})
+    return data
+
+
+@CELERY_APP.task
+def export_csv_interactives_completion_report():
+    """
+    Export a CSV containing information about the completion of interactives (reality checks and workspace forms)
+    for each student in all CCX courses.
+    """
+    header_row = ['Username', 'Email', 'Course ID', 'Course Name']
+    interactive_columns, units = course_interactives_csv_data()
+    header_row.extend(interactive_columns)
+
+    # CCX staff/coach/instructor etc.
+    non_student_user_ids = CourseAccessRole.objects.filter(
+        course_id=FASTTRAC_COURSE_KEY
+    ).values_list('user_id', flat=True)
+
+    lti_completion = get_lti_completion()
+
+    student_rows = []
+    fasttrac_ccxs = CustomCourseForEdX.objects.filter(course_id=FASTTRAC_COURSE_KEY)
+    ccxs_ids = [ccx.ccx_course_id for ccx in fasttrac_ccxs]
+
+    enrollments = CourseEnrollment.objects.filter(
+        course_id__in=ccxs_ids,
+        is_active=True
+    ).exclude(
+        user_id__in=non_student_user_ids
+    ).order_by('course_id', 'user')
+
+    for enrollment in enrollments:
+        student = enrollment.user
+        course = enrollment.course
+        row = [
+            student.username,
+            student.email,
+            course.id,
+            course.display_name
+        ]
+        student_lti_completion = lti_completion[student.email]
+
+        modules = StudentModule.objects.filter(course_id=course.id, student_id=student.id)
+        for unit in units:
+            if unit['type'] == 'lti_consumer':
+                row.append('Done' if is_lti_done(student_lti_completion, unit['id']) else '')
+            else:
+                usage_key = create_ccx_usage_key(course.id, unit['id'])
+                module = modules.filter(module_state_key=usage_key)
+                row.append('Done' if module else '')
+        student_rows.append(row)
+
+    rows = [header_row]
+    rows.extend(student_rows)
+
+    params = {
+        'csv_name': 'interactives_completion_report',
         'course_id': 'affiliates',
         'timestamp': datetime.now(),
         'rows': rows
