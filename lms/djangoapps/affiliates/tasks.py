@@ -411,28 +411,22 @@ def get_lti_completion():
 def export_csv_interactives_completion_report():
     """
     Export a CSV containing information about the completion of interactives (reality checks and workspace forms)
-    for each student in all CCX courses.
+    for each student in all CCX courses and the main FastTrac course.
     """
     header_row = ['Username', 'Email', 'Course ID', 'Course Name']
     interactive_columns, units = course_interactives_csv_data()
     header_row.extend(interactive_columns)
 
-    # CCX staff/coach/instructor etc.
-    non_student_user_ids = CourseAccessRole.objects.filter(
-        course_id=FASTTRAC_COURSE_KEY
-    ).values_list('user_id', flat=True)
-
     lti_completion = get_lti_completion()
 
     student_rows = []
+    enrollment_course_ids = [FASTTRAC_COURSE_KEY]
     fasttrac_ccxs = CustomCourseForEdX.objects.filter(course_id=FASTTRAC_COURSE_KEY)
-    ccxs_ids = [ccx.ccx_course_id for ccx in fasttrac_ccxs]
+    enrollment_course_ids.extend(ccx.ccx_course_id for ccx in fasttrac_ccxs)
 
     enrollments = CourseEnrollment.objects.filter(
-        course_id__in=ccxs_ids,
+        course_id__in=enrollment_course_ids,
         is_active=True
-    ).exclude(
-        user_id__in=non_student_user_ids
     ).order_by('course_id', 'user')
 
     for enrollment in enrollments:
