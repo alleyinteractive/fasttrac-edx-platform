@@ -4,7 +4,7 @@ from datetime import datetime
 
 import requests
 from django.conf import settings
-from ccx_keys.locator import CCXBlockUsageLocator
+from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from instructor_task.tasks_helper import upload_csv_to_report_store
@@ -373,10 +373,12 @@ def course_interactives_csv_data():
     return columns, units
 
 
-def create_ccx_usage_key(course_id, unit_id):
-    """Create a CCXBlockUsageLocator instance from a course block usage location."""
-    unit_usage_key = UsageKey.from_string(unit_id)
-    return CCXBlockUsageLocator(course_id, unit_usage_key.block_type, unit_usage_key.block_id)
+def create_usage_key(course_id, unit_id):
+    """Create a UsageKey or CCXBlockUsageLocator instance from a course block usage location."""
+    usage_key = UsageKey.from_string(unit_id)
+    if isinstance(course_id, CCXLocator):
+        return CCXBlockUsageLocator(course_id, usage_key.block_type, usage_key.block_id)
+    return usage_key
 
 
 def is_lti_done(completion_list, unit_id):
@@ -445,7 +447,7 @@ def export_csv_interactives_completion_report():
             if unit['type'] == 'lti_consumer':
                 row.append('Done' if is_lti_done(student_lti_completion, unit['id']) else '')
             else:
-                usage_key = create_ccx_usage_key(course.id, unit['id'])
+                usage_key = create_usage_key(course.id, unit['id'])
                 module = modules.filter(module_state_key=usage_key)
                 row.append('Done' if module else '')
         student_rows.append(row)
