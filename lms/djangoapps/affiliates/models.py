@@ -160,7 +160,14 @@ class AffiliateEntity(models.Model):
         learner_ids = [e.user_id for e in learner_enrollments]
         return User.objects.filter(id__in=learner_ids).order_by('-last_login').first()
 
+
 class AffiliateMembership(models.Model):
+    ROLES = {
+        'ccx_coach': 'Facilitator',
+        'instructor': 'Course Manager',
+        'staff': 'Program Director',
+    }
+
     role_choices = (
         ('ccx_coach', 'Facilitator'),
         ('instructor', 'Course Manager'),
@@ -178,8 +185,9 @@ class AffiliateMembership(models.Model):
     role = models.CharField(choices=role_choices, max_length=255)
 
     @classmethod
-    def find_by_user(self, user):
-        return self.objects.get(member=user)
+    def find_by_user(cls, user):
+        return cls.objects.get(member=user)
+
 
 class AffiliateInvite(models.Model):
     email = models.CharField(max_length=255)

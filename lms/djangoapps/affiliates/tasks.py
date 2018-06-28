@@ -1,12 +1,15 @@
-from datetime import datetime
 import json
-from lms import CELERY_APP
-from instructor_task.tasks_helper import upload_csv_to_report_store
+from datetime import datetime
+
 from django.conf import settings
+
+from instructor_task.tasks_helper import upload_csv_to_report_store
+from lms import CELERY_APP
 from lms.djangoapps.ccx.models import CustomCourseForEdX
-from student.models import UserProfile, CourseEnrollment, CourseAccessRole
-from .models import AffiliateEntity
+from lms.djangoapps.ccx.utils import get_ccx_from_ccx_locator
 from lms.djangoapps.ccx.views import get_ccx_schedule
+from student.models import UserProfile, CourseEnrollment, CourseAccessRole
+from .models import AffiliateEntity, AffiliateMembership
 from courseware.models import StudentModule, StudentTimeTracker
 from opaque_keys.edx.keys import UsageKey
 
@@ -87,6 +90,11 @@ def export_csv_user_report():
     """
     Celery task for saving user reports as CSV and uploading to S3
     """
+
+    def list_to_csv(values):
+        """Convert list to string of CSV's."""
+        return '{}'.format(', '.join(values))
+
     params = {'csv_name': 'user_report', 'course_id': 'affiliates',
               'timestamp': datetime.now()}
 
@@ -95,16 +103,36 @@ def export_csv_user_report():
              'Would you like to receive marketing communication from the Ewing Marion Kauffman Foundation and Kauffman FastTrac?',
              'Your motivation', 'Age', 'Gender', 'Race/Ethnicity',
              'Have you ever served in any branch of the U.S. Armed Forces, including the Coast Guard, the National Guard, or Reserve component of any service branch?',
-             'What was the highest degree or level of school you have completed?']]
+             'What was the highest degree or level of school you have completed?', 'Affiliate Organization', 'Affiliate Role', 'Course ID']]
 
     profiles = UserProfile.objects.all()
+
     for profile in profiles:
-        rows.append([profile.user.username, profile.user.email, profile.user.date_joined,
-                     profile.get_country_display(), profile.user.first_name, profile.user.last_name,
-                     profile.mailing_address, profile.city, profile.get_state_display(), profile.zipcode,
-                     profile.phone_number, profile.company, profile.title, profile.get_newsletter_display(),
-                     profile.get_bio_display(), profile.get_age_category_display(), profile.get_gender_display(),
-                     profile.get_ethnicity_display(), profile.get_veteran_status_display(), profile.get_education_display()])
+        user = profile.user
+
+        course_id_list = [
+            str(course_id) for course_id in user.courseenrollment_set.all().values_list('course_id', flat=True)
+        ]
+        course_ids = list_to_csv(course_id_list)
+
+        affiliate_org_list = []
+        affiliate_role_list = []
+        for affiliate_membership in user.affiliatemembership_set.all():
+            affiliate_org_list.append(affiliate_membership.affiliate.name)
+            affiliate_role_list.append(AffiliateMembership.ROLES[affiliate_membership.role])
+
+        affiliate_orgs = list_to_csv(affiliate_org_list)
+        affiliate_roles = list_to_csv(affiliate_role_list)
+
+        rows.append([
+            user.username, user.email, user.date_joined,
+            profile.get_country_display(), user.first_name, user.last_name,
+            profile.mailing_address, profile.city, profile.get_state_display(), profile.zipcode,
+            profile.phone_number, profile.company, profile.title, profile.get_newsletter_display(),
+            profile.get_bio_display(), profile.get_age_category_display(), profile.get_gender_display(),
+            profile.get_ethnicity_display(), profile.get_veteran_status_display(), profile.get_education_display(),
+            affiliate_orgs, affiliate_roles, course_ids
+        ])
 
     params.update({'rows': rows})
 
