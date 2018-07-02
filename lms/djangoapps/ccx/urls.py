@@ -37,4 +37,7 @@ urlpatterns = patterns(
     url(r'^ccx_messages/create/$', 'ccx.views.ccx_messages_create', name='ccx_messages_create'),
     url(r'^ccx_messages/delete/(?P<message_id>[^/]*)$', 'ccx.views.ccx_messages_delete', name='ccx_messages_delete'),
     url(r'^ccx_messages$', 'ccx.views.ccx_messages', name='ccx_messages'),
+
+    url(r'^ccx_export_report$', 'ccx.views.export_report', name='ccx_export_report'),
+    url(r'^ccx_report_list$', 'ccx.views.report_list', name='ccx_report_list'),
 )

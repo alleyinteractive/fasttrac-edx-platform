@@ -409,12 +409,7 @@ def get_lti_completion():
     return data
 
 
-@CELERY_APP.task
-def export_csv_interactives_completion_report():
-    """
-    Export a CSV containing information about the completion of interactives (reality checks and workspace forms)
-    for each student in all CCX courses and the main FastTrac course.
-    """
+def get_interactives_completion_csv_rows(ccxs):
     header_row = ['Username', 'Email', 'Course ID', 'Course Name']
     interactive_columns, units = course_interactives_csv_data()
     header_row.extend(interactive_columns)
@@ -423,8 +418,7 @@ def export_csv_interactives_completion_report():
 
     student_rows = []
     enrollment_course_ids = [FASTTRAC_COURSE_KEY]
-    fasttrac_ccxs = CustomCourseForEdX.objects.filter(course_id=FASTTRAC_COURSE_KEY)
-    enrollment_course_ids.extend(ccx.ccx_course_id for ccx in fasttrac_ccxs)
+    enrollment_course_ids.extend(ccx.ccx_course_id for ccx in ccxs)
 
     enrollments = CourseEnrollment.objects.filter(
         course_id__in=enrollment_course_ids,
@@ -455,9 +449,35 @@ def export_csv_interactives_completion_report():
     rows = [header_row]
     rows.extend(student_rows)
 
+    return rows
+
+
+@CELERY_APP.task
+def export_csv_interactives_completion_report():
+    """
+    Export a CSV containing information about the completion of interactives (reality checks and workspace forms)
+    for each student in all CCX courses and the main FastTrac course.
+    """
+    fasttrac_ccxs = CustomCourseForEdX.objects.filter(course_id=FASTTRAC_COURSE_KEY)
+    rows = get_interactives_completion_csv_rows(fasttrac_ccxs)
+
     params = {
         'csv_name': 'interactives_completion_report',
         'course_id': 'affiliates',
+        'timestamp': datetime.now(),
+        'rows': rows
+    }
+
+    upload_csv_to_report_store(**params)
+
+
+@CELERY_APP.task
+def export_ccx_interactives_completion_report(ccx):
+    rows = get_interactives_completion_csv_rows([ccx])
+
+    params = {
+        'csv_name': 'ccx_interactives_completion_report',
+        'course_id': str(ccx.ccx_course_id),
         'timestamp': datetime.now(),
         'rows': rows
     }

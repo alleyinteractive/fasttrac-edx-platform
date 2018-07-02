@@ -11,6 +11,7 @@
 $ft-temp-darkgray: #555;
 $ft-orange: #f76b1c;
 $ft-green: #99c221;
+$ft-gray: #c8c8c8;
 
 /**
 *   GLOBAL
@@ -665,7 +666,8 @@ $link-color: #6f6f6f;
 .login-register .login-button,
 .login-register .nav-btn.form-toggle,
 .login-register .password-reset-form button,
-#csv-actions a.csv-action-btn {
+#csv-actions a.csv-action-btn,
+#student_admin-progress button {
   background: $ft-orange;
   color: white;
   border: none;
@@ -924,5 +926,108 @@ label.u-field-title {
 @media (max-width: 680px) {
   nav.courseware.wrapper-course-material {
     display: none;
+  }
+}
+
+.custom-course-details-wrapper {
+  ul.instructor-nav {
+    border-bottom: 1px solid $ft-gray;
+  }
+
+  .idash-section .hd.hd-2 { border-top: none; }
+
+  #student_admin {
+    padding-left: 15px;
+    padding-right: 15px;
+
+    .refresh-list-btn {
+      float: right;
+      margin-top: 25px;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    nav.sub-nav {
+      height: 50px;
+      width: 100%;
+      border-bottom: 1px solid $ft-gray;
+
+      a {
+        display: inline-block;
+        height: 50px;
+        padding: 0 20px;
+        line-height: 50px;
+        color: #5e5e5e;
+        text-transform: uppercase;
+
+        &.active {
+          font-weight: 500;
+          color: $ft-orange;
+        }
+
+        &:first-child {
+          padding-left: 0;
+          border: none;
+        }
+
+        &:last-child { padding-right: 0; }
+
+        &:hover {
+          cursor: pointer;
+          color: $ft-orange;
+        }
+      }
+    }
+
+    #student_admin-progress {
+      button.btn {
+        margin: 20px 0;
+      }
+    }
+
+    .student_admin-wrapper {
+      margin: 20px 0;
+
+      .active-flag {
+        color: $ft-green;
+        text-align: right;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+
+        td, th {
+          border: 1px solid #999;
+          padding: 0.5rem;
+          height: 30px;
+          line-height: 30px;
+        }
+
+        thead { background-color: #b9b9b9; }
+
+        tbody tr:hover { background-color: #f7f7f7; }
+
+        .creation-date {
+          width: 200px;
+          text-align: right;
+
+          &th {
+            text-align: center;
+          }
+        }
+
+        .action {
+          width: 80px;
+          text-align: right;
+
+          &th {
+            text-align: center;
+          }
+        }
+      }
+    }
   }
 }
