@@ -1,4 +1,5 @@
 import json
+import logging
 from collections import OrderedDict, defaultdict
 from datetime import datetime
 
@@ -17,6 +18,8 @@ from courseware.models import StudentModule, StudentTimeTracker
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from .models import AffiliateEntity, AffiliateMembership
 from xmodule.modulestore.django import modulestore
+
+log = logging.getLogger("edx.affiliates")
 
 
 @CELERY_APP.task
@@ -346,13 +349,24 @@ def course_interactives_csv_data():
     * a list of columns (strings) indicating the location of each interactive in format:
         <chapter_name> - <section_name> - <subsection_name> - <interactive_type>
     * list of unit IDs and types
+    * list of sections within the course. Each item is a dictionary containing information
+        about the name of the section, total number of interactives in it and a display name
     """
     structure = CourseStructure.objects.get(course_id=FASTTRAC_COURSE_KEY).ordered_blocks
     units = []
     columns = []
+    sections = []
 
     for chapter in structure.items()[0][1]['children']:
         for section in structure[chapter]['children']:
+            section_data = {
+                'name': structure[section]['display_name'],
+                'total_interactives': 0,
+                'display_name': '{} - {}'.format(
+                    structure[chapter]['display_name'],
+                    structure[section]['display_name'],
+                )
+            }
             for subsection in structure[section]['children']:
                 for unit in structure[subsection]['children']:
                     value = structure[unit]
@@ -360,7 +374,8 @@ def course_interactives_csv_data():
                     if unit_type in INTERACTIVES_TYPES:
                         units.append({
                             'id': unit,
-                            'type': unit_type
+                            'type': unit_type,
+                            'section': structure[section]['display_name'],
                         })
                         columns.append(
                             '{} - {} - {} - {}'.format(
@@ -370,7 +385,11 @@ def course_interactives_csv_data():
                                 INTERACTIVES_TYPES.get(unit_type, unit_type),
                             )
                         )
-    return columns, units
+                        section_data['total_interactives'] += 1
+            if section_data['total_interactives']:
+                sections.append(section_data)
+
+    return columns, units, sections
 
 
 def create_usage_key(course_id, unit_id):
@@ -403,6 +422,8 @@ def get_lti_completion():
         settings.WORKSPACE_URL + '/api/completion',
         headers={'Authorization': settings.WORKSPACE_API_KEY}
     )
+    if response.status_code != 200:
+        log.error('Cannot connect to the Workspace app!')
     data = defaultdict(list)
     for item in response.json():
         data[item['email']].append({item['name']: item['completed']})
@@ -410,13 +431,29 @@ def get_lti_completion():
 
 
 def get_interactives_completion_csv_rows(ccxs):
+    """
+    Generates CSV/XLSX header and rows with information about the interactives completions.
+
+    Args:
+        ccxs (list): List of CCX courses for which the interactives completion is gathered
+
+    Returns.
+        - a list of raw data CSV/XLSX rows
+        - a list of summary data CSV/XLSX rows
+    """
     header_row = ['Username', 'Email', 'Course ID', 'Course Name']
-    interactive_columns, units = course_interactives_csv_data()
-    header_row.extend(interactive_columns)
+
+    interactive_columns, units, sections = course_interactives_csv_data()
+    raw_data_header_row = header_row[:]
+    raw_data_header_row.extend(interactive_columns)
+
+    summary_header_row = header_row[:]
+    summary_header_row.extend([section['display_name'] for section in sections])
 
     lti_completion = get_lti_completion()
 
     student_rows = []
+    summary_rows = []
     enrollment_course_ids = [FASTTRAC_COURSE_KEY]
     enrollment_course_ids.extend(ccx.ccx_course_id for ccx in ccxs)
 
@@ -426,30 +463,49 @@ def get_interactives_completion_csv_rows(ccxs):
     ).order_by('course_id', 'user')
 
     for enrollment in enrollments:
+        section_completion = {section['name']: 0 for section in sections}
         student = enrollment.user
         course = enrollment.course
+
         row = [
             student.username,
             student.email,
-            course.id,
+            str(course.id),
             course.display_name
         ]
+        summary_row = row[:]
+
         student_lti_completion = lti_completion[student.email]
 
         modules = StudentModule.objects.filter(course_id=course.id, student_id=student.id)
         for unit in units:
+            is_done = False
             if unit['type'] == 'lti_consumer':
-                row.append('Done' if is_lti_done(student_lti_completion, unit['id']) else '')
+                is_done = is_lti_done(student_lti_completion, unit['id'])
             else:
                 usage_key = create_usage_key(course.id, unit['id'])
                 module = modules.filter(module_state_key=usage_key)
-                row.append('Done' if module else '')
+                is_done = True if module else False
+
+            if is_done:
+                section_completion[unit['section']] += 1
+            row.append('Done' if is_done else '')
         student_rows.append(row)
 
-    rows = [header_row]
-    rows.extend(student_rows)
+        for section in sections:
+            summary_row.append(
+                '{0:.0%}'.format(float(section_completion[section['name']]) / section['total_interactives'])
+                if section_completion[section['name']] else ''
+            )
+        summary_rows.append(summary_row)
 
-    return rows
+    raw_data_rows = [raw_data_header_row]
+    raw_data_rows.extend(student_rows)
+
+    summary_data_rows = [summary_header_row]
+    summary_data_rows.extend(summary_rows)
+
+    return raw_data_rows, summary_data_rows
 
 
 @CELERY_APP.task
@@ -459,13 +515,13 @@ def export_csv_interactives_completion_report():
     for each student in all CCX courses and the main FastTrac course.
     """
     fasttrac_ccxs = CustomCourseForEdX.objects.filter(course_id=FASTTRAC_COURSE_KEY)
-    rows = get_interactives_completion_csv_rows(fasttrac_ccxs)
+    raw_data_rows, _ = get_interactives_completion_csv_rows(fasttrac_ccxs)
 
     params = {
         'csv_name': 'interactives_completion_report',
         'course_id': 'affiliates',
         'timestamp': datetime.now(),
-        'rows': rows
+        'rows': raw_data_rows
     }
 
     upload_csv_to_report_store(**params)
@@ -473,13 +529,26 @@ def export_csv_interactives_completion_report():
 
 @CELERY_APP.task
 def export_ccx_interactives_completion_report(ccx):
-    rows = get_interactives_completion_csv_rows([ccx])
+    """
+    Export an XLSX containing information about the completion of interactives (reality checks and workspace forms)
+    for each student in a specific CCX course and the main FastTrac course.
+    """
+    raw_data_rows, summary_rows = get_interactives_completion_csv_rows([ccx])
 
     params = {
         'csv_name': 'ccx_interactives_completion_report',
         'course_id': str(ccx.ccx_course_id),
         'timestamp': datetime.now(),
-        'rows': rows
+        'rows': raw_data_rows,
+        'xlsx_data': {
+            'ws1_title': 'Raw Data',
+            'additional_sheets': [
+                {
+                    'title': 'Summary Data',
+                    'rows': summary_rows
+                }
+            ]
+        }
     }
 
     upload_csv_to_report_store(**params)

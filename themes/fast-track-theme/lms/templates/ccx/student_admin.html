@@ -58,7 +58,7 @@
 
 <script>
     function extractDate(filename) {
-        var regex = /(\d{4}-\d{2}-\d{2}-\d{4})\.csv$/;
+        var regex = /(\d{4}-\d{2}-\d{2}-\d{4})/;
         var date = regex.exec(filename)[1];
 
         var mDate = moment(date, 'YYYY-MM-DD-hhmm');
@@ -136,7 +136,10 @@
                 method: 'POST',
                 data: {report_type: 'export_interactives_completion_report'},
                 url: 'ccx_export_report',
-                error: function (data) {console.log("ERROR: ", data)},
+                error: function (data) {
+                    $('span.status-info').text('An error occurred.')
+                    console.log("Interactives report error: ", data)
+                },
             });
         });
     });

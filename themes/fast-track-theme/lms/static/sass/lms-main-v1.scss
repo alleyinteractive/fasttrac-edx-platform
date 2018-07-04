@@ -991,8 +991,15 @@ label.u-field-title {
       margin: 20px 0;
 
       .active-flag {
-        color: $ft-green;
         text-align: right;
+
+        i.active {
+          color: $ft-green;
+        }
+
+        i.inactive {
+          color: red;
+        }
       }
 
       table {

@@ -600,9 +600,9 @@ def delete_problem_module_state(xmodule_instance_args, _module_descriptor, stude
     return UPDATE_STATUS_SUCCEEDED
 
 
-def upload_csv_to_report_store(rows, csv_name, course_id, timestamp, config_name='GRADES_DOWNLOAD'):
+def upload_csv_to_report_store(rows, csv_name, course_id, timestamp, config_name='GRADES_DOWNLOAD', xlsx_data=None):
     """
-    Upload data as a CSV using ReportStore.
+    Upload data as a CSV or XLSX using ReportStore.
 
     Arguments:
         rows: CSV data in the following format (first column may be a
@@ -613,17 +613,33 @@ def upload_csv_to_report_store(rows, csv_name, course_id, timestamp, config_name
             ]
         csv_name: Name of the resulting CSV
         course_id: ID of the course
+        xlsx_data: A dictionary containing data for the spreadsheet export.
     """
     report_store = ReportStore.from_config(config_name)
-    report_store.store_rows(
-        course_id,
-        u"{course_prefix}_{csv_name}_{timestamp_str}.csv".format(
-            course_prefix=course_filename_prefix_generator(course_id),
-            csv_name=csv_name,
-            timestamp_str=timestamp.strftime("%Y-%m-%d-%H%M")
-        ),
-        rows
-    )
+
+    if xlsx_data:
+        report_store.store_spreadsheet(
+            course_id,
+            u"{course_prefix}_{csv_name}_{timestamp_str}.xlsx".format(
+                course_prefix=course_filename_prefix_generator(course_id),
+                csv_name=csv_name,
+                timestamp_str=timestamp.strftime("%Y-%m-%d-%H%M")
+            ),
+            ws1_title=xlsx_data.get('ws1_title'),
+            ws1_rows=rows,
+            additional_sheets=xlsx_data.get('additional_sheets')
+        )
+    else:
+        report_store.store_rows(
+            course_id,
+            u"{course_prefix}_{csv_name}_{timestamp_str}.csv".format(
+                course_prefix=course_filename_prefix_generator(course_id),
+                csv_name=csv_name,
+                timestamp_str=timestamp.strftime("%Y-%m-%d-%H%M")
+            ),
+            rows
+        )
+
     tracker.emit(REPORT_REQUESTED_EVENT_NAME, {"report_type": csv_name, })
 
 
