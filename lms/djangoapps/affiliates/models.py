@@ -30,6 +30,7 @@ def user_directory_path(instance, filename):
 
 class AffiliateEntity(models.Model):
     slug = models.SlugField(max_length=255, unique=True, default='')
+    parent = models.ForeignKey('self', related_name='children', blank=True, null=True, on_delete=models.SET_NULL)
 
     email = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
@@ -112,6 +113,14 @@ class AffiliateEntity(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @property
+    def is_parent(self):
+        return self.parent is None and self.children.exists()
+
+    @property
+    def is_child(self):
+        return self.parent is not None
 
     @property
     def image_url(self):
