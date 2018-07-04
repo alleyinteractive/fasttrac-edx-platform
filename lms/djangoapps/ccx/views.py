@@ -766,7 +766,7 @@ def export_report(request, course, ccx, **kwargs):
     report = request.POST['report_type']
 
     if report == 'export_interactives_completion_report':
-        export_ccx_interactives_completion_report.delay(ccx=ccx)
+        export_ccx_interactives_completion_report.delay(ccx_id=ccx.id)
         return HttpResponse(
             json.dumps({'status': 'export_started'}),
             content_type='application/json',

@@ -528,11 +528,12 @@ def export_csv_interactives_completion_report():
 
 
 @CELERY_APP.task
-def export_ccx_interactives_completion_report(ccx):
+def export_ccx_interactives_completion_report(ccx_id):
     """
     Export an XLSX containing information about the completion of interactives (reality checks and workspace forms)
     for each student in a specific CCX course and the main FastTrac course.
     """
+    ccx = CustomCourseForEdX.objects.get(id=ccx_id)
     raw_data_rows, summary_rows = get_interactives_completion_csv_rows([ccx])
 
     params = {
