@@ -169,6 +169,10 @@ class AffiliateEntity(models.Model):
         learner_ids = [e.user_id for e in learner_enrollments]
         return User.objects.filter(id__in=learner_ids).order_by('-last_login').first()
 
+    @property
+    def program_director(self):
+        return self.affiliatemembership_set.get(role='staff').member
+
 
 class AffiliateMembership(models.Model):
     ROLES = {
@@ -329,3 +333,14 @@ def validate_course_dependency(sender, instance, **kwargs):
 
     if ccxs_for_member_exist and count_affiliate_memberships_of_member == 1:
         raise ValueError('Cannot delete this member because they have affiliate custom courses.')
+
+
+@receiver(post_save, sender=AffiliateEntity, dispatch_uid='inherit_program_director')
+def inherit_program_director(sender, instance, created, **kwargs):
+    """A sub-affiliate has to have the same program director as the parent."""
+    if created and instance.parent:
+        AffiliateMembership.objects.create(
+            affiliate=instance,
+            member=instance.parent.program_director,
+            role='staff'
+        )
