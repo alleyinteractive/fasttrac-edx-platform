@@ -12,16 +12,20 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
-from uuid import uuid4
 import csv
-import json
 import hashlib
+import json
+import logging
 import os.path
+from uuid import uuid4
+from zipfile import ZipFile, ZIP_DEFLATED
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.db import models, transaction
+from openpyxl import Workbook
+from openpyxl.writer.excel import ExcelWriter
 
 from openedx.core.storage import get_storage
 from xmodule_django.models import CourseKeyField
@@ -30,6 +34,8 @@ from xmodule_django.models import CourseKeyField
 # define custom states used by InstructorTask
 QUEUING = 'QUEUING'
 PROGRESS = 'PROGRESS'
+
+log = logging.getLogger('edx.instructor_tasks')
 
 
 class InstructorTask(models.Model):
@@ -268,6 +274,44 @@ class DjangoStorageReportStore(ReportStore):
         csvwriter = csv.writer(output_buffer)
         csvwriter.writerows(self._get_utf8_encoded_rows(rows))
         output_buffer.seek(0)
+        self.store(course_id, filename, output_buffer)
+
+    def store_spreadsheet(self, course_id, filename, ws1_title, ws1_rows, additional_sheets=None):
+        """
+        Create and store a new spreadsheet and store it in the selected storage.
+
+        Args:
+            course_id: used for storing purposes
+            filename (str): name of the spreadsheet
+            ws1_title (str): title of the first worksheet
+            ws1_rows (list): rows for the first worksheet
+            additional_sheets (list): a list of additional worksheets. Each item is a
+                dictionary containing a name and a list of rows
+        """
+        log.info('Creating new spreadsheet')
+        wb = Workbook()
+        ws1 = wb.active
+        ws1.title = ws1_title
+
+        for row in ws1_rows:
+            ws1.append(row)
+
+        for additional_sheet in additional_sheets:
+            additional_ws = wb.create_sheet(additional_sheet.get('title'))
+            for row in additional_sheet.get('rows'):
+                additional_ws.append(row)
+
+        output_buffer = ContentFile('')
+        archive = ZipFile(output_buffer, 'w', ZIP_DEFLATED, allowZip64=True)
+        writer = ExcelWriter(wb, archive)
+
+        try:
+            writer.write_data()
+        finally:
+            archive.close()
+
+        output_buffer.seek(0)
+        log.info('Saving spreadsheet {}'.format(filename))
         self.store(course_id, filename, output_buffer)
 
     def links_for(self, course_id):
