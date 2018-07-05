@@ -265,7 +265,7 @@
         <select id="affiliates-list" name="parent">
           <option value="0">-</option>
           % for aff in affiliates:
-          <option value="${aff.id}" ${'selected="selected"' if affiliate.parent.id == aff.id else ''}>${aff.name}</option>
+          <option value="${aff.id}" ${'selected="selected"' if affiliate.parent and affiliate.parent.id == aff.id else ''}>${aff.name}</option>
           % endfor
         </select>
         <br>

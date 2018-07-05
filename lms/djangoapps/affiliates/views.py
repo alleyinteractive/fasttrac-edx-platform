@@ -138,9 +138,9 @@ def index(request):
 
 def show(request, slug):
     affiliate = AffiliateEntity.objects.get(slug=slug)
-
     return render_to_response('affiliates/show.html', {
         'affiliate': affiliate,
+        'subaffiliates': affiliate.children.all(),
         'is_program_director': is_program_director(request.user, affiliate)
     })
 
