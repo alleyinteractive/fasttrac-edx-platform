@@ -137,7 +137,7 @@ class AffiliateEntity(models.Model):
 
     @property
     def courses(self):
-        return CustomCourseForEdX.objects.filter(coach__in=self.members.all())
+        return CustomCourseForEdX.objects.filter(coach=self.program_director)
 
     @property
     def enrollments(self):
@@ -159,6 +159,10 @@ class AffiliateEntity(models.Model):
         learner_enrollments = self.enrollments.exclude(user_id__in=member_ids)
         learner_ids = [e.user_id for e in learner_enrollments]
         return User.objects.filter(id__in=learner_ids).order_by('-last_login').first()
+
+    @property
+    def program_director(self):
+        return self.affiliatemembership_set.get(role='staff').member
 
 
 class AffiliateMembership(models.Model):
