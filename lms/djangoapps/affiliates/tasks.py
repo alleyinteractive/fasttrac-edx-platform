@@ -542,6 +542,7 @@ def export_ccx_interactives_completion_report(ccx_id):
         'course_id': str(ccx.ccx_course_id),
         'timestamp': datetime.now(),
         'rows': raw_data_rows,
+        'course_name': ccx.display_name,
         'xlsx_data': {
             'ws1_title': 'Raw Data',
             'additional_sheets': [

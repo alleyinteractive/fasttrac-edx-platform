@@ -66,7 +66,7 @@
     }
 
     function extractType(filename) {
-        var regex = /ccx\d*_ccx_(\w*)_\d*/;
+        var regex = /_ccx_(\w*)_\d*/;
         var type = regex.exec(filename)[1];
         var typeMap = {
             'affiliate_report': 'Affiliate',
