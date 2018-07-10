@@ -430,12 +430,12 @@ def get_lti_completion():
     return data
 
 
-def get_interactives_completion_csv_rows(ccxs):
+def get_interactives_completion_csv_rows(course_ids):
     """
     Generates CSV/XLSX header and rows with information about the interactives completions.
 
     Args:
-        ccxs (list): List of CCX courses for which the interactives completion is gathered
+        course_ids (list): List of course IDs for which the interactives completion is gathered
 
     Returns.
         - a list of raw data CSV/XLSX rows
@@ -454,11 +454,9 @@ def get_interactives_completion_csv_rows(ccxs):
 
     student_rows = []
     summary_rows = []
-    enrollment_course_ids = [FASTTRAC_COURSE_KEY]
-    enrollment_course_ids.extend(ccx.ccx_course_id for ccx in ccxs)
 
     enrollments = CourseEnrollment.objects.filter(
-        course_id__in=enrollment_course_ids,
+        course_id__in=course_ids,
         is_active=True
     ).order_by('course_id', 'user')
 
@@ -515,7 +513,10 @@ def export_csv_interactives_completion_report():
     for each student in all CCX courses and the main FastTrac course.
     """
     fasttrac_ccxs = CustomCourseForEdX.objects.filter(course_id=FASTTRAC_COURSE_KEY)
-    raw_data_rows, _ = get_interactives_completion_csv_rows(fasttrac_ccxs)
+    course_ids = [FASTTRAC_COURSE_KEY]
+    course_ids.extend(ccx.ccx_course_id for ccx in fasttrac_ccxs)
+
+    raw_data_rows, _ = get_interactives_completion_csv_rows(course_ids)
 
     params = {
         'csv_name': 'interactives_completion_report',
@@ -531,10 +532,10 @@ def export_csv_interactives_completion_report():
 def export_ccx_interactives_completion_report(ccx_id):
     """
     Export an XLSX containing information about the completion of interactives (reality checks and workspace forms)
-    for each student in a specific CCX course and the main FastTrac course.
+    for each student in a specific CCX course.
     """
     ccx = CustomCourseForEdX.objects.get(id=ccx_id)
-    raw_data_rows, summary_rows = get_interactives_completion_csv_rows([ccx])
+    raw_data_rows, summary_rows = get_interactives_completion_csv_rows([ccx.ccx_course_id])
 
     params = {
         'csv_name': 'ccx_interactives_completion_report',
