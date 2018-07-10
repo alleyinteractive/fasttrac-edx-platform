@@ -124,6 +124,18 @@
           </li>
         </ul>
       </div>
+      <div class="course-summary">
+        % if affiliate.is_parent:
+          <span>Sub-affiliates of ${affiliate.name}:</span>
+          % for aff in subaffiliates:
+            <div class="sub-affiliate">
+              <h4><a href="/affiilates/${aff.name}">${aff.name}</a></h4>
+            </div>
+          % endfor
+        % elif affiliate.is_child:
+          <span>This is a sub-affiliate of <a href="/affiliates/${affiliate.parent.name}">${affiliate.parent.name}</a></span>
+        % endif
+      </div>
     </div>
   </div>
 </div>

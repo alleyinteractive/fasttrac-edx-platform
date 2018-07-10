@@ -30,6 +30,7 @@ def user_directory_path(instance, filename):
 
 class AffiliateEntity(models.Model):
     slug = models.SlugField(max_length=255, unique=True, default='')
+    parent = models.ForeignKey('self', related_name='children', blank=True, null=True, on_delete=models.SET_NULL)
 
     email = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
@@ -112,6 +113,14 @@ class AffiliateEntity(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @property
+    def is_parent(self):
+        return self.parent is None and self.children.exists()
+
+    @property
+    def is_child(self):
+        return self.parent is not None
 
     @property
     def image_url(self):
@@ -324,3 +333,14 @@ def validate_course_dependency(sender, instance, **kwargs):
 
     if ccxs_for_member_exist and count_affiliate_memberships_of_member == 1:
         raise ValueError('Cannot delete this member because they have affiliate custom courses.')
+
+
+@receiver(post_save, sender=AffiliateEntity, dispatch_uid='inherit_program_director')
+def inherit_program_director(sender, instance, created, **kwargs):
+    """A sub-affiliate has to have the same program director as the parent."""
+    if created and instance.parent:
+        AffiliateMembership.objects.create(
+            affiliate=instance,
+            member=instance.parent.program_director,
+            role='staff'
+        )

@@ -257,6 +257,22 @@
       </div>
       <br>
 
+      % if request.user.is_staff:
+      <br>
+      <div>
+        <label for="affliates-list">Parent Affiliate</label>
+        <br>
+        <select id="affiliates-list" name="parent">
+          <option value="0">-</option>
+          % for aff in affiliates:
+          <option value="${aff.id}" ${'selected="selected"' if affiliate.parent and affiliate.parent.id == aff.id else ''}>${aff.name}</option>
+          % endfor
+        </select>
+        <br>
+        <span>Select only if you are creating a sub-affiliate.</span>
+      </div>
+      % endif
+
       <br>
       <br>
       <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
@@ -264,3 +280,7 @@
     </form>
   % endif
 </section>
+
+<script>
+
+</script>

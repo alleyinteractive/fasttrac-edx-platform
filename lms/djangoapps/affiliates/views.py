@@ -138,9 +138,9 @@ def index(request):
 
 def show(request, slug):
     affiliate = AffiliateEntity.objects.get(slug=slug)
-
     return render_to_response('affiliates/show.html', {
         'affiliate': affiliate,
+        'subaffiliates': affiliate.children.all(),
         'is_program_director': is_program_director(request.user, affiliate)
     })
 
@@ -149,6 +149,7 @@ def show(request, slug):
 def new(request):
     return render_to_response('affiliates/form.html', {
         'affiliate': AffiliateEntity(),
+        'affiliates': AffiliateEntity.objects.all(),
         'state_choices': STATE_CHOICES,
         'countries': countries,
         'role_choices': AffiliateMembership.role_choices
@@ -171,6 +172,11 @@ def create(request):
     for key in post_data:
         if key == 'year_of_birth':
             setattr(affiliate, key, int(post_data[key]))
+        elif key == 'parent':
+            if not int(post_data[key]):
+                continue
+            parent = AffiliateEntity.objects.get(id=post_data[key])
+            setattr(affiliate, key, parent)
         else:
             setattr(affiliate, key, post_data[key])
 
@@ -197,6 +203,9 @@ def edit(request, slug):
         for key in request.POST:
             if key == 'year_of_birth':
                 setattr(affiliate, key, int(request.POST[key]))
+            elif key == 'parent':
+                parent = AffiliateEntity.objects.get(id=request.POST[key])
+                setattr(affiliate, key, parent)
             else:
                 setattr(affiliate, key, request.POST[key])
 
@@ -214,6 +223,7 @@ def edit(request, slug):
 
     return render_to_response('affiliates/form.html', {
         'affiliate': affiliate,
+        'affiliates': AffiliateEntity.objects.all(),
         'state_choices': STATE_CHOICES,
         'countries': countries,
         'role_choices': role_choices,
