@@ -17,7 +17,7 @@ import logging
 from celery import Task, current_task
 from celery.states import SUCCESS, FAILURE
 from django.contrib.auth.models import User
-from django.core.files.storage import DefaultStorage
+from django.core.files.storage import DefaultStorage, get_valid_filename
 from django.db import reset_queries
 from django.db.models import Q
 import dogstats_wrapper as dog_stats_api
@@ -600,7 +600,7 @@ def delete_problem_module_state(xmodule_instance_args, _module_descriptor, stude
     return UPDATE_STATUS_SUCCEEDED
 
 
-def upload_csv_to_report_store(rows, csv_name, course_id, timestamp, config_name='GRADES_DOWNLOAD', xlsx_data=None):
+def upload_csv_to_report_store(rows, csv_name, course_id, timestamp, config_name='GRADES_DOWNLOAD', course_name=None, xlsx_data=None):
     """
     Upload data as a CSV or XLSX using ReportStore.
 
@@ -621,7 +621,7 @@ def upload_csv_to_report_store(rows, csv_name, course_id, timestamp, config_name
         report_store.store_spreadsheet(
             course_id,
             u"{course_prefix}_{csv_name}_{timestamp_str}.xlsx".format(
-                course_prefix=course_filename_prefix_generator(course_id),
+                course_prefix=get_valid_filename(course_name),
                 csv_name=csv_name,
                 timestamp_str=timestamp.strftime("%Y-%m-%d-%H%M")
             ),
