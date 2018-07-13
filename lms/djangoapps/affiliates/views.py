@@ -204,7 +204,10 @@ def edit(request, slug):
             if key == 'year_of_birth':
                 setattr(affiliate, key, int(request.POST[key]))
             elif key == 'parent':
-                parent = AffiliateEntity.objects.get(id=request.POST[key])
+                if int(request.POST[key]):
+                    parent = AffiliateEntity.objects.get(id=request.POST[key])
+                else:
+                    parent = None
                 setattr(affiliate, key, parent)
             else:
                 setattr(affiliate, key, request.POST[key])
