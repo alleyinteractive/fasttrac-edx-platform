@@ -128,7 +128,7 @@
         % if affiliate.is_parent:
           <h4>Sub-affiliates of ${affiliate.name}:</h4>
           % for aff in subaffiliates:
-            <a class="affiliate-box" href="/affiliates/${aff.name}">
+            <a class="affiliate-box" href="/affiliates/${aff.slug}">
             <div class="sub-affiliate">
               <div class="affiliate-image">
                 <img src="${affiliate.image_url}">
@@ -142,7 +142,7 @@
           % endfor
         % elif affiliate.is_child:
             <h4>Parent Affiliate:</h4>
-            <a class="affiliate-box" href="/affiliates/${affiliate.parent.name}">
+            <a class="affiliate-box" href="/affiliates/${affiliate.parent.slug}">
             <div class="parent-affiliate">
               <div class="affiliate-image">
                 <img src="${affiliate.image_url}">
