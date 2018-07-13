@@ -78,22 +78,23 @@ class AffiliateEntity(models.Model):
             setattr(self, 'location_latitude', latitude)
             setattr(self, 'location_longitude', longitude)
 
-        if not self.pk and self.parent:
-            super(AffiliateEntity, self).save(*args, **kwargs)
-            AffiliateMembership.objects.create(
-                affiliate=self,
-                member=self.parent.program_director,
-                role='staff'
-            )
-        else:
-            super(AffiliateEntity, self).save(*args, **kwargs)
-
+        super(AffiliateEntity, self).save(*args, **kwargs)
+        if self.parent:
+            self.inherit_program_director()
         self._full_address = new_full_address
 
     def delete(self):
         with transaction.atomic():
             self.courses.delete()
             super(AffiliateEntity, self).delete()
+
+    def inherit_program_director(self, member=None):
+        member = member if member else self.parent.program_director
+        AffiliateMembership.objects.create(
+            affiliate=self,
+            member=member,
+            role='staff'
+        )
 
     def build_full_address(self):
         return '{}, {}, {}'.format(self.address, self.zipcode, self.city)
@@ -314,7 +315,6 @@ def add_affiliate_course_enrollments(sender, instance, **kwargs):
             course_id = course_overview.id
 
             enroll_email(course_id, instance.member.email, auto_enroll=True)
-
 
 
 @receiver(post_delete, sender=AffiliateMembership, dispatch_uid="remove_affiliate_course_enrollments")
