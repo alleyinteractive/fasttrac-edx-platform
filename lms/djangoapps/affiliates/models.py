@@ -79,22 +79,12 @@ class AffiliateEntity(models.Model):
             setattr(self, 'location_longitude', longitude)
 
         super(AffiliateEntity, self).save(*args, **kwargs)
-        if self.parent:
-            self.inherit_program_director()
         self._full_address = new_full_address
 
     def delete(self):
         with transaction.atomic():
             self.courses.delete()
             super(AffiliateEntity, self).delete()
-
-    def inherit_program_director(self, member=None):
-        member = member if member else self.parent.program_director
-        AffiliateMembership.objects.create(
-            affiliate=self,
-            member=member,
-            role='staff'
-        )
 
     def build_full_address(self):
         return '{}, {}, {}'.format(self.address, self.zipcode, self.city)
@@ -181,7 +171,8 @@ class AffiliateEntity(models.Model):
 
     @property
     def program_director(self):
-        return self.affiliatemembership_set.get(role='staff').member
+        pd_membership = self.affiliatemembership_set.filter(role='staff')
+        return pd_membership.first().member if pd_membership else None
 
 
 class AffiliateMembership(models.Model):
@@ -317,6 +308,7 @@ def add_affiliate_course_enrollments(sender, instance, **kwargs):
             enroll_email(course_id, instance.member.email, auto_enroll=True)
 
 
+
 @receiver(post_delete, sender=AffiliateMembership, dispatch_uid="remove_affiliate_course_enrollments")
 def remove_affiliate_course_enrollments(sender, instance, **kwargs):
     'Remove all privileges over all affiliate courses.'
@@ -343,3 +335,13 @@ def validate_course_dependency(sender, instance, **kwargs):
     if ccxs_for_member_exist and count_affiliate_memberships_of_member == 1:
         raise ValueError('Cannot delete this member because they have affiliate custom courses.')
 
+
+@receiver(post_save, sender=AffiliateEntity, dispatch_uid='inherit_program_director')
+def inherit_program_director(sender, instance, created, **kwargs):
+    """A sub-affiliate has to have the same program director as the parent."""
+    if created and instance.parent:
+        AffiliateMembership.objects.create(
+            affiliate=instance,
+            member=instance.parent.program_director,
+            role='staff'
+        )
