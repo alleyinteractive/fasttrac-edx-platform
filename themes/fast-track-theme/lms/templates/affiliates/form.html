@@ -154,7 +154,7 @@
           <label>Sub-affiliates</label>
           <ul class="sub-affiliates-list">
             % for child in affiliate.children.all():
-              <li><a href="/affiliates/${child.name}">${child.name}</a></li>
+              <li><a href="/affiliates/${child.slug}">${child.name}</a></li>
             % endfor
           </ul>
         </div>
