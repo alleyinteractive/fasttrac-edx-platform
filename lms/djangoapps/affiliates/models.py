@@ -78,7 +78,16 @@ class AffiliateEntity(models.Model):
             setattr(self, 'location_latitude', latitude)
             setattr(self, 'location_longitude', longitude)
 
-        super(AffiliateEntity, self).save(*args, **kwargs)
+        if not self.pk and self.parent:
+            super(AffiliateEntity, self).save(*args, **kwargs)
+            AffiliateMembership.objects.create(
+                affiliate=self,
+                member=self.parent.program_director,
+                role='staff'
+            )
+        else:
+            super(AffiliateEntity, self).save(*args, **kwargs)
+
         self._full_address = new_full_address
 
     def delete(self):
@@ -334,13 +343,3 @@ def validate_course_dependency(sender, instance, **kwargs):
     if ccxs_for_member_exist and count_affiliate_memberships_of_member == 1:
         raise ValueError('Cannot delete this member because they have affiliate custom courses.')
 
-
-@receiver(post_save, sender=AffiliateEntity, dispatch_uid='inherit_program_director')
-def inherit_program_director(sender, instance, created, **kwargs):
-    """A sub-affiliate has to have the same program director as the parent."""
-    if created and instance.parent:
-        AffiliateMembership.objects.create(
-            affiliate=instance,
-            member=instance.parent.program_director,
-            role='staff'
-        )
