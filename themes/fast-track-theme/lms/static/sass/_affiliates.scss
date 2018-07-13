@@ -282,8 +282,8 @@ h1.explore-header {
     font-weight: bold;
     font-size: .9rem;
     color: #777;
-    border-bottom: 1px solid #ddd;
     padding-bottom: .8rem;
+    margin-top: 10px;
   }
 
   .contact-info {
@@ -304,6 +304,19 @@ h1.explore-header {
         color: $ft-orange;
         font-weight: bold;
       }
+    }
+  }
+
+  a.affiliate-box:hover {
+    text-decoration: none;
+  }
+
+  .parent-affiliate,
+  .sub-affiliate {
+    @include affiliate-box;
+
+    &:hover {
+      text-decoration: none;
     }
   }
 }
@@ -329,6 +342,7 @@ h1.explore-header {
     label {
       display: inline-block;
       width: 31%;
+      margin-right: 1.2%;
       border: 1px solid $ft-gray;
       padding: 10px 0px;
       text-align: center;
@@ -357,7 +371,7 @@ h1.explore-header {
 
           button {
             border: none;
-            font-size: 1r em;
+            font-size: 0.8rem;
             vertical-align: middle;
             color: $ft-orange;
 
@@ -370,8 +384,13 @@ h1.explore-header {
       }
 
       .affiliates-list {
-        background: #f76b1c;
-        color: white;
+        width: calc(100% - 420px);
+      }
+
+      button.add-btn {
+        @include ft-button;
+        border-radius: 0;
+        height: 37px;
         font-size: 1rem;
       }
     }
@@ -495,6 +514,8 @@ h1.explore-header {
     height: 2rem;
   }
 }
+
+
 
 
 @media screen and (max-width: 980px) {

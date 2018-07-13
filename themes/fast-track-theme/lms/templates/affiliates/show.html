@@ -1,0 +1,160 @@
+<%! from ccx_keys.locator import CCXLocator %>
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">Affiliate Information - ${affiliate.name}</%block>
+<%block name="headextra"> <script src="//cdn.optimizely.com/js/9498790582.js"></script> </%block>
+
+
+<section class="course-info">
+  <header class="course-profile">
+    <div class="intro-inner-wrapper">
+      <div class="table">
+        <section class="intro">
+          <div class="heading-group">
+            <h1>
+              ${affiliate.name}
+            </h1>
+          </div>
+
+          <div class="main-cta">
+            <div class="fa fa-map-marker"></div>
+            ${affiliate.city}
+            , ${affiliate.state}
+          </div>
+        </section>
+
+        <div class="media">
+          <div class="hero" style="background-image: url(${affiliate.image_url})"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="details">
+      % if is_program_director:
+        <a href="/affiliates/edit/${affiliate.slug}">
+          <i class="fa fa-pencil"></i>
+          Edit Affiliate Info
+        </a>
+        <br>
+        <br>
+      % endif
+
+      % if user.is_staff:
+        <a onclick="return confirm('This will delete ALL affiliate courses. This cannot be undone. Are you sure you want to delete ${affiliate.name}')" href="/affiliates/delete/${affiliate.slug}">
+          <i class="fa fa-ban"></i>
+          Delete Affiliate
+        </a>
+        <br>
+        <br>
+      % endif
+
+      <div class="inner-wrapper">
+        <h4>Description</h4>
+        <p>${affiliate.description}</p>
+
+        <br><br>
+        <h4>Affiliate Courses</h4>
+        <div class="affiliate-courses">
+          <ul>
+            % for course in affiliate.courses.filter(enrollment_type='PUBLIC'):
+              <li class="affiliate-card">
+                <div class="image" style="background-image: url(${affiliate.image_url});"></div>
+                <div class="name">
+                  ${course.display_name}
+                </div>
+                <div class="description">
+                  % if len(course.course_description) > 90:
+                    <span>${course.course_description[:90] + '...'}</span>
+                  % else:
+                      <span>${course.course_description}</span>
+                  % endif
+                </div>
+                <div class="card-footer">
+                  <span class="delivery-mode-item">
+                    % if course.delivery_mode == 'IN_PERSON':
+                        <i class="fa fa-users"></i>
+                    % elif course.delivery_mode == 'BLENDED':
+                        <i class="fa fa-exchange"></i>
+                    % else:
+                        <i class="fa fa-globe"></i>
+                    % endif
+                    ${course.get_delivery_mode_display()}
+                  </span>
+                  <span class="skewed-footer-item">
+                    <span>
+                      <span class="fa fa-map-marker"></span>
+                      ${course.location_state}
+                    </span>
+                  </span>
+                  <span>
+                    <a href="/courses/${CCXLocator.from_course_locator(course.course_id, unicode(course.pk))}/about">
+                      View
+                      <span class="fa fa-arrow-circle-o-right"></span>
+                    </a>
+                  </span>
+                </div>
+              </li>
+            % endfor
+          </ul>
+        </div>
+      </div>
+  </div>
+    <div class="course-sidebar">
+      <div class="course-summary">
+        <h4>Contact Info.</h4>
+
+        <ul class="contact-info">
+          <li>
+            <div class="fa fa-envelope"></div>
+            <a href="mailto:${affiliate.email}">${affiliate.email}</a>
+          </li>
+
+          <li>
+            <div class="fa fa-phone-square"></div>
+            <a href="tel:${affiliate.phone_number}">${affiliate.phone_number}</a>
+          </li>
+
+          <li>
+            <div class="fa fa-globe"></div>
+            <a href="${affiliate.website_url}" target="_blank">${affiliate.website}</a>
+          </li>
+        </ul>
+      </div>
+      <div class="course-summary">
+        % if affiliate.is_parent:
+          <h4>Sub-affiliates of ${affiliate.name}:</h4>
+          % for aff in subaffiliates:
+            <a class="affiliate-box" href="/affiliates/${aff.name}">
+            <div class="sub-affiliate">
+              <div class="affiliate-image">
+                <img src="${affiliate.image_url}">
+              </div>
+              <div class="affiliate-info">
+                <div class="affiliate-name">${aff.name}</div>
+                <div class="affiliate-address">${aff.name}, ${aff.state}</div>
+              </div>
+            </div>
+            </a>
+          % endfor
+        % elif affiliate.is_child:
+            <h4>Parent Affiliate:</h4>
+            <a class="affiliate-box" href="/affiliates/${affiliate.parent.name}">
+            <div class="parent-affiliate">
+              <div class="affiliate-image">
+                <img src="${affiliate.image_url}">
+              </div>
+              <div class="affiliate-info">
+                <div class="affiliate-name">${affiliate.parent.name}</div>
+                <div class="affiliate-address">${affiliate.parent.name}, ${affiliate.parent.state}</div>
+              </div>
+            </div>
+            </a>
+        % endif
+      </div>
+    </div>
+  </div>
+</div>

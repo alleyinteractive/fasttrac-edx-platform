@@ -112,44 +112,69 @@
       <h1 class="explore-header">${'Affiliate Profile' if affiliate.slug else 'Create Affiliate'}</h1>
 
       % if request.user.is_staff:
+      <%
+        aff_type = 'standalone'
+        if affiliate.is_child:
+          aff_type = 'subaff'
+        elif affiliate.is_parent:
+          aff_type = 'parent'
+      %>
       <div class="form-control">
         <label for="affiliate-type">Affiliate Type</label>
         <div class="affiliate-type-toggle">
-          <input type="radio" name="affiliate-type" value="standalone" class="hidden" id="standalone-type" checked="checked">
-          <label for="standalone-type">Standalone</label>
-          <input type="radio" name="affiliate-type" value="parent" class="hidden" id="parent-type">
+          <input type="radio"
+                 name="affiliate-type"
+                 value="standalone"
+                 class="hidden"
+                 id="standalone-type"
+                 ${'checked="checked"' if aff_type == 'standalone' else ''}
+                 >
+                 <label for="standalone-type">Standalone</label>
+                 <input type="radio"
+                 name="affiliate-type"
+                 value="parent"
+                 class="hidden"
+                 id="parent-type"
+                 ${'checked="checked"' if aff_type == 'parent' else ''}
+          >
           <label for="parent-type">Parent</label>
-          <input type="radio" name="affiliate-type" value="sub-affiliate" class="hidden" id="sub-type">
-          <label for="sub-type">Sub-affiliate</label>
+          <input type="radio"
+                 name="affiliate-type"
+                 value="sub-affiliate"
+                 id="sub-type"
+                 class="hidden"
+                 ${'checked="checked"' if aff_type == 'subaff' else ''}
+          >
+          <label for="sub-type">Sub-Affiliate</label>
         </div>
       </div>
 
-      <div class="form-control parent-type hidden">
+      <div class="form-control parent-type  ${'' if aff_type == 'parent' else 'hidden'}">
         <div clas="form-control">
           <label>Sub-affiliates</label>
-          <ul>
-            <li>Sub 1 <button>Remove</button></li>
-            <li>Sub 2 <button>Remove</button></li>
-            <li>Sub 3 <button>Remove</button></li>
+          <ul class="sub-affiliates-list">
+            % for child in affiliate.children.all():
+              <li><a href="/affiliates/${child.name}">${child.name}</a></li>
+            % endfor
           </ul>
         </div>
-
+<!--
         <div class="form-control">
           <label>Add Sub-Affiliate</label>
-          <select id="affiliates-list">
+          <select class="affiliates-list">
             <option value="0">-</option>
             % for aff in affiliates:
             <option value="${aff.id}">${aff.name}</option>
             % endfor
           </select>
-          <button>Add</button>
+          <button type="button" class="add-btn">Add</button>
         </div>
+-->
       </div>
-
-      <div class="form-control sub-type hidden">
+      <div class="form-control sub-type ${'' if aff_type == 'subaff' else 'hidden'}">
         <div class="form-control">
           <label>Parent</label>
-          <select id="affiliates-list" name="parent">
+          <select class="affiliates-list" name="parent">
             <option value="0">-</option>
             % for aff in affiliates:
             <option value="${aff.id}" ${'selected="selected"' if affiliate.parent and affiliate.parent.id == aff.id else ''}>${aff.name}</option>
@@ -258,6 +283,7 @@
 
 <script>
   $(document).ready(function() {
+    var parentAffiliateId = ${affiliate.parent.id if affiliate.parent else 0};
     var $parentAffiliateArea = $('.form-control.parent-type');
     var $subAffiliateArea = $('.form-control.sub-type');
 
@@ -269,10 +295,29 @@
       } else if (value === 'sub-affiliate') {
         $parentAffiliateArea.addClass('hidden');
         $subAffiliateArea.removeClass('hidden');
+
+        $('.affiliates-list', $subAffiliateArea).val(parentAffiliateId);
       } else {
         $parentAffiliateArea.addClass('hidden');
         $subAffiliateArea.addClass('hidden');
+
+        $('.affiliates-list', $subAffiliateArea).val(0);
       }
+    });
+
+    $('.parent-type .add-btn').click(function() {
+      var affValue = $('.parent-type .affiliates-list').val();
+      var affName = $('.parent-type .affiliates-list option:selected').text();
+      var $list = $('.sub-affiliates-list');
+      $list.append(
+        '<li value="' + affValue + '">' +
+        affName + '<button type="button" class="remove-btn">Remove</button>' +
+        '</li>'
+      );
+    });
+
+    $(document).on('click', '.parent-type .remove-btn', function() {
+      $(this).parent().remove();
     });
   });
 </script>
