@@ -13,8 +13,8 @@
                 <td>Name</td>
                 <td>Username</td>
                 <td>Email Address</td>
-                <td style="text-align: right">Date Enrolled</td>
-                <td title="Inactive includes both unenrolled and invited students" style="text-align: right">Active/Inactive</td>
+                <td class="date-enrolled">Date Enrolled</td>
+                <td class="status" title="Inactive includes both unenrolled and invited students">Status</td>
             </thead>
             <tbody>
                 % for student_enrollment in ccx_student_enrollments:
@@ -26,9 +26,9 @@
                         <td>${student_enrollment.user.profile.name}</td>
                         <td>${student_enrollment.user.username}</td>
                         <td>${student_enrollment.user.email}</td>
-                        <td style="text-align: right">${student_enrollment.created.strftime("%m/%d/%Y")}</td>
-                        <td class="active-flag">
-                            <i class="fa fa-circle ${'active' if student_enrollment.is_active else 'inactive'}" />
+                        <td>${student_enrollment.created.strftime("%m/%d/%Y")}</td>
+                        <td class="active-flag ${'active' if student_enrollment.is_active else 'inactive'}">
+                            <i class="fa fa-circle "></i>
                             ${'Active' if student_enrollment.is_active else 'Inactive'}
                         </td>
                     </tr>

@@ -975,13 +975,11 @@ label.u-field-title {
       margin: 20px 0;
 
       .active-flag {
-        text-align: right;
-
-        i.active {
+        &.active {
           color: $ft-green;
         }
 
-        i.inactive {
+        &.inactive {
           color: red;
         }
       }
@@ -989,6 +987,7 @@ label.u-field-title {
       table {
         width: 100%;
         border-collapse: collapse;
+        word-wrap: break-word;
 
         td, th {
           border: 1px solid #999;
@@ -999,24 +998,17 @@ label.u-field-title {
 
         thead { background-color: #b9b9b9; }
 
+        .date-enrolled { width: 110px; }
+        .status { width: 80px; }
+
         tbody tr:hover { background-color: #f7f7f7; }
 
         .creation-date {
           width: 200px;
-          text-align: right;
-
-          &th {
-            text-align: center;
-          }
         }
 
         .action {
           width: 80px;
-          text-align: right;
-
-          &th {
-            text-align: center;
-          }
         }
       }
     }
