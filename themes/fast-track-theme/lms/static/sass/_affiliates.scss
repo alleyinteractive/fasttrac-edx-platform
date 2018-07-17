@@ -410,6 +410,7 @@ h1.explore-header {
         border-radius: 0;
         height: 37px;
         font-size: 1rem;
+        text-align: center;
       }
     }
   }
@@ -538,15 +539,40 @@ h1.explore-header {
 
 @media screen and (max-width: 980px) {
   .edit-affiliate-container {
-    label:not(:first-child) {
+    .affiliate-type-toggle {
       display: block;
       width: 100%;
+
+      label {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    }
+
+    ul.sub-affiliates-list {
+      width: 100%;
+    }
+
+    .form-control.parent-type select.affiliates-list {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    button.add-btn {
+      width: 100%;
+    }
+
+    label {
+      display: block;
+      width: 100%;
+      text-align: center;
     }
 
     input:not(.upload-profile-image), select, textarea {
       display: block;
       width: 100%;
-      margin-left: none;
+      margin: 0;
       border-left: none;
       border-top: none;
       border-right: none;
