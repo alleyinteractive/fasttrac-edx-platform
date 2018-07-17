@@ -151,7 +151,7 @@
       </div>
 
       <div class="form-control parent-type ${'' if aff_type == 'parent' else 'hidden'}">
-        <div clas="form-control">
+        <div class="form-control ${'' if affiliate.children.exists() else 'hidden'}">
           <label>Sub-affiliates</label>
           <ul class="sub-affiliates-list">
             % for child in affiliate.children.all():
@@ -323,6 +323,7 @@
       );
 
       $('.parent-type .affiliates-list option[value=' + affValue + ']').remove();
+      $list.parent().removeClass('hidden');
     });
 
     $(document).on('click', '.parent-type .remove-btn', function() {
@@ -333,6 +334,10 @@
       $('.parent-type .affiliates-list').append(
         '<option value="' + value + '">' + name + '</option>'
       );
+
+      if (!$('.sub-affiliates-list li').length) {
+        $('.sub-affiliates-list').parent().addClass('hidden');
+      }
     });
   });
 </script>
