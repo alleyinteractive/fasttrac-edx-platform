@@ -147,9 +147,12 @@ def show(request, slug):
 
 @only_program_director
 def new(request):
+    all_affiliates = AffiliateEntity.objects.all()
+
     return render_to_response('affiliates/form.html', {
         'affiliate': AffiliateEntity(),
-        'affiliates': AffiliateEntity.objects.all(),
+        'affiliates': all_affiliates,
+        'available_subs': all_affiliates,
         'state_choices': STATE_CHOICES,
         'countries': countries,
         'role_choices': AffiliateMembership.role_choices
