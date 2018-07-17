@@ -191,7 +191,8 @@ def create(request):
 
 @only_staff
 def edit(request, slug):
-    affiliate = AffiliateEntity.objects.get(slug=slug)
+    affiliates = AffiliateEntity.objects.all()
+    affiliate = affiliates.get(slug=slug)
 
     if request.method == 'POST':
         # delete image from POST since we pull it from FILES
@@ -199,6 +200,12 @@ def edit(request, slug):
 
         if request.FILES and request.FILES['image']:
             setattr(affiliate, 'image', request.FILES['image'])
+
+        # If a parent affiliate is changed to be a standalone or a sub-affiliate
+        # we remove all of that parent's children references.
+        affiliate_type = request.POST['affiliate-type']
+        if affiliate.is_parent and affiliate_type in ['standalone', 'sub-affiliate']:
+            affiliate.children.all().update(parent=None)
 
         for key in request.POST:
             if key == 'year_of_birth':
@@ -209,6 +216,11 @@ def edit(request, slug):
                 else:
                     parent = None
                 setattr(affiliate, key, parent)
+            elif affiliate_type == 'parent' and key == 'sub-affiliates':
+                affiliate.parent = None
+                subs = dict(request.POST)['sub-affiliates']
+                affiliate.children.exclude(id__in=subs).update(parent=None)
+                affiliates.filter(id__in=subs).update(parent=affiliate)
             else:
                 setattr(affiliate, key, request.POST[key])
 
@@ -226,7 +238,10 @@ def edit(request, slug):
 
     return render_to_response('affiliates/form.html', {
         'affiliate': affiliate,
-        'affiliates': AffiliateEntity.objects.all(),
+        'affiliates': affiliates,
+        'available_subs': affiliates.exclude(
+            id__in=affiliate.children.all().values_list('id', flat=True)
+        ),
         'state_choices': STATE_CHOICES,
         'countries': countries,
         'role_choices': role_choices,
