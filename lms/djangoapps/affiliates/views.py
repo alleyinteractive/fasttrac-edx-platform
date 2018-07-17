@@ -184,6 +184,9 @@ def create(request):
             setattr(affiliate, key, post_data[key])
 
     affiliate.save()
+    if post_data['affiliate-type'] == 'parent':
+        subs = dict(request.POST)['sub-affiliates']
+        AffiliateEntity.objects.filter(id__in=subs).update(parent=affiliate)
 
     # SurveyGizmo functionality to automatically add Program Director upon creation
     if program_director_identifier:
