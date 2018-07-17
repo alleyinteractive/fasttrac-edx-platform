@@ -121,6 +121,7 @@
       %>
       <div class="form-control">
         <label for="affiliate-type">Affiliate Type</label>
+
         <div class="affiliate-type-toggle">
           <input type="radio"
                  name="affiliate-type"
@@ -128,48 +129,52 @@
                  class="hidden"
                  id="standalone-type"
                  ${'checked="checked"' if aff_type == 'standalone' else ''}
-                 >
-                 <label for="standalone-type">Standalone</label>
-                 <input type="radio"
-                 name="affiliate-type"
-                 value="parent"
-                 class="hidden"
-                 id="parent-type"
-                 ${'checked="checked"' if aff_type == 'parent' else ''}
           >
-          <label for="parent-type">Parent</label>
-          <input type="radio"
-                 name="affiliate-type"
-                 value="sub-affiliate"
-                 id="sub-type"
-                 class="hidden"
-                 ${'checked="checked"' if aff_type == 'subaff' else ''}
-          >
-          <label for="sub-type">Sub-Affiliate</label>
+        <label for="standalone-type">Standalone</label>
+        <input type="radio"
+               name="affiliate-type"
+               value="parent"
+               class="hidden"
+               id="parent-type"
+               ${'checked="checked"' if aff_type == 'parent' else ''}
+        >
+        <label for="parent-type">Parent</label>
+        <input type="radio"
+                name="affiliate-type"
+                value="sub-affiliate"
+                id="sub-type"
+                class="hidden"
+                ${'checked="checked"' if aff_type == 'subaff' else ''}
+        >
+        <label for="sub-type">Sub-Affiliate</label>
         </div>
       </div>
 
-      <div class="form-control parent-type  ${'' if aff_type == 'parent' else 'hidden'}">
+      <div class="form-control parent-type ${'' if aff_type == 'parent' else 'hidden'}">
         <div clas="form-control">
           <label>Sub-affiliates</label>
           <ul class="sub-affiliates-list">
             % for child in affiliate.children.all():
-              <li><a href="/affiliates/${child.slug}">${child.name}</a></li>
+              <li>
+                <a href="/affiliates/${child.slug}">${child.name}</a>
+                <i class="remove-btn fa fa-times"></i>
+                <input type="hidden" name="sub-affiliates" value="${child.id}">
+              </li>
             % endfor
           </ul>
         </div>
-<!--
+
         <div class="form-control">
           <label>Add Sub-Affiliate</label>
           <select class="affiliates-list">
             <option value="0">-</option>
-            % for aff in affiliates:
+            % for aff in available_subs:
             <option value="${aff.id}">${aff.name}</option>
             % endfor
           </select>
           <button type="button" class="add-btn">Add</button>
         </div>
--->
+
       </div>
       <div class="form-control sub-type ${'' if aff_type == 'subaff' else 'hidden'}">
         <div class="form-control">
@@ -311,13 +316,23 @@
       var $list = $('.sub-affiliates-list');
       $list.append(
         '<li value="' + affValue + '">' +
-        affName + '<button type="button" class="remove-btn">Remove</button>' +
+        '<a href="/affiliates/' + affName + '">' + affName + '</a>' +
+        '<i class="remove-btn fa fa-times"></i>' +
+        '<input type="hidden" name="sub-affiliates" value="' + affValue + '">' +
         '</li>'
       );
+
+      $('.parent-type .affiliates-list option[value=' + affValue + ']').remove();
     });
 
     $(document).on('click', '.parent-type .remove-btn', function() {
-      $(this).parent().remove();
+      var $parent = $(this).parent();
+      var value = $parent.find('input').val();
+      var name = $parent.find('a').text();
+      $parent.remove();
+      $('.parent-type .affiliates-list').append(
+        '<option value="' + value + '">' + name + '</option>'
+      );
     });
   });
 </script>

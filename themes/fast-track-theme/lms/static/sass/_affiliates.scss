@@ -358,6 +358,24 @@ h1.explore-header {
     }
   }
 
+  ul.sub-affiliates-list {
+    width: calc(100% - 340px);
+
+    li {
+      padding: 10px 20px;
+      margin-bottom: 10px;
+      border: 1px solid $ft-gray;
+
+      .remove-btn {
+        float: right;
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
+  }
+
   .form-control {
     &.parent-type {
       ul {
