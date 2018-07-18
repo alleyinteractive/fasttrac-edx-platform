@@ -85,7 +85,7 @@
           <th>Invited At</th>
           <th></th>
         </thead>
-        % for invite in affiliate.invites:
+        % for invite in affiliate.active_invites:
         <tr>
           <td>${invite.email}</td>
           <td>${invite.get_role_display()}</td>
