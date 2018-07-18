@@ -145,6 +145,10 @@ class AffiliateEntity(models.Model):
         return AffiliateInvite.objects.filter(affiliate=self)
 
     @property
+    def active_invites(self):
+        return AffiliateInvite.objects.filter(affiliate=self, active=True)
+
+    @property
     def courses(self):
         return CustomCourseForEdX.objects.filter(coach=self.program_director)
 
@@ -210,6 +214,8 @@ class AffiliateInvite(models.Model):
 
     invited_by = models.ForeignKey(User)
     invited_at = models.DateTimeField(auto_now=True)
+
+    active = models.BooleanField(default=True)
 
 
 def update_mailchimp_interest(affiliate_membership, value):
@@ -307,6 +313,21 @@ def add_affiliate_course_enrollments(sender, instance, **kwargs):
 
             enroll_email(course_id, instance.member.email, auto_enroll=True)
 
+
+@receiver(post_save, sender=AffiliateMembership, dispatch_uid="deactivate_invite")
+def deactivate_invite(sender, instance, created, **kwargs):
+    """An invite needs to be deactivated once a user creates an account."""
+    if created:
+        try:
+            invite = AffiliateInvite.objects.get(
+                email=instance.member.email,
+                affiliate=instance.affiliate,
+                active=True
+            )
+            invite.active = False
+            invite.save()
+        except AffiliateInvite.DoesNotExist:
+            pass
 
 
 @receiver(post_delete, sender=AffiliateMembership, dispatch_uid="remove_affiliate_course_enrollments")

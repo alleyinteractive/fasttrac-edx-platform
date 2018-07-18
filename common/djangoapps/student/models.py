@@ -624,7 +624,6 @@ def enroll_user_into_default_course(sender, instance, created, **kwargs):
 def add_member_to_affiliate(sender, instance, created, **kwargs):
     """
     Check and add member to affiliate entity.
-
     """
     if created:
         from affiliates.models import AffiliateInvite, AffiliateMembership
