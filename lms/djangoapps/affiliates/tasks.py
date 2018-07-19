@@ -487,7 +487,7 @@ def get_interactives_completion_csv_rows(course_ids):
 
             if is_done:
                 section_completion[unit['section']] += 1
-            row.append('Done' if is_done else '')
+            row.append('x' if is_done else '')
         student_rows.append(row)
 
         for section in sections:
