@@ -150,7 +150,7 @@ class AffiliateEntity(models.Model):
 
     @property
     def courses(self):
-        return CustomCourseForEdX.objects.filter(coach=self.program_director)
+        return self.ccx.all()
 
     @property
     def enrollments(self):

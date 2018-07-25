@@ -25,7 +25,6 @@ from instructor_task.models import ReportStore
 import django.contrib.auth as auth
 
 
-
 @only_staff
 def admin(request):
     affiliates = AffiliateEntity.objects.all().order_by('name')
