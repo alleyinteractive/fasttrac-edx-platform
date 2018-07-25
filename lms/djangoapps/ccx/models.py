@@ -285,6 +285,7 @@ class CcxFieldOverride(models.Model):
 
     value = models.TextField(default='null')
 
+
 class CourseUpdates(models.Model):
     date = models.DateField(blank=False, null=False)
     content = models.TextField(blank=False, null=False)
