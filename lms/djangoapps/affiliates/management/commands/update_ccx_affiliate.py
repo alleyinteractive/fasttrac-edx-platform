@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand
+
 from affiliates.models import AffiliateEntity
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 
 
 class Command(BaseCommand):
@@ -8,4 +10,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for affiliate in AffiliateEntity.objects.all():
             self.stdout.write('Updating affiliate {}'.format(affiliate.name))
-            affiliate.courses.update(affiliate=affiliate)
+            CustomCourseForEdX.objects.filter(
+                coach=affiliate.program_director
+            ).update(affiliate=affiliate)
