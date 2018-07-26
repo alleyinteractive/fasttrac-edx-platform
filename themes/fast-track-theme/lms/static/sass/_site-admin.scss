@@ -1,0 +1,143 @@
+#site-admin {
+  max-width: 80%;
+
+  nav.top-nav {
+    li {
+      display: inline-block;
+      margin-right: 20px;
+      margin-bottom: 100px;
+      text-transform: uppercase;
+      font-weight: 500;
+      font-size: 1.7rem;
+      color: $ft-gray;
+      transition-duration: 0.2s;
+
+      &:hover {
+        cursor: pointer;
+        color: $ft-orange;
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      &.active {
+        color: $ft-orange;
+      }
+    }
+  }
+
+
+  .dataTables_filter {
+    margin-bottom: 10px;
+  }
+
+  .ft-table {
+    border-bottom: 1px solid $ft-table-border;
+    border-collapse: collapse;
+
+    thead {
+      background-color: $ft-table-thead-bg;
+    }
+
+    tbody tr {
+      td:not(:first-child) {
+        text-align: center;
+      }
+
+      &:hover {
+        background-color: $ft-table-tr-hover;
+      }
+    }
+
+    tr {
+      transition-duration: 0.2s;
+
+      td, th {
+        padding: 0.5rem;
+        height: 30px;
+        line-height: 30px;
+        border: 1px solid $ft-table-border;
+
+        &.active {
+          color: $ft-green;
+          font-weight: 500;
+        }
+
+        &.inactive {
+          color: #f00;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  #affiliate-mngmt {
+    .add-new-affiliate {
+      @include ft-button;
+      display: inline-block;
+      padding: 10px;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    .dataTables_filter {
+      margin-top: -25px;
+    }
+  }
+
+  #learning-mngmt {
+    #learner-info {
+      display: inline-block;
+      width: 50%;
+      border-right: 1px solid $ft-table-border;
+      text-align: center;
+
+      h1 {
+        font-size: 1.6rem;
+        text-transform: uppercase;
+      }
+
+      .learner-info-box {
+        display: inline-block;
+        margin-bottom: 30px;
+        line-height: 0.5rem;
+        padding-right: 20px;
+
+        h2 {
+          display: inline-block;
+          font-weight: 500;
+          font-size: 2rem;
+        }
+      }
+    }
+
+    #impersonate-user {
+      display: inline-block;
+      width: 45%;
+      vertical-align: top;
+      text-align: center;
+
+      h1 {
+        font-size: 1.6rem;
+        text-transform: uppercase;
+      }
+
+      form {
+        input[type=submit] {
+          @include ft-button;
+        }
+      }
+    }
+
+    #courses-info {
+      margin-top: 100px;
+
+      .ft-table {
+        tbody tr td:nth-child(2) { text-align: left; }
+      }
+    }
+  }
+}
