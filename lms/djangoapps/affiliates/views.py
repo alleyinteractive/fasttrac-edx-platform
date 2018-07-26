@@ -212,20 +212,23 @@ def edit(request, slug):
         if affiliate.is_parent and affiliate_type in ['standalone', 'sub-affiliate']:
             affiliate.children.all().update(parent=None)
 
+        if affiliate_type in ['parent', 'standalone']:
+            affiliate.parent = None
+
         for key in request.POST:
             if key == 'year_of_birth':
                 setattr(affiliate, key, int(request.POST[key]))
             elif key == 'parent':
-                if int(request.POST[key]):
+                if affiliate_type == 'sub-affiliate' and int(request.POST[key]):
                     parent = AffiliateEntity.objects.get(id=request.POST[key])
                 else:
                     parent = None
                 setattr(affiliate, key, parent)
-            elif affiliate_type == 'parent' and key == 'sub-affiliates':
-                affiliate.parent = None
-                subs = dict(request.POST)['sub-affiliates']
-                affiliate.children.exclude(id__in=subs).update(parent=None)
-                affiliates.filter(id__in=subs).update(parent=affiliate)
+            elif key == 'sub-affiliates':
+                if affiliate_type == 'parent':
+                    subs = dict(request.POST)['sub-affiliates']
+                    affiliate.children.exclude(id__in=subs).update(parent=None)
+                    affiliates.filter(id__in=subs).update(parent=affiliate)
             else:
                 setattr(affiliate, key, request.POST[key])
 
