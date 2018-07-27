@@ -64,7 +64,8 @@ class ImpersonateView(APIView):
 class DataExportView(APIView):
     permission_classes = (IsAdminUser,)
 
-    def get(self, request):
+    def get(self, request):  # pylint: disable=unused-argument
+        """Retrieve all the reports from S3."""
         report_store = ReportStore.from_config('GRADES_DOWNLOAD')
         return Response(
             data={'exports': report_store.links_for('affiliates')},
@@ -73,6 +74,7 @@ class DataExportView(APIView):
         )
 
     def post(self, request):
+        """Start new report export task."""
         report_type = request.POST.get('report_type')
 
         if report_type == 'export_csv_affiliate_report':

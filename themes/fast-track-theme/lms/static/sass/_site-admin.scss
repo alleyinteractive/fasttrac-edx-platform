@@ -183,12 +183,11 @@
     }
 
     .refresh-list-btn {
-      font-size: 1.6rem;
-
-      &:hover {
-        cursor: pointer;
-      }
+      @include ft-button;
+      font-size: 1rem;
     }
+
+
 
     .dataTables_filter {
       margin-top: -25px;

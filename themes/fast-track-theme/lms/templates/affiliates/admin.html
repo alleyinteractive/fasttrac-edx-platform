@@ -141,7 +141,9 @@
       <span class="info"></span>
     </div>
 
-    <i class="fa fa-refresh fa-lg refresh-list-btn"></i>
+    <button class="refresh-list-btn">
+        <i class="fa fa-refresh fa-lg"></i>
+    </button>
 
     <table class="ft-table">
       <thead>
@@ -260,8 +262,8 @@
     }
 
     function populateExports() {
-      var $refreshBtn = $('.refresh-list-btn');
-      $refreshBtn.addClass('fa-spin');
+      var $refreshBtnIcon = $('.refresh-list-btn i');
+      $refreshBtnIcon.addClass('fa-spin');
       $('#csv-actions span.info').text('');
 
       $.ajax({
@@ -287,11 +289,11 @@
             );
           }
 
-          $refreshBtn.removeClass('fa-spin');
+          $refreshBtnIcon.removeClass('fa-spin');
         },
         error: function(data) {
           console.log("Error when populating exports: ", data);
-          $refreshBtn.removeClass('fa-spin');
+          $refreshBtnIcon.removeClass('fa-spin');
         }
       });
     }

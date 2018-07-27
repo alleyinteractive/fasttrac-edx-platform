@@ -1,45 +1,49 @@
+import logging
+
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
 from django.core import serializers
-from django.shortcuts import render, redirect
-from django.db.models import Q, F
-from django.http import Http404
+from django.shortcuts import redirect
+from django.db.models import Q
 from django.views.generic import View
-from lms.envs.common import STATE_CHOICES
 from django_countries import countries
-from edxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response
+
 from lms.djangoapps.ccx.models import CustomCourseForEdX
-from .models import AffiliateEntity, AffiliateMembership, AffiliateInvite
-from django.contrib.auth.models import User
-from student.models import CourseEnrollment
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
+from lms.envs.common import STATE_CHOICES
+from student.models import CourseEnrollment
+
 from .decorators import only_program_director, only_staff
-from .tasks import (
-    export_csv_user_report,
-    export_csv_affiliate_course_report,
-    export_csv_affiliate_report,
-    export_csv_course_report,
-    export_csv_interactives_completion_report
-)
-from instructor_task.models import ReportStore
-import django.contrib.auth as auth
-from django.utils.decorators import method_decorator
+from .models import AffiliateEntity, AffiliateMembership, AffiliateInvite
+
+LOG = logging.getLogger(__name__)
 
 
-class SiteAdminView(View):
+class IsStaffMixin(object):
+    def has_permissions(self):
+        return self.request.user.is_staff
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.has_permissions():
+            LOG.info('Unauthorized attempt to access site admin by %s', self.request.user.username)
+            return redirect('root')
+        return super(IsStaffMixin, self).dispatch(request, *args, **kwargs)
+
+
+class SiteAdminView(IsStaffMixin, View):
     template_name = 'affiliates/admin.html'
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):    # pylint: disable=unused-argument
         affiliates = AffiliateEntity.objects.all().order_by('name')
         ccxs = CustomCourseForEdX.objects.all()
-        ccxs = sorted(ccxs, key=lambda ccx: ccx.affiliate.name)
         fasttrac_course_key = settings.FASTTRAC_COURSE_KEY
+        active_enrollments = CourseEnrollment.objects.filter(is_active=True)
 
-        total_learners = CourseEnrollment.objects.filter(is_active=True).count()
-        total_fasttrac_learners = CourseEnrollment.objects.filter(is_active=True, course_id__startswith=fasttrac_course_key).count()
-        total_affiliate_learners = CourseEnrollment.objects.filter(is_active=True).exclude(course_id__startswith=fasttrac_course_key).count()
+        total_learners = active_enrollments.count()
+        total_fasttrac_learners = active_enrollments.filter(course_id__startswith=fasttrac_course_key).count()
+        total_affiliate_learners = active_enrollments.exclude(course_id__startswith=fasttrac_course_key).count()
 
         context = {
             'affiliates': affiliates,
@@ -50,67 +54,6 @@ class SiteAdminView(View):
             'total_affiliate_learners': total_affiliate_learners
         }
         return render_to_response(self.template_name, context)
-
-
-@only_staff
-def admin(request):
-    affiliates = AffiliateEntity.objects.all().order_by('name')
-    ccxs = CustomCourseForEdX.objects.all()
-    ccxs = sorted(ccxs, key = lambda ccx: ccx.affiliate.name)
-    fasttrac_course_key = settings.FASTTRAC_COURSE_KEY
-
-    total_learners = CourseEnrollment.objects.filter(is_active=True).count()
-    total_fasttrac_learners = CourseEnrollment.objects.filter(is_active=True, course_id__startswith=fasttrac_course_key).count()
-    total_affiliate_learners = CourseEnrollment.objects.filter(is_active=True).exclude(course_id__startswith=fasttrac_course_key).count()
-
-    return render_to_response('affiliates/admin.html', {
-        'affiliates': affiliates,
-        'ccxs': ccxs,
-        'partial_course_key': fasttrac_course_key.split(':')[1],
-        'total_learners': total_learners,
-        'total_fasttrac_learners': total_fasttrac_learners,
-        'total_affiliate_learners': total_affiliate_learners
-    })
-
-
-@only_staff
-def csv_admin(request):
-    report_store = ReportStore.from_config('GRADES_DOWNLOAD')
-
-    return render_to_response('affiliates/csv_admin.html', {
-        'csv_files': report_store.links_for('affiliates')
-    })
-
-
-@only_staff
-def csv_export(request):
-    report_type = request.GET.get('report_type')
-
-    if report_type == 'export_csv_affiliate_report':
-        export_csv_affiliate_report.delay()
-        messages.add_message(request, messages.INFO, 'Generating affiliate report CSV... Refresh to see the download link below.')
-
-    elif report_type == 'export_csv_affiliate_course_report':
-        export_csv_affiliate_course_report.delay()
-        messages.add_message(request, messages.INFO, 'Generating affiliate course report CSV... Refresh to see the download link below.')
-
-    elif report_type == 'export_csv_user_report':
-        export_csv_user_report.delay()
-        messages.add_message(request, messages.INFO, 'Generating user report CSV... Refresh to see the download link below.')
-
-    elif report_type == 'export_csv_time_report':
-        export_csv_course_report.delay(time_report=True)
-        messages.add_message(request, messages.INFO, 'Generating course time report CSV... Refresh to see the download link below.')
-
-    elif report_type == 'export_csv_completion_report':
-        export_csv_course_report.delay(time_report=False)
-        messages.add_message(request, messages.INFO, 'Generating course completion report CSV... Refresh to see the download link below.')
-
-    elif report_type == 'export_completion_report':
-        export_csv_interactives_completion_report.delay()
-        messages.add_message(request, messages.INFO, 'Generating course interactives completion report CSV... Refresh to see the download link below.')
-
-    return redirect('affiliates:csv_admin')
 
 
 def index(request):
@@ -140,11 +83,13 @@ def index(request):
         affiliates = AffiliateEntity.objects.filter(**filters).order_by('name')
         if location_latitude and location_longitude:
             affiliates = affiliates.exclude(Q(location_longitude=None) | Q(location_latitude=None))
-            affiliates = sorted(affiliates, key=lambda affiliate: affiliate.distance_from(
-            {'latitude': location_latitude, 'longitude': location_longitude}))
+            affiliates = sorted(
+                affiliates, key=lambda affiliate: affiliate.distance_from(
+                    {'latitude': location_latitude, 'longitude': location_longitude}
+                )
+            )
 
-
-            if len(affiliates) > 0:
+            if affiliates:
                 user_messages.append('Affiliates are sorted by the distance!')
     else:
         affiliates = AffiliateEntity.objects.filter(pk=affiliate_id, active=True)
@@ -172,7 +117,7 @@ def show(request, slug):
 
 
 @only_program_director
-def new(request):
+def new(request):    # pylint: disable=unused-argument
     all_affiliates = AffiliateEntity.objects.all()
 
     return render_to_response('affiliates/form.html', {
@@ -220,6 +165,7 @@ def create(request):
         AffiliateMembership.objects.create(affiliate=affiliate, member=member, role='staff')
 
     return redirect('affiliates:show', slug=affiliate.slug)
+
 
 @only_staff
 def edit(request, slug):
@@ -283,14 +229,15 @@ def edit(request, slug):
         'is_program_director': is_program_director(request.user, affiliate)
     })
 
+
 @only_program_director
-def delete(request, slug):
+def delete(request, slug):    # pylint: disable=unused-argument
     AffiliateEntity.objects.get(slug=slug).delete()
 
     return redirect('affiliates:index')
 
 
-def payment(request):
+def payment(request):    # pylint: disable=unused-argument
     return render_to_response('affiliates/payment.html', {
         'preview': settings.PAYMENT_PREVIEW
     })
@@ -312,7 +259,11 @@ def add_member(request, slug):
         # create a user invite if the user does not exist
         invite_new_user(affiliate, member_identifier, role, request.user)
 
-        messages.add_message(request, messages.INFO, 'User "{}" does not exist. They will be invited.'.format(member_identifier))
+        messages.add_message(
+            request,
+            messages.INFO,
+            'User "{}" does not exist. They will be invited.'.format(member_identifier)
+        )
         return redirect('affiliates:edit', slug=slug)
 
     params = {
@@ -321,8 +272,7 @@ def add_member(request, slug):
         'role': role,
     }
 
-    membership = AffiliateMembership.objects.create(**params)
-
+    AffiliateMembership.objects.create(**params)
     return redirect('affiliates:edit', slug=slug)
 
 
@@ -359,18 +309,21 @@ def remove_invite(request, slug, invite_id):
 
 
 @only_staff
-def toggle_active_status(request, slug):
+def toggle_active_status(request, slug):    # pylint: disable=unused-argument
     affiliate = AffiliateEntity.objects.select_for_update().get(slug=slug)
     affiliate.active = not affiliate.active
     affiliate.save()
 
     return redirect('affiliates:edit', slug=slug)
 
+
 def is_program_director(user, affiliate):
     if user.is_anonymous():
         return False
     else:
-        return user.is_staff or AffiliateMembership.objects.filter(member=user, affiliate=affiliate, role='staff').exists()
+        return user.is_staff or AffiliateMembership.objects.filter(
+            member=user, affiliate=affiliate, role='staff'
+        ).exists()
 
 
 def invite_new_user(affiliate, user_email, role, current_user):
