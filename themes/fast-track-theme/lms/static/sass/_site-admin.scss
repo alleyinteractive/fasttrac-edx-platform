@@ -106,8 +106,11 @@
         line-height: 0.5rem;
         padding-right: 20px;
 
+        &:last-child {
+          padding-right: 0;
+        }
+
         h2 {
-          display: inline-block;
           font-weight: 500;
           font-size: 2rem;
         }
@@ -125,10 +128,16 @@
         text-transform: uppercase;
       }
 
-      form {
-        input[type=submit] {
-          @include ft-button;
-        }
+      button {
+        @include ft-button;
+        height: 35px;
+      }
+
+      .error {
+        display: block;
+        margin-top: 10px;
+        color: #f00;
+        font-style: italic;
       }
     }
 

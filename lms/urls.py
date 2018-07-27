@@ -999,6 +999,7 @@ if settings.FEATURES["CUSTOM_COURSES_EDX"]:
 # Affiliates Feature
 urlpatterns += (
     url(r'^affiliates/', include('lms.djangoapps.affiliates.urls', namespace='affiliates')),
+    url(r'^api/affiliates/', include('lms.djangoapps.affiliates.api.urls', namespace='affiliates_api')),
 )
 
 # Access to courseware as an LTI provider

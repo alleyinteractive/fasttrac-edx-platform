@@ -339,22 +339,6 @@ def toggle_active_status(request, slug):
 
     return redirect('affiliates:edit', slug=slug)
 
-
-@only_staff
-def login_as_user(request):
-    email = request.POST.get('email')
-    try:
-        user = User.objects.get(email=email)
-        if not hasattr(request.user, 'backend'):
-            user.backend = _get_path_of_arbitrary_backend_for_user(user)
-
-        auth.login(request, user)
-        return redirect('/')
-    except User.DoesNotExist:
-        messages.error(request, 'User "{}" does not exist'.format(email))
-        return redirect(request.META['HTTP_REFERER'])
-
-
 def is_program_director(user, affiliate):
     if user.is_anonymous():
         return False
@@ -364,13 +348,3 @@ def is_program_director(user, affiliate):
 
 def invite_new_user(affiliate, user_email, role, current_user):
     AffiliateInvite.objects.create(affiliate=affiliate, email=user_email, role=role, invited_by=current_user)
-
-
-def _get_path_of_arbitrary_backend_for_user(user):
-        """
-        Return the path to the first found authentication backend that recognizes the given user.
-        """
-        for backend_path in settings.AUTHENTICATION_BACKENDS:
-            backend = auth.load_backend(backend_path)
-            if backend.get_user(user.id):
-                return backend_path

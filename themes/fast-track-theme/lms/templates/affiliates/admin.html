@@ -71,11 +71,9 @@
 
     <div id="impersonate-user">
       <h1>Impersonate a User</h1>
-      <form action="login_as_user" method="POST">
-          <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
-          <input type="email" name="email" placeholder="Email of user to impersonate" />
-          <input type="submit" value="Impersonate" />
-      </form>
+      <input type="email" name="email" placeholder="Email of user to impersonate" />
+      <button class="btn submit">Impersonate</button>
+      <span class="error"></span>
     </div>
 
     <div id="courses-info">
@@ -160,5 +158,37 @@
 
     $('#affiliate-mngmt .ft-table').DataTable(defaultTableOptions);
     $('#learning-mngmt .ft-table').DataTable(learningTableOptions);
+
+    // IMPERSONATION
+    $('#impersonate-user button.submit').click(function() {
+      var $errorField = $('#impersonate-user span.error');
+      var $emaiField = $('#impersonate-user input[name=email]');
+      var email = $emaiField.val();
+
+      function showError(msg) {
+        $errorField.text(msg);
+        $emaiField.focus();
+      }
+
+      $errorField.text('');
+
+      if (!email) {
+        showError('Email field empty.');
+      } else if (!$emaiField[0].checkValidity()) {
+        showError('Entered email is invalid.');
+      } else {
+        $.ajax({
+          url: '/api/affiliates/impersonate',
+          method: 'POST',
+          data: {email: email},
+          success: function() {
+            window.location.href = '/';
+          },
+          error: function(data) {
+            showError(data.responseJSON.msg);
+          }
+        });
+      }
+    });
   });
 </script>
