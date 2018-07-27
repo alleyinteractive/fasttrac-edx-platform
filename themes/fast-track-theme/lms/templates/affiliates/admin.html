@@ -95,10 +95,19 @@
           <tr>
             <td>${ccx.affiliate.name}</td>
             <td>${ccx.display_name}</td>
-            % if ccx.time < now() < ccx.end_date:
+            <%
+              active_course = False
+              if ccx.time and not ccx.end_date and ccx.time < now():
+                active_course = True
+              if not ccx.time and ccx.end_date and ccx.end_time > now():
+                active_course = True
+              if ccx.time and ccx.end_date and ccx.time < now() < ccx.end_date:
+                active_course = True
+            %>
+            % if active_course:
               <td class="active">Active</td>
-              % else:
-              <td class="inactive">Inctive</td>
+            % else:
+              <td class="inactive">Inactive</td>
             % endif
             % if ccx.affiliate.active:
               <td class="active">Active</td>
