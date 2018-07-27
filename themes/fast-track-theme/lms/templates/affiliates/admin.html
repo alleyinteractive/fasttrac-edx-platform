@@ -10,6 +10,8 @@
 <%block name="headextra">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
   <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+  <script src="//cdn.datatables.net/plug-ins/1.10.19/sorting/datetime-moment.js"></script>
 </%block>
 
 <div id="site-admin" class="container">
@@ -170,6 +172,8 @@
 
 <script>
   $(document).ready(function() {
+    $.fn.dataTable.moment('MMMM Do YYYY, HH:mm');
+
     // TOP NAVIGATION
     var $affiliateSection = $('section#affiliate-mngmt');
     var $learningSection = $('section#learning-mngmt');
@@ -202,8 +206,13 @@
       ]
     }, defaultTableOptions);
     var dataExportsTableOptions = $.extend({
+      'columns': [
+        {data: 'reportType'},
+        {data: 'filename'},
+        {data: 'creationDate'}
+      ],
       'order': [
-        [2, 'asc']
+        [2, 'desc']
       ]
     }, defaultTableOptions);
 
@@ -279,9 +288,10 @@
         method: 'GET',
         url: '/api/affiliates/data-exports',
         success: function(data) {
+          var rows = [];
           var exports = data.exports;
-          var $tbody = $('#data-exports table tbody');
-          $tbody.empty();
+          var $table = $('#data-exports table').DataTable();
+          $table.clear();
 
           for (var i = 0; i < exports.length; i++) {
             var filename = exports[i][0];
@@ -289,15 +299,14 @@
             var type = extractType(filename);
             var creationDate = extractDate(filename);
 
-            $tbody.append(
-              '<tr>' +
-                '<td>' + type + '</td>' +
-                '<td><a href="' + url + '">' + filename + '</td>' +
-                '<td>' + creationDate + '</td>' +
-              '</tr>'
-            );
+            rows.push({
+              reportType: type,
+              filename: '<a href="' + url + '">' + filename + '</a>',
+              creationDate: creationDate
+            });
           }
 
+          $table.rows.add(rows).draw();
           $refreshBtnIcon.removeClass('fa-spin');
         },
         error: function(data) {
