@@ -3,10 +3,12 @@ URLs for the Affiliate Feature.
 """
 from django.conf.urls import patterns, url
 
+from affiliates.views import SiteAdminView
+
 
 urlpatterns = patterns('',
     url(r'^$', 'affiliates.views.index', name='index'),
-    url(r'^admin$', 'affiliates.views.admin', name='admin'),
+    url(r'^admin$', SiteAdminView.as_view(), name='admin'),
     url(r'^csv_admin$', 'affiliates.views.csv_admin', name='csv_admin'),
     url(r'^csv_export$', 'affiliates.views.csv_export', name='csv_export'),
     url(r'^payment$', 'affiliates.views.payment', name='payment'),

@@ -149,4 +149,65 @@
       }
     }
   }
+
+  #data-exports {
+    #csv-actions {
+      line-height: 40px;
+      margin-bottom: 40px;
+
+      h1 {
+        font-size: 1.3rem;
+        text-transform: uppercase;
+        text-align: left;
+        margin-bottom: 0;
+      }
+
+      button {
+        @include ft-button;
+        font-size: 1rem;
+        text-transform: capitalize;
+      }
+
+      span.info {
+        display: block;
+        font-style: italic;
+
+        &.success {
+          color: $ft-green;
+        }
+
+        &.error {
+          color: #f00;
+        }
+      }
+    }
+
+    .refresh-list-btn {
+      font-size: 1.6rem;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    .dataTables_filter {
+      margin-top: -25px;
+    }
+
+    .ft-table {
+      tr {
+        td {
+          text-align: left;
+
+          &:first-child {
+            width: 180px;
+          }
+
+          &:last-child {
+            width: 220px;
+          }
+        }
+      }
+    }
+  }
 }

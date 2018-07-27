@@ -1,10 +1,12 @@
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core import serializers
 from django.shortcuts import render, redirect
 from django.db.models import Q, F
 from django.http import Http404
+from django.views.generic import View
 from lms.envs.common import STATE_CHOICES
 from django_countries import countries
 from edxmako.shortcuts import render_to_response, render_to_string
@@ -23,6 +25,31 @@ from .tasks import (
 )
 from instructor_task.models import ReportStore
 import django.contrib.auth as auth
+from django.utils.decorators import method_decorator
+
+
+class SiteAdminView(View):
+    template_name = 'affiliates/admin.html'
+
+    def get(self, request, *args, **kwargs):
+        affiliates = AffiliateEntity.objects.all().order_by('name')
+        ccxs = CustomCourseForEdX.objects.all()
+        ccxs = sorted(ccxs, key=lambda ccx: ccx.affiliate.name)
+        fasttrac_course_key = settings.FASTTRAC_COURSE_KEY
+
+        total_learners = CourseEnrollment.objects.filter(is_active=True).count()
+        total_fasttrac_learners = CourseEnrollment.objects.filter(is_active=True, course_id__startswith=fasttrac_course_key).count()
+        total_affiliate_learners = CourseEnrollment.objects.filter(is_active=True).exclude(course_id__startswith=fasttrac_course_key).count()
+
+        context = {
+            'affiliates': affiliates,
+            'ccxs': ccxs,
+            'partial_course_key': fasttrac_course_key.split(':')[1],
+            'total_learners': total_learners,
+            'total_fasttrac_learners': total_fasttrac_learners,
+            'total_affiliate_learners': total_affiliate_learners
+        }
+        return render_to_response(self.template_name, context)
 
 
 @only_staff

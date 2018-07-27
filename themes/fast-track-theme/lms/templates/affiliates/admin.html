@@ -80,7 +80,7 @@
       <table class="ft-table">
         <thead>
           <tr>
-            <th>Affliate Name</th>
+            <th>Affiliate Name</th>
             <th>Course Name</th>
             <th>Course Status</th>
             <th>Affiliate Status</th>
@@ -118,6 +118,41 @@
   </section>
 
   <section id="data-exports" class="hidden">
+    <div id="csv-actions">
+      <h1>Select a report type to export:</h1>
+      <button class="csv-action-btn" data-report-type="export_csv_affiliate_report">
+        Affiliate Report
+      </button>
+      <button class="csv-action-btn" data-report-type="export_csv_affiliate_course_report">
+        Affiliate Course Report
+      </button>
+      <button class="csv-action-btn" data-report-type="export_csv_user_report">
+        User Report
+      </button>
+      <button class="csv-action-btn" data-report-type="export_csv_time_report">
+        Course Time Report
+      </button>
+      <button class="csv-action-btn" data-report-type="export_csv_completion_report">
+        Course Completion Report
+      </button>
+      <button class="csv-action-btn" data-report-type="export_completion_report">
+        Course Interactives Completion Report
+      </button>
+      <span class="info"></span>
+    </div>
+
+    <i class="fa fa-refresh fa-lg refresh-list-btn"></i>
+
+    <table class="ft-table">
+      <thead>
+        <tr>
+          <th>Report Type</th>
+          <th>Filename</th>
+          <th>Created at</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
   </section>
 </div>
@@ -127,7 +162,7 @@
     // TOP NAVIGATION
     var $affiliateSection = $('section#affiliate-mngmt');
     var $learningSection = $('section#learning-mngmt');
-    var $dataDownloadSection = $('section#data-exports');
+    var $dataExportsSection = $('section#data-exports');
 
     $('nav.top-nav li').click(function() {
       $('#site-admin section').addClass('hidden');
@@ -140,7 +175,7 @@
         $learningSection.removeClass('hidden');
       } else if ($(this).hasClass('data-exports-link')) {
         $(this).addClass('active');
-        $dataDownloadSection.removeClass('hidden');
+        $dataExportsSection.removeClass('hidden');
       }
     });
 
@@ -155,9 +190,15 @@
         [1, 'asc']
       ]
     }, defaultTableOptions);
+    var dataExportsTableOptions = $.extend({
+      'order': [
+        [2, 'asc']
+      ]
+    }, defaultTableOptions);
 
     $('#affiliate-mngmt .ft-table').DataTable(defaultTableOptions);
     $('#learning-mngmt .ft-table').DataTable(learningTableOptions);
+    $('#data-exports .ft-table').DataTable(dataExportsTableOptions);
 
     // IMPERSONATION
     $('#impersonate-user button.submit').click(function() {
@@ -190,5 +231,99 @@
         });
       }
     });
+
+    // DATA EXPORTS
+    function extractDate(filename) {
+      var regex = /(\d{4}-\d{2}-\d{2}-\d{4})\.csv$/;
+      var date = regex.exec(filename)[1];
+
+      var mDate = moment(date, 'YYYY-MM-DD-hhmm');
+      return mDate.format('MMMM Do YYYY, hh:mm');
+    }
+
+    function extractType(filename) {
+      var regex = /^affiliates_(\w*)_\d*/;
+      var type = regex.exec(filename)[1];
+      var typeMap = {
+        'affiliate_report': 'Affiliate',
+        'affiliates_report': 'Affiliate',
+        'completion_report': 'Course Completion',
+        'course_report': 'Affiliate Course',
+        'courses': 'Affiliate Course',
+        'interactives_completion_report': 'Interactives Completion',
+        'report': 'Affiliate',
+        'time_report': 'Course Time',
+        'user_report': 'User',
+      };
+
+      return typeMap[type] || '';
+    }
+
+    function populateExports() {
+      var $refreshBtn = $('.refresh-list-btn');
+      $refreshBtn.addClass('fa-spin');
+      $('#csv-actions span.info').text('');
+
+      $.ajax({
+        method: 'GET',
+        url: '/api/affiliates/data-exports',
+        success: function(data) {
+          var exports = data.exports;
+          var $tbody = $('#data-exports table tbody');
+          $tbody.empty();
+
+          for (var i = 0; i < exports.length; i++) {
+            var filename = exports[i][0];
+            var url = exports[i][1];
+            var type = extractType(filename);
+            var creationDate = extractDate(filename);
+
+            $tbody.append(
+              '<tr>' +
+                '<td>' + type + '</td>' +
+                '<td><a href="' + url + '">' + filename + '</td>' +
+                '<td>' + creationDate + '</td>' +
+              '</tr>'
+            );
+          }
+
+          $refreshBtn.removeClass('fa-spin');
+        },
+        error: function(data) {
+          console.log("Error when populating exports: ", data);
+          $refreshBtn.removeClass('fa-spin');
+        }
+      });
+    }
+
+    populateExports();
+
+    $('.csv-action-btn').click(function() {
+      var reportType = $(this).data('report-type');
+      var $infoField = $('#data-exports span.info');
+
+      $infoField.removeClass('success error');
+      $infoField.text('');
+
+      $.ajax({
+        url: '/api/affiliates/data-exports',
+        method: 'POST',
+        data: {report_type: reportType},
+        success: function() {
+          $infoField.addClass('success');
+          $infoField.text(
+            'Generating ' + reportType + ', this will take a few minutes. ' +
+            'Refresh table to see the download link.'
+            );
+        },
+        error: function(data) {
+          $infoField.addClass('error');
+          $infoField.text('An error occurred.');
+          console.error('Data export error: ', data)
+        }
+      });
+    });
+
+    $('.refresh-list-btn').click(populateExports);
   });
 </script>
