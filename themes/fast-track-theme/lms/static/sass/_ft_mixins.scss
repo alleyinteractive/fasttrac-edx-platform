@@ -2,7 +2,9 @@
   background: $ft-orange;
   color: white;
   border: none;
+  border-radius: 0;
   box-shadow: none;
+  transition-duration: 0.1s;
 
   &:hover, &:active {
     background: $ft-orange;
