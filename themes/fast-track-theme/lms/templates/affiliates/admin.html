@@ -199,7 +199,25 @@
       'info': false,
       'paging': false
     };
+    var affiliateTableOptions = $.extend({
+      'columns': [
+        null,
+        null,
+        {orderable: false},
+        {orderable: false},
+      ]
+    }, defaultTableOptions);
     var learningTableOptions = $.extend({
+      'columns': [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {orderable: false},
+        {orderable: false},
+      ],
       'order': [
         [0, 'asc'],
         [1, 'asc']
@@ -216,7 +234,7 @@
       ]
     }, defaultTableOptions);
 
-    $('#affiliate-mngmt .ft-table').DataTable(defaultTableOptions);
+    $('#affiliate-mngmt .ft-table').DataTable(affiliateTableOptions);
     $('#learning-mngmt .ft-table').DataTable(learningTableOptions);
     $('#data-exports .ft-table').DataTable(dataExportsTableOptions);
 
