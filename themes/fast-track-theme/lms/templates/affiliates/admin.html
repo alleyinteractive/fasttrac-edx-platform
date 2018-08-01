@@ -95,7 +95,11 @@
         <tbody>
           % for ccx in ccxs:
           <tr>
+            % if ccx.affiliate:
             <td>${ccx.affiliate.name}</td>
+            % else:
+            <td>-</td>
+            % endif
             <td>${ccx.display_name}</td>
             <%
               active_course = False
@@ -111,10 +115,14 @@
             % else:
               <td class="inactive">Inactive</td>
             % endif
-            % if ccx.affiliate.active:
-              <td class="active">Active</td>
+            % if ccx.affiliate:
+              % if ccx.affiliate.active:
+                <td class="active">Active</td>
               % else:
-              <td class="inactive">Inctive</td>
+                <td class="inactive">Inactive</td>
+              % endif
+            % else:
+            <td>-</td>
             % endif
             <td>${ccx.time.strftime("%b %d, %Y") if ccx.time else '--'}</td>
             <td>${ccx.end_date.strftime("%b %d, %Y") if ccx.end_date else '--'}</td>
