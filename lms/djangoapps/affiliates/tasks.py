@@ -1,17 +1,17 @@
 import json
 import logging
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from datetime import datetime
 
 import requests
 from django.conf import settings
+from django.db.models import Q
 from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from instructor_task.tasks_helper import upload_csv_to_report_store
 from lms import CELERY_APP
 from lms.djangoapps.ccx.models import CustomCourseForEdX
-from lms.djangoapps.ccx.utils import get_ccx_from_ccx_locator
 from lms.djangoapps.ccx.views import get_ccx_schedule
 from student.models import UserProfile, CourseEnrollment, CourseAccessRole
 from courseware.models import StudentModule, StudentTimeTracker
@@ -455,7 +455,10 @@ def get_interactives_completion_csv_rows(course_ids):
     student_rows = []
     summary_rows = []
 
+    affiliate_staff_ids = AffiliateMembership.objects.all().values_list('member_id', flat=True)
+
     enrollments = CourseEnrollment.objects.filter(
+        ~Q(user_id__in=affiliate_staff_ids),
         course_id__in=course_ids,
         is_active=True
     ).order_by('course_id', 'user')
