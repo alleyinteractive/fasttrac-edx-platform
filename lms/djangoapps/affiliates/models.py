@@ -352,7 +352,6 @@ def remove_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: 
 
             revoke_access(course, instance.member, AffiliateMembership.CCX_COACH, False)
 
-
 @receiver(pre_delete, sender=AffiliateMembership, dispatch_uid="validate_course_dependency")
 def validate_course_dependency(sender, instance, **kwargs):  # pylint: disable=unused-argument
     count_affiliate_memberships_of_member = AffiliateMembership.objects.filter(member=instance.member).count()
@@ -365,8 +364,8 @@ def validate_course_dependency(sender, instance, **kwargs):  # pylint: disable=u
 @receiver(post_save, sender=AffiliateEntity, dispatch_uid='manage_program_director')
 def manage_program_director(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
     """A sub-affiliate has to have the same program director as the parent."""
-    if instance.parent:
-        AffiliateMembership.objects.get_or_create(
+    if created and instance.parent:
+        AffiliateMembership.objects.create(
             affiliate=instance,
             member=instance.parent.program_director,
             role=AffiliateMembership.STAFF
