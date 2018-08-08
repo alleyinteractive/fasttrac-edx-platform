@@ -92,26 +92,51 @@
       display: inline-block;
       width: 50%;
       border-right: 1px solid $ft-table-border;
-      text-align: center;
 
       h1 {
         font-size: 1.6rem;
         text-transform: uppercase;
+
+        .ft-tooltip-btn {
+          @include ft-tooltip-btn;
+          font-size: 1.2rem;
+
+          .ft-tooltip {
+            top: -15px;
+            left: 20px;
+            width: 500px;
+            text-transform: initial;
+            font-size: 0.85rem;
+
+            &:after {
+              @include ft-tooltip-arrow-left;
+              top: 10%;
+            }
+          }
+        }
       }
 
-      .learner-info-box {
-        display: inline-block;
-        margin-bottom: 30px;
-        line-height: 0.5rem;
-        padding-right: 20px;
+      .learner-info-wrapper {
+        display: flex;
+        justify-content: space-around;
 
-        &:last-child {
-          padding-right: 0;
-        }
+        .learner-info-box {
+          display: inline-block;
+          margin-bottom: 30px;
 
-        h2 {
-          font-weight: 500;
-          font-size: 2rem;
+          ul {
+            list-style: none;
+            font-size: 1.2rem;
+
+            li {
+              margin-bottom: 15px;
+
+              span {
+                font-weight: bold;
+                font-size: 1.3rem;
+              }
+            }
+          }
         }
       }
     }

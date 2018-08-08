@@ -51,3 +51,35 @@
     }
   }
 }
+
+@mixin ft-tooltip-btn {
+  .ft-tooltip {
+    position: absolute;
+    z-index: 999;
+    visibility: hidden;
+    opacity: 0;
+    width: auto;
+    background-color: black;
+    color: white;
+    text-align: left;
+    padding: 5px;
+    border-radius: 5px;
+    transition-duration: .2s;
+  }
+
+  &:hover .ft-tooltip {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+@mixin ft-tooltip-arrow-left {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent black transparent transparent;
+}
