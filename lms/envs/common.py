@@ -1112,6 +1112,7 @@ MIDDLEWARE_CLASSES = (
     'microsite_configuration.middleware.MicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'lms.fasttrac.middleware.FTSlackErrorMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
 
     # Allows us to define redirects via Django admin
