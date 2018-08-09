@@ -557,30 +557,31 @@ def course_info(request, course_id):
 
             for subsection in section.get_children():
                 # last xblock of last unit is "mark as complete"
-                last_subsection_xblock = subsection.get_children()[-1].get_children()[-1]
+                if subsection.get_children() and subsection.get_children()[-1].get_children():
+                    last_subsection_xblock = subsection.get_children()[-1].get_children()[-1]
 
-                if hasattr(last_subsection_xblock, 'done'):
-                    student_module = StudentModule.objects.filter(course_id=course.id, module_state_key=last_subsection_xblock.location, student=user).first()
-                    if student_module:
-                        student_module_state = json.loads(student_module.state)
-                        if student_module_state.get('done'):
-                            completed_subsections += 1
-                else:
-                    # run through all units and see if they were marked helpful or not helpful
-                    units_completed = True
-                    for unit in subsection.get_children()[1:-1]:
-                        last_unit_xblock = unit.get_children()[-1]
-                        student_module = StudentModule.objects.filter(course_id=course.id, module_state_key=last_unit_xblock.location, student=user).first()
-
+                    if hasattr(last_subsection_xblock, 'done'):
+                        student_module = StudentModule.objects.filter(course_id=course.id, module_state_key=last_subsection_xblock.location, student=user).first()
                         if student_module:
                             student_module_state = json.loads(student_module.state)
+                            if student_module_state.get('done'):
+                                completed_subsections += 1
+                    else:
+                        # run through all units and see if they were marked helpful or not helpful
+                        units_completed = True
+                        for unit in subsection.get_children()[1:-1]:
+                            last_unit_xblock = unit.get_children()[-1]
+                            student_module = StudentModule.objects.filter(course_id=course.id, module_state_key=last_unit_xblock.location, student=user).first()
 
-                            if student_module_state.get('helpful') is None:
-                                units_completed = False
+                            if student_module:
+                                student_module_state = json.loads(student_module.state)
 
-                    # if no unit wasn't marked helpful/not helpful and it has more than 2 units (not intro unit)
-                    if units_completed and len(subsection.get_children()[1:-1]) > 0:
-                        completed_subsections += 1
+                                if student_module_state.get('helpful') is None:
+                                    units_completed = False
+
+                        # if no unit wasn't marked helpful/not helpful and it has more than 2 units (not intro unit)
+                        if units_completed and len(subsection.get_children()[1:-1]) > 0:
+                            completed_subsections += 1
 
             section.completed_subsections = completed_subsections
 
