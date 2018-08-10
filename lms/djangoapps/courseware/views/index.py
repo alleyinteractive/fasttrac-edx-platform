@@ -5,7 +5,6 @@ import sys
 import traceback
 
 # pylint: disable=attribute-defined-outside-init
-import requests
 from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
