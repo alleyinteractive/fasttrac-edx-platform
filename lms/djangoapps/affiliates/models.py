@@ -1,27 +1,25 @@
-import hashlib
 import datetime
+import hashlib
+
+import requests
+from ccx_keys.locator import CCXLocator
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.db import models, IntegrityError, transaction
-from django.db.models import Q, F
 from django.db.models.signals import post_save, pre_delete, post_delete
 from django.dispatch import receiver
-from django.contrib.auth.models import User
-from django.conf import settings
-from lms.envs.common import STATE_CHOICES
-from django_countries.fields import CountryField
-from lms.djangoapps.ccx.models import CustomCourseForEdX
-from instructor.access import allow_access, revoke_access
-from ccx_keys.locator import CCXLocator
-from courseware.courses import get_course_by_id
-from contextlib import contextmanager
-from courseware.courses import get_course_with_access, get_course_by_id
-from opaque_keys.edx.keys import CourseKey
-from student.models import CourseAccessRole, CourseEnrollment, UserProfile
 from django.template.defaultfilters import slugify
 from django.utils.crypto import get_random_string
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from lms.djangoapps.instructor.enrollment import enroll_email
+from django_countries.fields import CountryField
+
+from courseware.courses import get_course_by_id
+from instructor.access import allow_access, revoke_access
+from lms.envs.common import STATE_CHOICES
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.courseware.gis_helpers import coordinates_distance
-import requests
+from lms.djangoapps.instructor.enrollment import enroll_email
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseEnrollment
 
 
 def user_directory_path(instance, filename):
@@ -98,7 +96,7 @@ class AffiliateEntity(models.Model):
         url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + params + ',&key=' + geocoding_api_key
         json_response = requests.get(url).json()
 
-        if len(json_response['results']) == 0:
+        if not json_response['results']:
             return None, None
 
         location = json_response['results'][0]['geometry']['location']
@@ -106,7 +104,10 @@ class AffiliateEntity(models.Model):
         return location['lat'], location['lng']
 
     def distance_from(self, coordinate):
-        return coordinates_distance({ 'latitude': self.location_latitude, 'longitude': self.location_longitude }, coordinate)
+        return coordinates_distance({
+            'latitude': self.location_latitude,
+            'longitude': self.location_longitude
+        }, coordinate)
 
     class Meta:
         unique_together = ('email', 'name')
@@ -230,6 +231,8 @@ def update_mailchimp_interest(affiliate_membership, value):
         interest_id = affiliate_membership.mailchimp_interests[affiliate_membership.role]
         affiliate = affiliate_membership.member.profile.affiliate
 
+        is_affiliate_user = affiliate_membership.member.profile.is_affiliate_user
+
         data = {
             'email_address': affiliate_membership.member.email,
             'status': 'subscribed',
@@ -238,16 +241,16 @@ def update_mailchimp_interest(affiliate_membership, value):
             },
             'interests': {
                 interest_id: value,
-                settings.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not affiliate_membership.member.profile.is_affiliate_user, # Entrepreneur User
-                settings.AFFILIATE_MAILCHIMP_INTEREST_ID: affiliate_membership.member.profile.is_affiliate_user # Affiliate User
+                settings.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not is_affiliate_user,  # Entrepreneur User
+                settings.AFFILIATE_MAILCHIMP_INTEREST_ID: is_affiliate_user  # Affiliate User
             }
         }
 
         # TODO: notify admin if this fails (send email)
         r = requests.put(mailchimp_url, auth=('fasttrac', mailchimp_api_key), json=data)
         if not r.status_code == 200:
-            print('Affiliate membership update error')
-            print(r.content)
+            print 'Affiliate membership update error'
+            print r.content
 
 
 @receiver(post_save, sender=AffiliateInvite, dispatch_uid="send_invite_email")
@@ -255,7 +258,6 @@ def send_invite_email(sender, instance, created, **kwargs):
     if created:
         from django.core.mail import send_mail
         from django.template import loader
-
 
         context = {
             'site_name': settings.SITE_NAME,
@@ -267,12 +269,13 @@ def send_invite_email(sender, instance, created, **kwargs):
         subject = 'FastTrac Affiliate Invite'
         message = loader.render_to_string('emails/affiliate_invitation.txt', context)
 
-        send_mail(subject, message, from_address, [
-                    instance.email], fail_silently=False)
+        send_mail(subject, message, from_address, [instance.email], fail_silently=False)
+
 
 @receiver(post_save, sender=AffiliateMembership, dispatch_uid="add_mailchimp_interests")
 def add_mailchimp_interests(sender, instance, **kwargs):
     update_mailchimp_interest(instance, True)
+
 
 @receiver(post_delete, sender=AffiliateMembership, dispatch_uid="remove_mailchimp_interests")
 def remove_mailchimp_interests(sender, instance, **kwargs):
@@ -281,7 +284,10 @@ def remove_mailchimp_interests(sender, instance, **kwargs):
 
 @receiver(post_save, sender=AffiliateMembership, dispatch_uid="add_affiliate_course_enrollments")
 def add_affiliate_course_enrollments(sender, instance, **kwargs):
-    'Allow staff or instructor access to affiliate member into all affiliate courses if they are staff or instructor member.'
+    """
+    Allow staff or instructor access to affiliate member into all
+    affiliate courses if they are staff or instructor member.
+    """
     if not instance.role == 'ccx_coach':
         for ccx in instance.affiliate.courses:
             ccx_locator = CCXLocator.from_course_locator(ccx.course_id, ccx.id)
