@@ -81,7 +81,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
         button_target = '/courses/{0}/ccx_coach'.format(enrollment.course_id)
         button_label = 'Create Custom Course'
       elif is_ccx and is_staff_or_instructor:
-        button_target = '/courses/{0}/edit_custom_course'.format(ccx_custom_course.ccx_course_id)
+        button_target = '/courses/{0}/ccx_coach'.format(ccx_custom_course.ccx_course_id)
         button_label = 'Edit Course'
       else:
         button_target = course_target
