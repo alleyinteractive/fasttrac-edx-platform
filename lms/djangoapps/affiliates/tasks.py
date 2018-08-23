@@ -430,12 +430,12 @@ def get_lti_completion():
     return data
 
 
-def get_interactives_completion_csv_rows(course_ids):
+def get_interactives_completion_csv_rows(courses):
     """
     Generates CSV/XLSX header and rows with information about the interactives completions.
 
     Args:
-        course_ids (list): List of course IDs for which the interactives completion is gathered
+        courses (list): List of courses for which the interactives completion is gathered
 
     Returns.
         - a list of raw data CSV/XLSX rows
@@ -455,13 +455,28 @@ def get_interactives_completion_csv_rows(course_ids):
     student_rows = []
     summary_rows = []
 
-    affiliate_staff_ids = AffiliateMembership.objects.all().values_list('member_id', flat=True)
+    enrollments = []
+    for course in courses:
+        if hasattr(course, 'ccx_course_id'):
+            # Exclude CCX staff
+            affiliate_staff_ids = AffiliateMembership.objects.filter(
+                affiliate=course.affiliate
+            ).values_list('member_id', flat=True)
 
-    enrollments = CourseEnrollment.objects.filter(
-        ~Q(user_id__in=affiliate_staff_ids),
-        course_id__in=course_ids,
-        is_active=True
-    ).order_by('course_id', 'user')
+            enrollments.extend(
+                CourseEnrollment.objects.filter(
+                    ~Q(user_id__in=affiliate_staff_ids),
+                    course_id=course.ccx_course_id,
+                    is_active=True
+                ).order_by('course_id', 'user')
+            )
+        else:
+            enrollments.extend(
+                CourseEnrollment.objects.filter(
+                    course_id=course.course_id,
+                    is_active=True
+                ).order_by('course_id', 'user')
+            )
 
     for enrollment in enrollments:
         section_completion = {section['name']: 0 for section in sections}
@@ -516,10 +531,11 @@ def export_csv_interactives_completion_report():
     for each student in all CCX courses and the main FastTrac course.
     """
     fasttrac_ccxs = CustomCourseForEdX.objects.filter(course_id=FASTTRAC_COURSE_KEY)
-    course_ids = [FASTTRAC_COURSE_KEY]
-    course_ids.extend(ccx.ccx_course_id for ccx in fasttrac_ccxs)
+    fasttrac_course = fasttrac_ccxs.first().course
+    courses = [fasttrac_course]
+    courses.extend(fasttrac_ccxs)
 
-    raw_data_rows, _ = get_interactives_completion_csv_rows(course_ids)
+    raw_data_rows, _ = get_interactives_completion_csv_rows(courses)
 
     params = {
         'csv_name': 'interactives_completion_report',
@@ -538,7 +554,7 @@ def export_ccx_interactives_completion_report(ccx_id):
     for each student in a specific CCX course.
     """
     ccx = CustomCourseForEdX.objects.get(id=ccx_id)
-    raw_data_rows, summary_rows = get_interactives_completion_csv_rows([ccx.ccx_course_id])
+    raw_data_rows, summary_rows = get_interactives_completion_csv_rows([ccx])
 
     params = {
         'csv_name': 'ccx_interactives_completion_report',
