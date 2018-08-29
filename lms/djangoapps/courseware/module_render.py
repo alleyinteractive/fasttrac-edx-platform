@@ -237,13 +237,14 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
                 # determine if subsection is viewed
                 # last xblock of last unit
-                last_section_xblock = section.get_children()[-1].children[-1]
-                check_section_view_data = view_data.filter(
-                    module_state_key=last_section_xblock).first()
-                if check_section_view_data:
-                    if 'done' in check_section_view_data.state:
-                        if json.loads(check_section_view_data.state).get('done'):
-                            section_viewed = True
+                if section.get_children() and section.get_children()[-1].children:
+                    last_section_xblock = section.get_children()[-1].children[-1]
+                    check_section_view_data = view_data.filter(
+                        module_state_key=last_section_xblock).first()
+                    if check_section_view_data:
+                        if 'done' in check_section_view_data.state:
+                            if json.loads(check_section_view_data.state).get('done'):
+                                section_viewed = True
 
                 # if last xblock of last unit wasn't marked,
                 # check if all other units were marked helpful or not helpful
