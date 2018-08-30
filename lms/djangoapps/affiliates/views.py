@@ -188,6 +188,11 @@ def edit(request, slug):
         if affiliate_type in ['parent', 'standalone']:
             affiliate.parent = None
 
+        if affiliate_type == 'parent':
+            subs = dict(request.POST)['sub-affiliates'] if 'sub-affiliates' in request.POST else []
+            affiliate.children.exclude(id__in=subs).update(parent=None)
+            affiliates.filter(id__in=subs).update(parent=affiliate)
+
         for key in request.POST:
             if key == 'year_of_birth':
                 setattr(affiliate, key, int(request.POST[key]))
@@ -197,11 +202,6 @@ def edit(request, slug):
                 else:
                     parent = None
                 setattr(affiliate, key, parent)
-            elif key == 'sub-affiliates':
-                if affiliate_type == 'parent':
-                    subs = dict(request.POST)['sub-affiliates']
-                    affiliate.children.exclude(id__in=subs).update(parent=None)
-                    affiliates.filter(id__in=subs).update(parent=affiliate)
             else:
                 setattr(affiliate, key, request.POST[key])
 

@@ -360,21 +360,3 @@ def validate_course_dependency(sender, instance, **kwargs):  # pylint: disable=u
 
     if ccxs_for_member_exist and count_affiliate_memberships_of_member == 1:
         raise ValueError('Cannot delete this member because they have affiliate custom courses.')
-
-
-@receiver(post_save, sender=AffiliateEntity, dispatch_uid='manage_program_director')
-def manage_program_director(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
-    """A sub-affiliate has to have the same program director as the parent."""
-    if instance.parent:
-        AffiliateMembership.objects.get_or_create(
-            affiliate=instance,
-            member=instance.parent.program_director,
-            role=AffiliateMembership.STAFF
-        )
-    else:
-        AffiliateMembership.objects.filter(
-            affiliate=instance,
-            role=AffiliateMembership.STAFF
-        ).exclude(
-            member=instance.program_director,
-        ).delete()
