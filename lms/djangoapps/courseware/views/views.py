@@ -551,7 +551,6 @@ def course_info(request, course_id):
             else:
                 section.last_subsection_url_name = ''
 
-
             section.total_subsections = len(section.children) - 1
             completed_subsections = 0
 
@@ -570,17 +569,18 @@ def course_info(request, course_id):
                         # run through all units and see if they were marked helpful or not helpful
                         units_completed = True
                         for unit in subsection.get_children()[1:-1]:
-                            last_unit_xblock = unit.get_children()[-1]
-                            student_module = StudentModule.objects.filter(course_id=course.id, module_state_key=last_unit_xblock.location, student=user).first()
+                            if unit.get_children():
+                                last_unit_xblock = unit.get_children()[-1]
+                                student_module = StudentModule.objects.filter(course_id=course.id, module_state_key=last_unit_xblock.location, student=user).first()
 
-                            if student_module:
-                                student_module_state = json.loads(student_module.state)
+                                if student_module:
+                                    student_module_state = json.loads(student_module.state)
 
-                                if student_module_state.get('helpful') is None:
-                                    units_completed = False
+                                    if student_module_state.get('helpful') is None:
+                                        units_completed = False
 
                         # if no unit wasn't marked helpful/not helpful and it has more than 2 units (not intro unit)
-                        if units_completed and len(subsection.get_children()[1:-1]) > 0:
+                        if units_completed and subsection.get_children() and len(subsection.get_children()[1:-1]) > 0:
                             completed_subsections += 1
 
             section.completed_subsections = completed_subsections
