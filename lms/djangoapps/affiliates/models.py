@@ -1,27 +1,28 @@
-import hashlib
 import datetime
+import hashlib
+import logging
+
+import requests
+from ccx_keys.locator import CCXLocator
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.db import models, IntegrityError, transaction
-from django.db.models import Q, F
 from django.db.models.signals import post_save, pre_delete, post_delete
 from django.dispatch import receiver
-from django.contrib.auth.models import User
-from django.conf import settings
-from lms.envs.common import STATE_CHOICES
-from django_countries.fields import CountryField
-from lms.djangoapps.ccx.models import CustomCourseForEdX
-from instructor.access import allow_access, revoke_access
-from ccx_keys.locator import CCXLocator
-from courseware.courses import get_course_by_id
-from contextlib import contextmanager
-from courseware.courses import get_course_with_access, get_course_by_id
-from opaque_keys.edx.keys import CourseKey
-from student.models import CourseAccessRole, CourseEnrollment, UserProfile
 from django.template.defaultfilters import slugify
 from django.utils.crypto import get_random_string
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from lms.djangoapps.instructor.enrollment import enroll_email
+from django_countries.fields import CountryField
+
+from courseware.courses import get_course_by_id
+from instructor.access import allow_access, revoke_access
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.courseware.gis_helpers import coordinates_distance
-import requests
+from lms.djangoapps.instructor.enrollment import enroll_email
+from lms.envs.common import STATE_CHOICES
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseEnrollment
+
+LOG = logging.getLogger(__name__)
 
 
 def user_directory_path(instance, filename):
@@ -57,9 +58,15 @@ class AffiliateEntity(models.Model):
 
     _full_address = None
 
+    class Meta:  # pylint: disable=no-init,old-style-class
+        unique_together = ('email', 'name')
+
     def __init__(self, *args, **kwargs):
         super(AffiliateEntity, self).__init__(*args, **kwargs)
         self._full_address = self.build_full_address()
+
+    def __unicode__(self):
+        return self.name
 
     def save(self, *args, **kwargs):
         slug = slugify(self.name)
@@ -75,8 +82,8 @@ class AffiliateEntity(models.Model):
 
         if self._full_address != new_full_address:
             latitude, longitude = self.get_location_coordinates()
-            setattr(self, 'location_latitude', latitude)
-            setattr(self, 'location_longitude', longitude)
+            self.location_latitude = latitude
+            self.location_longitude = longitude
 
         super(AffiliateEntity, self).save(*args, **kwargs)
         self._full_address = new_full_address
@@ -98,21 +105,17 @@ class AffiliateEntity(models.Model):
         url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + params + ',&key=' + geocoding_api_key
         json_response = requests.get(url).json()
 
-        if len(json_response['results']) == 0:
+        if not json_response['results']:
             return None, None
 
         location = json_response['results'][0]['geometry']['location']
-
         return location['lat'], location['lng']
 
     def distance_from(self, coordinate):
-        return coordinates_distance({ 'latitude': self.location_latitude, 'longitude': self.location_longitude }, coordinate)
-
-    class Meta:
-        unique_together = ('email', 'name')
-
-    def __unicode__(self):
-        return self.name
+        return coordinates_distance({
+            'latitude': self.location_latitude,
+            'longitude': self.location_longitude
+        }, coordinate)
 
     @property
     def is_parent(self):
@@ -126,15 +129,13 @@ class AffiliateEntity(models.Model):
     def image_url(self):
         if self.image:
             return self.image.url
-        else:
-            return 'https://s3-us-west-2.amazonaws.com/fasttrac-edx-prod/default_full.png'
+        return 'https://s3-us-west-2.amazonaws.com/fasttrac-edx-prod/default_full.png'
 
     @property
     def website_url(self):
         if self.website.startswith('http'):
             return self.website
-        else:
-            return 'http://{}'.format(self.website)
+        return 'http://{}'.format(self.website)
 
     @property
     def memberships(self):
@@ -175,7 +176,7 @@ class AffiliateEntity(models.Model):
 
     @property
     def program_director(self):
-        pd_membership = self.affiliatemembership_set.filter(role='staff')
+        pd_membership = self.affiliatemembership_set.filter(role=AffiliateMembership.STAFF)
         return pd_membership.first().member if pd_membership else None
 
 
@@ -229,6 +230,7 @@ def update_mailchimp_interest(affiliate_membership, value):
 
         interest_id = affiliate_membership.mailchimp_interests[affiliate_membership.role]
         affiliate = affiliate_membership.member.profile.affiliate
+        is_affiliate_user = affiliate_membership.member.profile.is_affiliate_user
 
         data = {
             'email_address': affiliate_membership.member.email,
@@ -238,24 +240,22 @@ def update_mailchimp_interest(affiliate_membership, value):
             },
             'interests': {
                 interest_id: value,
-                settings.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not affiliate_membership.member.profile.is_affiliate_user, # Entrepreneur User
-                settings.AFFILIATE_MAILCHIMP_INTEREST_ID: affiliate_membership.member.profile.is_affiliate_user # Affiliate User
+                settings.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not is_affiliate_user,  # Entrepreneur User
+                settings.AFFILIATE_MAILCHIMP_INTEREST_ID: is_affiliate_user  # Affiliate User
             }
         }
 
         # TODO: notify admin if this fails (send email)
         r = requests.put(mailchimp_url, auth=('fasttrac', mailchimp_api_key), json=data)
         if not r.status_code == 200:
-            print('Affiliate membership update error')
-            print(r.content)
+            LOG.error('Affiliate membership update error: %s', r.content)
 
 
 @receiver(post_save, sender=AffiliateInvite, dispatch_uid="send_invite_email")
-def send_invite_email(sender, instance, created, **kwargs):
+def send_invite_email(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
     if created:
         from django.core.mail import send_mail
         from django.template import loader
-
 
         context = {
             'site_name': settings.SITE_NAME,
@@ -267,21 +267,25 @@ def send_invite_email(sender, instance, created, **kwargs):
         subject = 'FastTrac Affiliate Invite'
         message = loader.render_to_string('emails/affiliate_invitation.txt', context)
 
-        send_mail(subject, message, from_address, [
-                    instance.email], fail_silently=False)
+        send_mail(subject, message, from_address, [instance.email], fail_silently=False)
+
 
 @receiver(post_save, sender=AffiliateMembership, dispatch_uid="add_mailchimp_interests")
-def add_mailchimp_interests(sender, instance, **kwargs):
+def add_mailchimp_interests(sender, instance, **kwargs):  # pylint: disable=unused-argument
     update_mailchimp_interest(instance, True)
 
+
 @receiver(post_delete, sender=AffiliateMembership, dispatch_uid="remove_mailchimp_interests")
-def remove_mailchimp_interests(sender, instance, **kwargs):
+def remove_mailchimp_interests(sender, instance, **kwargs):  # pylint: disable=unused-argument
     update_mailchimp_interest(instance, False)
 
 
 @receiver(post_save, sender=AffiliateMembership, dispatch_uid="add_affiliate_course_enrollments")
-def add_affiliate_course_enrollments(sender, instance, **kwargs):
-    'Allow staff or instructor access to affiliate member into all affiliate courses if they are staff or instructor member.'
+def add_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: disable=unused-argument
+    """
+    Allow staff or instructor access to affiliate member into
+    all affiliate courses if they are staff or instructor member.
+    """
     if not instance.role == 'ccx_coach':
         for ccx in instance.affiliate.courses:
             ccx_locator = CCXLocator.from_course_locator(ccx.course_id, ccx.id)
@@ -291,12 +295,16 @@ def add_affiliate_course_enrollments(sender, instance, **kwargs):
                 with transaction.atomic():
                     allow_access(course, instance.member, instance.role, False)
             except IntegrityError:
-                print 'IntegrityError: Allow access failed.'
+                LOG.error('IntegrityError: Allow access failed.')
 
     # Program Director and Course Manager needs to be CCX coach on FastTrac course
     course_overviews = CourseOverview.objects.exclude(id__startswith='ccx-')
 
+<<<<<<< HEAD
     if instance.role == 'staff' or instance.role == 'instructor':
+=======
+    if instance.role == AffiliateMembership.STAFF or instance.role == AffiliateMembership.INSTRUCTOR:
+>>>>>>> 676127cbd6... fixup! Fix linting issues in affiliate models.
         for course_overview in course_overviews:
             course_id = course_overview.id
             course = get_course_by_id(course_id)
@@ -305,7 +313,7 @@ def add_affiliate_course_enrollments(sender, instance, **kwargs):
                 with transaction.atomic():
                     allow_access(course, instance.member, 'ccx_coach', False)
             except IntegrityError:
-                print 'IntegrityError: CCX coach failed.'
+                LOG.error('IntegrityError: CCX coach failed.')
 
     elif instance.role == 'ccx_coach':
         for course_overview in course_overviews:
@@ -315,7 +323,7 @@ def add_affiliate_course_enrollments(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=AffiliateMembership, dispatch_uid="deactivate_invite")
-def deactivate_invite(sender, instance, created, **kwargs):
+def deactivate_invite(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
     """An invite needs to be deactivated once a user creates an account."""
     if created:
         try:
@@ -331,7 +339,7 @@ def deactivate_invite(sender, instance, created, **kwargs):
 
 
 @receiver(post_delete, sender=AffiliateMembership, dispatch_uid="remove_affiliate_course_enrollments")
-def remove_affiliate_course_enrollments(sender, instance, **kwargs):
+def remove_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: disable=unused-argument
     'Remove all privileges over all affiliate courses.'
     for ccx in instance.affiliate.courses:
         ccx_locator = CCXLocator.from_course_locator(ccx.course_id, ccx.id)
@@ -350,7 +358,7 @@ def remove_affiliate_course_enrollments(sender, instance, **kwargs):
 
 
 @receiver(pre_delete, sender=AffiliateMembership, dispatch_uid="validate_course_dependency")
-def validate_course_dependency(sender, instance, **kwargs):
+def validate_course_dependency(sender, instance, **kwargs):  # pylint: disable=unused-argument
     count_affiliate_memberships_of_member = AffiliateMembership.objects.filter(member=instance.member).count()
     ccxs_for_member_exist = CustomCourseForEdX.objects.filter(coach=instance.member).exists()
 
@@ -359,7 +367,7 @@ def validate_course_dependency(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=AffiliateEntity, dispatch_uid='manage_program_director')
-def manage_program_director(sender, instance, created, **kwargs):
+def manage_program_director(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
     """A sub-affiliate has to have the same program director as the parent."""
     if instance.parent:
         AffiliateMembership.objects.get_or_create(
