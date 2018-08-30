@@ -4,20 +4,21 @@ from collections import defaultdict
 from datetime import datetime
 
 import requests
+from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 from django.conf import settings
 from django.db.models import Q
-from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
+from courseware.models import StudentModule, StudentTimeTracker
 from instructor_task.tasks_helper import upload_csv_to_report_store
 from lms import CELERY_APP
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.views import get_ccx_schedule
-from student.models import UserProfile, CourseEnrollment, CourseAccessRole
-from courseware.models import StudentModule, StudentTimeTracker
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
-from .models import AffiliateEntity, AffiliateMembership
+from student.models import UserProfile, CourseEnrollment, CourseAccessRole
 from xmodule.modulestore.django import modulestore
+
+from .models import AffiliateEntity, AffiliateMembership
 
 log = logging.getLogger("edx.affiliates")
 
@@ -31,8 +32,10 @@ def export_csv_affiliate_course_report():
     ccxs = CustomCourseForEdX.objects.all()
     ccxs = sorted(ccxs, key=lambda ccx: ccx.affiliate.name)
 
-    rows = [['Course Name', 'Course ID', 'Affiliate Name', 'Affiliate Active', 'Start Date', 'End Date', 'Participant Count',
-         'Delivery Mode', 'Enrollment Type', 'Course Type', 'Fee', 'Facilitator Name']]
+    rows = [[
+        'Course Name', 'Course ID', 'Affiliate Name', 'Affiliate Active', 'Start Date', 'End Date',
+        'Participant Count', 'Delivery Mode', 'Enrollment Type', 'Course Type', 'Fee', 'Facilitator Name'
+    ]]
 
     for ccx in ccxs:
         rows.append([
@@ -57,7 +60,6 @@ def export_csv_affiliate_course_report():
     upload_csv_to_report_store(**params)
 
 
-
 @CELERY_APP.task
 def export_csv_affiliate_report():
     """
@@ -75,12 +77,15 @@ def export_csv_affiliate_report():
             affiliate.name, ('Yes' if affiliate.active else 'No'),
             affiliate.members.count(), affiliate.courses.count(), affiliate.enrollments.count(),
             (affiliate.last_course_taught.display_name if affiliate.last_course_taught else '--'),
-            (affiliate.last_course_taught.end_date.strftime(
-                "%B %d, %Y") if affiliate.last_course_taught else '--'),
-            ("{}, {}".format(affiliate.last_affiliate_user.profile.name, affiliate.last_affiliate_user.last_login.strftime(
-                "%B %d, %Y")) if affiliate.last_affiliate_user else '--'),
-            ("{}, {}".format(affiliate.last_affiliate_learner.profile.name, affiliate.last_affiliate_learner.last_login.strftime(
-                "%B %d, %Y")) if affiliate.last_affiliate_learner else '--')
+            (affiliate.last_course_taught.end_date.strftime("%B %d, %Y") if affiliate.last_course_taught else '--'),
+            ("{}, {}".format(
+                affiliate.last_affiliate_user.profile.name,
+                affiliate.last_affiliate_user.last_login.strftime("%B %d, %Y")
+            ) if affiliate.last_affiliate_user else '--'),
+            ("{}, {}".format(
+                affiliate.last_affiliate_learner.profile.name,
+                affiliate.last_affiliate_learner.last_login.strftime("%B %d, %Y")
+            ) if affiliate.last_affiliate_learner else '--')
         ])
 
     params = {
@@ -106,12 +111,14 @@ def export_csv_user_report():
     params = {'csv_name': 'user_report', 'course_id': 'affiliates',
               'timestamp': datetime.now()}
 
-    rows = [['Username', 'Email', 'Registration Date', 'Country', 'First Name', 'Last Name',
-             'Mailing Address', 'City', 'State', 'Postal Code', 'Phone Number', 'Company', 'Title',
-             'Would you like to receive marketing communication from the Ewing Marion Kauffman Foundation and Kauffman FastTrac?',
-             'Your motivation', 'Age', 'Gender', 'Race/Ethnicity',
-             'Have you ever served in any branch of the U.S. Armed Forces, including the Coast Guard, the National Guard, or Reserve component of any service branch?',
-             'What was the highest degree or level of school you have completed?', 'Affiliate Organization', 'Affiliate Role', 'Course ID']]
+    rows = [[
+        'Username', 'Email', 'Registration Date', 'Country', 'First Name', 'Last Name',
+        'Mailing Address', 'City', 'State', 'Postal Code', 'Phone Number', 'Company', 'Title',
+        'Would you like to receive marketing communication from the Ewing Marion Kauffman Foundation and Kauffman FastTrac?',
+        'Your motivation', 'Age', 'Gender', 'Race/Ethnicity',
+        'Have you ever served in any branch of the U.S. Armed Forces, including the Coast Guard, the National Guard, or Reserve component of any service branch?',
+        'What was the highest degree or level of school you have completed?', 'Affiliate Organization', 'Affiliate Role', 'Course ID'
+    ]]
 
     profiles = UserProfile.objects.all()
 
@@ -162,7 +169,11 @@ def export_csv_course_report(time_report=True):
     for section in fasttrac_course.get_children():
         for subsection in section.get_children():
             for unit in subsection.get_children():
-                header_columns.append("{} - {} - {}".format(section.display_name, subsection.display_name, unit.display_name))
+                header_columns.append("{} - {} - {}".format(
+                    section.display_name,
+                    subsection.display_name,
+                    unit.display_name
+                ))
 
     fasttrac_course_units_length = len(header_columns) - header_index_padding
 
@@ -179,8 +190,6 @@ def export_csv_course_report(time_report=True):
         course_id=fasttrac_course.id)
     student_modules = StudentModule.objects.filter(course_id=fasttrac_course.id)
 
-
-
     # for each student create empty CSV row
     student_data = {}
 
@@ -194,44 +203,44 @@ def export_csv_course_report(time_report=True):
                 location = unit.location
 
                 for student in students:
-                        student_id = unicode(student.id)
+                    student_id = unicode(student.id)
 
-                        try:
-                            column_name = "{} - {} - {}".format(
-                                section.display_name, subsection.display_name, unit.display_name)
-                            unit_index = header_columns.index(
-                                column_name) - header_index_padding
-                        except IndexError:
-                            continue
+                    try:
+                        column_name = "{} - {} - {}".format(
+                            section.display_name, subsection.display_name, unit.display_name)
+                        unit_index = header_columns.index(
+                            column_name) - header_index_padding
+                    except IndexError:
+                        continue
 
-                        unit_data = '-'
+                    unit_data = '-'
 
-                        # if we are generating a time spent on unit report
-                        if time_report:
-                            # get time tracker object
-                            tracker = student_time_tracker.filter(
-                                unit_location=location, student=student).first()
+                    # if we are generating a time spent on unit report
+                    if time_report:
+                        # get time tracker object
+                        tracker = student_time_tracker.filter(
+                            unit_location=location, student=student).first()
 
-                            if tracker:
-                                unit_data = tracker.time_duration / 1000
+                        if tracker:
+                            unit_data = tracker.time_duration / 1000
 
-                        # if we are generating a course completion report
-                        else:
-                            for xblock in unit.get_children():
-                                module = student_modules.filter(
-                                    module_state_key=xblock.location, student=student).first()
-                                if module and ('done' in module.state or 'helpful' in module.state):
-                                    module_state = json.loads(module.state)
+                    # if we are generating a course completion report
+                    else:
+                        for xblock in unit.get_children():
+                            module = student_modules.filter(
+                                module_state_key=xblock.location, student=student).first()
+                            if module and ('done' in module.state or 'helpful' in module.state):
+                                module_state = json.loads(module.state)
 
-                                    if module_state.get('done'):
-                                        unit_data = 'done'
-                                    elif module_state.get('helpful') != None:
-                                        if module_state.get('helpful') == 'true':
-                                            unit_data = 'helpful'
-                                        else:
-                                            unit_data = 'not helpful'
+                                if module_state.get('done'):
+                                    unit_data = 'done'
+                                elif module_state.get('helpful'):
+                                    if module_state.get('helpful') == 'true':
+                                        unit_data = 'helpful'
+                                    else:
+                                        unit_data = 'not helpful'
 
-                        student_data[student_id][unit_index] = unit_data
+                    student_data[student_id][unit_index] = unit_data
 
     for student_id in student_data:
         if student_data.get(student_id):
@@ -274,7 +283,11 @@ def export_csv_course_report(time_report=True):
                         student_id = unicode(student.id)
 
                         try:
-                            column_name = "{} - {} - {}".format(section['display_name'], subsection['display_name'], unit['display_name'])
+                            column_name = "{} - {} - {}".format(
+                                section['display_name'],
+                                subsection['display_name'],
+                                unit['display_name']
+                            )
                             unit_index = header_columns.index(column_name) - header_index_padding
                         except IndexError:
                             continue
@@ -287,7 +300,7 @@ def export_csv_course_report(time_report=True):
                             tracker = student_time_tracker.filter(unit_location=location, student=student).first()
 
                             if tracker:
-                                unit_data = tracker.time_duration/1000
+                                unit_data = tracker.time_duration / 1000
 
                         # if we are generating a course completion report
                         else:
@@ -296,20 +309,22 @@ def export_csv_course_report(time_report=True):
                                 ccx_xblock_location = xblock_ccx_id.replace(original_course_id, ccx_course_id)
                                 xblock_location = UsageKey.from_string(ccx_xblock_location)
 
-                                module = student_modules.filter(module_state_key=xblock_location, student=student).first()
+                                module = student_modules.filter(
+                                    module_state_key=xblock_location,
+                                    student=student
+                                ).first()
                                 if module and ('done' in module.state or 'helpful' in module.state):
                                     module_state = json.loads(module.state)
 
                                     if module_state.get('done'):
                                         unit_data = 'done'
-                                    elif module_state.get('helpful') != None:
+                                    elif module_state.get('helpful'):
                                         if module_state.get('helpful') == 'true':
                                             unit_data = 'helpful'
                                         else:
                                             unit_data = 'not helpful'
 
                         student_data[student_id][unit_index] = unit_data
-
 
         for student_id in student_data:
             if student_data.get(student_id):

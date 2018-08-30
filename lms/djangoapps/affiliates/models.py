@@ -181,31 +181,31 @@ class AffiliateEntity(models.Model):
 
 
 class AffiliateMembership(models.Model):
+    CCX_COACH = 'ccx_coach'
+    INSTRUCTOR = 'instructor'
+    STAFF = 'staff'
+
     ROLES = {
-        'ccx_coach': 'Facilitator',
-        'instructor': 'Course Manager',
-        'staff': 'Program Director',
+        CCX_COACH: 'Facilitator',
+        INSTRUCTOR: 'Course Manager',
+        STAFF: 'Program Director',
     }
 
     role_choices = (
-        ('ccx_coach', 'Facilitator'),
-        ('instructor', 'Course Manager'),
-        ('staff', 'Program Director'),
+        (CCX_COACH, 'Facilitator'),
+        (INSTRUCTOR, 'Course Manager'),
+        (STAFF, 'Program Director'),
     )
 
     mailchimp_interests = {
-        'ccx_coach': '1b920c7fe2',
-        'instructor': '738d5d6873',
-        'staff': 'c6f38d6306'
+        CCX_COACH: '1b920c7fe2',
+        INSTRUCTOR: '738d5d6873',
+        STAFF: 'c6f38d6306'
     }
 
     member = models.ForeignKey(User)
     affiliate = models.ForeignKey(AffiliateEntity, on_delete=models.CASCADE)
     role = models.CharField(choices=role_choices, max_length=255)
-
-    @classmethod
-    def find_by_user(cls, user):
-        return cls.objects.get(member=user)
 
 
 class AffiliateInvite(models.Model):
@@ -286,7 +286,7 @@ def add_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: dis
     Allow staff or instructor access to affiliate member into
     all affiliate courses if they are staff or instructor member.
     """
-    if not instance.role == 'ccx_coach':
+    if not instance.role == AffiliateMembership.CCX_COACH:
         for ccx in instance.affiliate.courses:
             ccx_locator = CCXLocator.from_course_locator(ccx.course_id, ccx.id)
             course = get_course_by_id(ccx_locator)
@@ -300,22 +300,18 @@ def add_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: dis
     # Program Director and Course Manager needs to be CCX coach on FastTrac course
     course_overviews = CourseOverview.objects.exclude(id__startswith='ccx-')
 
-<<<<<<< HEAD
-    if instance.role == 'staff' or instance.role == 'instructor':
-=======
     if instance.role == AffiliateMembership.STAFF or instance.role == AffiliateMembership.INSTRUCTOR:
->>>>>>> 676127cbd6... fixup! Fix linting issues in affiliate models.
         for course_overview in course_overviews:
             course_id = course_overview.id
             course = get_course_by_id(course_id)
 
             try:
                 with transaction.atomic():
-                    allow_access(course, instance.member, 'ccx_coach', False)
+                    allow_access(course, instance.member, AffiliateMembership.CCX_COACH, False)
             except IntegrityError:
                 LOG.error('IntegrityError: CCX coach failed.')
 
-    elif instance.role == 'ccx_coach':
+    elif instance.role == AffiliateMembership.CCX_COACH:
         for course_overview in course_overviews:
             course_id = course_overview.id
 
@@ -348,13 +344,13 @@ def remove_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: 
         revoke_access(course, instance.member, instance.role, False)
 
     # Remove CCX coach on FastTrac course
-    if instance.role == 'staff' or instance.role == 'instructor':
+    if instance.role == AffiliateMembership.STAFF or instance.role == AffiliateMembership.INSTRUCTOR:
         course_overviews = CourseOverview.objects.exclude(id__startswith='ccx-')
         for course_overview in course_overviews:
             course_id = course_overview.id
             course = get_course_by_id(course_id)
 
-            revoke_access(course, instance.member, 'ccx_coach', False)
+            revoke_access(course, instance.member, AffiliateMembership.CCX_COACH, False)
 
 
 @receiver(pre_delete, sender=AffiliateMembership, dispatch_uid="validate_course_dependency")
@@ -373,12 +369,12 @@ def manage_program_director(sender, instance, created, **kwargs):  # pylint: dis
         AffiliateMembership.objects.get_or_create(
             affiliate=instance,
             member=instance.parent.program_director,
-            role='staff'
+            role=AffiliateMembership.STAFF
         )
     else:
         AffiliateMembership.objects.filter(
             affiliate=instance,
-            role='staff'
+            role=AffiliateMembership.STAFF
         ).exclude(
             member=instance.program_director,
         ).delete()
