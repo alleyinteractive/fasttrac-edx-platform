@@ -216,15 +216,16 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
                     # unit view calc
                     # last xblock is the one we want to check
-                    check_unit = child.children[-1]
-                    check_unit_view_data = view_data.filter(module_state_key=check_unit).first()
-                    if check_unit_view_data:
-                        if 'helpful' in check_unit_view_data.state:
-                            viewed = True
-
-                        if 'done' in check_unit_view_data.state:
-                            if json.loads(check_unit_view_data.state).get('done'):
+                    if child.children:
+                        check_unit = child.children[-1]
+                        check_unit_view_data = view_data.filter(module_state_key=check_unit).first()
+                        if check_unit_view_data:
+                            if 'helpful' in check_unit_view_data.state:
                                 viewed = True
+
+                            if 'done' in check_unit_view_data.state:
+                                if json.loads(check_unit_view_data.state).get('done'):
+                                    viewed = True
 
                     is_bookmarked = bookmarks_service.is_bookmarked(usage_key=child.scope_ids.usage_id)
                     units.append({
