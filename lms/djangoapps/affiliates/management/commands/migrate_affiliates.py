@@ -1,13 +1,13 @@
-import urllib2, io
-from PIL import Image
+import urllib2
+
 from django.core.files.base import ContentFile
-from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
+from django.core.management.base import BaseCommand
 from django.db.utils import IntegrityError
-from opaque_keys.edx.keys import CourseKey
-from affiliates.models import AffiliateEntity, AffiliateMembership
-from student.models import CourseAccessRole
+
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
+from student.models import CourseAccessRole
+
+from affiliates.models import AffiliateEntity, AffiliateMembership
 
 
 class Command(BaseCommand):
@@ -17,7 +17,8 @@ class Command(BaseCommand):
         between the Program Director and that entity.
         Program Director is ccx_coach on master course.
     """
-    def handle(self, *args, **options):
+
+    def handle(self, *args, **options):  # pylint: disable=unused-argument
         program_director_roles = CourseAccessRole.objects.filter(role='ccx_coach').exclude(course_id__startswith='ccx-')
 
         for program_director_role in program_director_roles:
@@ -67,6 +68,5 @@ class Command(BaseCommand):
                 )
             except IntegrityError:
                 self.stdout.write('Duplicate entry.')
-
 
         self.stdout.write('Successfully migrated affiliate users')
