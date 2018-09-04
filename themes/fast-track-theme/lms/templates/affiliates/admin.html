@@ -1,0 +1,375 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%
+  from django.utils.timezone import now
+%>
+
+<%block name="pagetitle">Site Administration</%block>
+
+<%block name="headextra">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+  <script src="//cdn.datatables.net/plug-ins/1.10.19/sorting/datetime-moment.js"></script>
+</%block>
+
+<div id="site-admin" class="container">
+  <nav class="top-nav">
+    <ul>
+      <li class="affiliate-mngmt-link active">Affiliate Management</li>
+      <li class="learning-mngmt-link">Learning Management</li>
+      <li class="data-exports-link">Data Exports</li>
+    </ul>
+  </nav>
+
+  <section id="affiliate-mngmt">
+    <a class="add-new-affiliate" href="/affiliates/new">Add New Affiliate</a>
+    <table class="ft-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>View</th>
+          <th>Edit</th>
+        </tr>
+      </thead>
+      <tbody>
+        % for affiliate in affiliates:
+        <tr>
+          <td>${affiliate.name}</td>
+          % if affiliate.active:
+            <td class="active">Active</td>
+            % else:
+            <td class="inactive">Inactive</td>
+          % endif
+          <td><a href="/affiliates/${affiliate.slug}">View</a></td>
+          <td><a href="/affiliates/edit/${affiliate.slug}">Edit</a></td>
+        </tr>
+        % endfor
+      </tbody>
+    </table>
+  </section>
+
+  <section id="learning-mngmt" class="hidden">
+    <div id="learner-info">
+      <h1>Learner Statistics</h1>
+
+      <div class="learner-info-box">
+        <h2>${total_learners}</h2>
+        <span>Total Learners</span>
+      </div>
+
+      <div class="learner-info-box">
+        <h2>${total_affiliate_learners}</h2>
+        <span>Total Affiliate Learners</span>
+      </div>
+
+      <div class="learner-info-box">
+        <h2>${total_fasttrac_learners}</h2>
+        <span>Total FastTrac Learners</span>
+      </div>
+    </div>
+
+    <div id="impersonate-user">
+      <h1>Impersonate a User</h1>
+      <input type="email" name="email" placeholder="Email of user to impersonate" />
+      <button class="btn submit">Impersonate</button>
+      <span class="error"></span>
+    </div>
+
+    <div id="courses-info">
+      <table class="ft-table">
+        <thead>
+          <tr>
+            <th>Affiliate Name</th>
+            <th>Course Name</th>
+            <th>Course Status</th>
+            <th>Affiliate Status</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>About Page</th>
+            <th>Dashboard</th>
+          </tr>
+        </thead>
+        <tbody>
+          % for ccx in ccxs:
+          <tr>
+            % if ccx.affiliate:
+            <td>${ccx.affiliate.name}</td>
+            % else:
+            <td>-</td>
+            % endif
+            <td>${ccx.display_name}</td>
+            <%
+              active_course = False
+              if ccx.time and not ccx.end_date and ccx.time < now():
+                active_course = True
+              if not ccx.time and ccx.end_date and ccx.end_time > now():
+                active_course = True
+              if ccx.time and ccx.end_date and ccx.time < now() < ccx.end_date:
+                active_course = True
+            %>
+            % if active_course:
+              <td class="active">Active</td>
+            % else:
+              <td class="inactive">Inactive</td>
+            % endif
+            % if ccx.affiliate:
+              % if ccx.affiliate.active:
+                <td class="active">Active</td>
+              % else:
+                <td class="inactive">Inactive</td>
+              % endif
+            % else:
+            <td>-</td>
+            % endif
+            <td>${ccx.time.strftime("%b %d, %Y") if ccx.time else '--'}</td>
+            <td>${ccx.end_date.strftime("%b %d, %Y") if ccx.end_date else '--'}</td>
+            <td><a href="/courses/${ccx.ccx_course_id}/about">View</a></td>
+            <td><a href="/courses/${ccx.ccx_course_id}/edit_custom_course">Dashboard</a></td>
+          </tr>
+          % endfor
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+
+  <section id="data-exports" class="hidden">
+    <div id="csv-actions">
+      <h1>Select a report type to export:</h1>
+      <button class="csv-action-btn" data-report-type="export_csv_affiliate_report">
+        Affiliate Report
+      </button>
+      <button class="csv-action-btn" data-report-type="export_csv_affiliate_course_report">
+        Affiliate Course Report
+      </button>
+      <button class="csv-action-btn" data-report-type="export_csv_user_report">
+        User Report
+      </button>
+      <button class="csv-action-btn" data-report-type="export_csv_time_report">
+        Course Time Report
+      </button>
+      <button class="csv-action-btn" data-report-type="export_csv_completion_report">
+        Course Completion Report
+      </button>
+      <button class="csv-action-btn" data-report-type="export_completion_report">
+        Course Interactives Completion Report
+      </button>
+      <span class="info"></span>
+    </div>
+
+    <button class="refresh-list-btn">
+        <i class="fa fa-refresh fa-lg"></i>
+    </button>
+
+    <table class="ft-table">
+      <thead>
+        <tr>
+          <th>Report Type</th>
+          <th>Filename</th>
+          <th>Created at</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+  </section>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $.fn.dataTable.moment('MMMM Do YYYY, HH:mm');
+
+    // TOP NAVIGATION
+    var $affiliateSection = $('section#affiliate-mngmt');
+    var $learningSection = $('section#learning-mngmt');
+    var $dataExportsSection = $('section#data-exports');
+
+    $('nav.top-nav li').click(function() {
+      $('#site-admin section').addClass('hidden');
+      $('nav.top-nav li').removeClass('active');
+      if ($(this).hasClass('affiliate-mngmt-link')) {
+        $(this).addClass('active');
+        $affiliateSection.removeClass('hidden');
+      } else if ($(this).hasClass('learning-mngmt-link')) {
+        $(this).addClass('active');
+        $learningSection.removeClass('hidden');
+      } else if ($(this).hasClass('data-exports-link')) {
+        $(this).addClass('active');
+        $dataExportsSection.removeClass('hidden');
+      }
+    });
+
+    // TABLE OPTIONS
+    var defaultTableOptions = {
+      'info': false,
+      'paging': false
+    };
+    var affiliateTableOptions = $.extend({
+      'columns': [
+        null,
+        null,
+        {orderable: false},
+        {orderable: false},
+      ]
+    }, defaultTableOptions);
+    var learningTableOptions = $.extend({
+      'columns': [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {orderable: false},
+        {orderable: false},
+      ],
+      'order': [
+        [0, 'asc'],
+        [1, 'asc']
+      ]
+    }, defaultTableOptions);
+    var dataExportsTableOptions = $.extend({
+      'columns': [
+        {data: 'reportType'},
+        {data: 'filename'},
+        {data: 'creationDate'}
+      ],
+      'order': [
+        [2, 'desc']
+      ]
+    }, defaultTableOptions);
+
+    $('#affiliate-mngmt .ft-table').DataTable(affiliateTableOptions);
+    $('#learning-mngmt .ft-table').DataTable(learningTableOptions);
+    $('#data-exports .ft-table').DataTable(dataExportsTableOptions);
+
+    // IMPERSONATION
+    $('#impersonate-user button.submit').click(function() {
+      var $errorField = $('#impersonate-user span.error');
+      var $emaiField = $('#impersonate-user input[name=email]');
+      var email = $emaiField.val();
+
+      function showError(msg) {
+        $errorField.text(msg);
+        $emaiField.focus();
+      }
+
+      $errorField.text('');
+
+      if (!email) {
+        showError('Email field empty.');
+      } else if (!$emaiField[0].checkValidity()) {
+        showError('Entered email is invalid.');
+      } else {
+        $.ajax({
+          url: '/api/affiliates/impersonate',
+          method: 'POST',
+          data: {email: email},
+          success: function() {
+            window.location.href = '/';
+          },
+          error: function(data) {
+            showError(data.responseJSON.msg);
+          }
+        });
+      }
+    });
+
+    // DATA EXPORTS
+    function extractDate(filename) {
+      var regex = /(\d{4}-\d{2}-\d{2}-\d{4})\.csv$/;
+      var date = regex.exec(filename)[1];
+
+      var mDate = moment(date, 'YYYY-MM-DD-hhmm');
+      return mDate.format('MMMM Do YYYY, hh:mm');
+    }
+
+    function extractType(filename) {
+      var regex = /^affiliates_(\w*)_\d*/;
+      var type = regex.exec(filename)[1];
+      var typeMap = {
+        'affiliate_report': 'Affiliate',
+        'affiliates_report': 'Affiliate',
+        'completion_report': 'Course Completion',
+        'course_report': 'Affiliate Course',
+        'courses': 'Affiliate Course',
+        'interactives_completion_report': 'Interactives Completion',
+        'report': 'Affiliate',
+        'time_report': 'Course Time',
+        'user_report': 'User',
+      };
+
+      return typeMap[type] || '';
+    }
+
+    function populateExports() {
+      var $refreshBtnIcon = $('.refresh-list-btn i');
+      $refreshBtnIcon.addClass('fa-spin');
+      $('#csv-actions span.info').text('');
+
+      $.ajax({
+        method: 'GET',
+        url: '/api/affiliates/data-exports',
+        success: function(data) {
+          var rows = [];
+          var exports = data.exports;
+          var $table = $('#data-exports table').DataTable();
+          $table.clear();
+
+          for (var i = 0; i < exports.length; i++) {
+            var filename = exports[i][0];
+            var url = exports[i][1];
+            var type = extractType(filename);
+            var creationDate = extractDate(filename);
+
+            rows.push({
+              reportType: type,
+              filename: '<a href="' + url + '">' + filename + '</a>',
+              creationDate: creationDate
+            });
+          }
+
+          $table.rows.add(rows).draw();
+          $refreshBtnIcon.removeClass('fa-spin');
+        },
+        error: function(data) {
+          console.log("Error when populating exports: ", data);
+          $refreshBtnIcon.removeClass('fa-spin');
+        }
+      });
+    }
+
+    populateExports();
+
+    $('.csv-action-btn').click(function() {
+      var reportType = $(this).data('report-type');
+      var $infoField = $('#data-exports span.info');
+
+      $infoField.removeClass('success error');
+      $infoField.text('');
+
+      $.ajax({
+        url: '/api/affiliates/data-exports',
+        method: 'POST',
+        data: {report_type: reportType},
+        success: function() {
+          $infoField.addClass('success');
+          $infoField.text(
+            'Generating ' + reportType + ', this will take a few minutes. ' +
+            'Refresh table to see the download link.'
+            );
+        },
+        error: function(data) {
+          $infoField.addClass('error');
+          $infoField.text('An error occurred.');
+          console.error('Data export error: ', data)
+        }
+      });
+    });
+
+    $('.refresh-list-btn').click(populateExports);
+  });
+</script>

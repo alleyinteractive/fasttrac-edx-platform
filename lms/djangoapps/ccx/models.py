@@ -6,13 +6,13 @@ import logging
 import decimal
 from datetime import datetime
 
+import requests
 from django.contrib.auth.models import User
 from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 from pytz import utc
-import requests
 
 from lazy import lazy
 from openedx.core.lib.time_zone_utils import get_time_zone_abbr
@@ -24,8 +24,6 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from ccx_keys.locator import CCXLocator
 from instructor.access import allow_access
 from lms.djangoapps.courseware.gis_helpers import coordinates_distance
-
-
 
 log = logging.getLogger("edx.ccx")
 
@@ -49,7 +47,6 @@ class CustomCourseForEdX(models.Model):
         (PRIVATE, 'Private'),
         (PUBLIC, 'Public')
     )
-
 
     course_id = CourseKeyField(max_length=255, db_index=True)
     display_name = models.CharField(max_length=255)
@@ -91,6 +88,8 @@ class CustomCourseForEdX(models.Model):
     enrollment_end_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
 
+    affiliate = models.ForeignKey('affiliates.AffiliateEntity', null=True, blank=True, related_name='ccx')
+
     _full_address = None
 
     class Meta(object):
@@ -124,10 +123,6 @@ class CustomCourseForEdX(models.Model):
             CourseEnrollment.objects.filter(course_id=self.ccx_course_id).delete()
 
             super(CustomCourseForEdX, self).delete()
-
-    @property
-    def affiliate(self):
-        return self.coach.profile.affiliate
 
     @property
     def students(self):
@@ -290,6 +285,7 @@ class CcxFieldOverride(models.Model):
 
     value = models.TextField(default='null')
 
+
 class CourseUpdates(models.Model):
     date = models.DateField(blank=False, null=False)
     content = models.TextField(blank=False, null=False)
@@ -298,6 +294,13 @@ class CourseUpdates(models.Model):
 
     def __getitem__(self, item):
         return getattr(self, item)
+
+
+@receiver(post_save, sender=CustomCourseForEdX, dispatch_uid="associate_affiliate")
+def associate_affiliate(sender, instance, created, **kwargs):
+    if created:
+        instance.affiliate = instance.coach.profile.affiliate
+        instance.save()
 
 
 @receiver(post_save, sender=CustomCourseForEdX, dispatch_uid="add_affiliate_course_enrollments")
@@ -312,3 +315,5 @@ def add_affiliate_course_enrollments(sender, instance, created, **kwargs):
     course = get_course_by_id(instance.ccx_course_id)
     for membership in instance.affiliate.memberships.exclude(role='ccx_coach'):
         allow_access(course, membership.member, membership.role, False)
+
+

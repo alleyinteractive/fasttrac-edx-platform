@@ -1,7 +1,11 @@
 """
 View for Courseware Index
 """
+import sys
+import traceback
+
 # pylint: disable=attribute-defined-outside-init
+import requests
 from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -22,6 +26,8 @@ from edxmako.shortcuts import render_to_response, render_to_string
 import logging
 import newrelic.agent
 import urllib
+
+from lms.fasttrac.slack import send_slack_notification
 
 from lang_pref import LANGUAGE_KEY
 from xblock.fragment import Fragment
@@ -114,7 +120,15 @@ class CoursewareIndex(View):
             # let it propagate
             raise
         except Exception:  # pylint: disable=broad-except
+            self._send_slack_notification()
             return self._handle_unexpected_error()
+
+    def _send_slack_notification(self):
+        if settings.SLACK_WEBHOOK_URL:
+            tb = traceback.format_exception(*sys.exc_info())
+            tb = ''.join(tb)
+            send_slack_notification(self.request, tb)
+        return None
 
     def _setup_masquerade_for_effective_user(self):
         """

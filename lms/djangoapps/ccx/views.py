@@ -28,6 +28,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.models import User
+
 from student.models import CourseAccessRole, CourseEnrollmentAllowed
 from courseware.access import has_access, has_ccx_coach_role
 from courseware.courses import get_course_by_id
@@ -46,6 +47,7 @@ from instructor.enrollment import (
     enroll_email,
     get_email_params,
 )
+from instructor_task.models import ReportStore
 
 from lms.envs.common import STATE_CHOICES
 from lms.djangoapps.ccx.models import CustomCourseForEdX, CourseUpdates
@@ -191,7 +193,7 @@ def dashboard(request, course, ccx=None, **kwargs):
         'is_instructor': False,
         'is_ccx_coach': False,
         'is_staff': False,
-        'is_from_fasttrac_course': partial_course_key in unicode(course.id)
+        'is_from_fasttrac_course': partial_course_key in unicode(course.id),
     }
 
     context.update(get_ccx_creation_dict(course))
@@ -754,3 +756,31 @@ def ccx_messages_delete(request, course, ccx=None, **kwargs):
 
     return redirect(reverse('ccx_messages', kwargs={'course_id': ccx_id}))
 
+
+@coach_dashboard
+def export_report(request, course, ccx, **kwargs):
+    # Importing here to avoid circular dependecies
+    # TODO: Fix the circular deps.
+    from affiliates.tasks import export_ccx_interactives_completion_report
+
+    report = request.POST['report_type']
+
+    if report == 'export_interactives_completion_report':
+        export_ccx_interactives_completion_report.delay(ccx_id=ccx.id)
+        return HttpResponse(
+            json.dumps({'status': 'export_started'}),
+            content_type='application/json',
+        )
+
+
+@coach_dashboard
+def report_list(request, course, ccx, **kwargs):
+    report_store = ReportStore.from_config('GRADES_DOWNLOAD')
+    reports = report_store.links_for(str(ccx.ccx_course_id))
+    data = []
+    for report in reports:
+        data.append({
+            'filename': report[0],
+            'url': report[1],
+        })
+    return HttpResponse(json.dumps(data), content_type='application/json')

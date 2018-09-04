@@ -1,33 +1,146 @@
 <%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 
-<h2 class="hd hd-2">${_('Students')}</h2>
-<div class="gradebook-wrapper">
-    <table class="students-table">
-        <thead>
-            <td>Name</td>
-            <td>Username</td>
-            <td>Email Address</td>
-            <td style="text-align: right">Date Enrolled</td>
-            <td title="Inactive includes both unenrolled and invited students"">Active/Inactive</td>
-        </thead>
-        <tbody>
-            % for student_enrollment in ccx_student_enrollments:
-                <tr
-                    % if not student_enrollment.is_active:
-                        title="Student is enrolled but inactive."
-                    % endif
-                >
-                    <td>${student_enrollment.user.profile.name}</td>
-                    <td>${student_enrollment.user.username}</td>
-                    <td>${student_enrollment.user.email}</td>
-                    <td style="text-align: right">${student_enrollment.created.strftime("%m/%d/%Y")}</td>
-                    <td class="active-flag">
-                        <i class="fa fa-circle ${'active' if student_enrollment.is_active else 'inactive'}" />
-                        ${'Active' if student_enrollment.is_active else 'Inactive'}
-                    </td>
-                </tr>
-            % endfor
-        </tbody>
-    </table>
-</div>
+<nav class="sub-nav">
+    <a class="student-list-btn active">Students</a>
+    <a class="student-progress-btn">Progress</a>
+</nav>
+
+<section id="student_admin-students" class="student_admin">
+    <div class="student_admin-wrapper">
+        <table class="students-table">
+            <thead>
+                <td>Name</td>
+                <td>Username</td>
+                <td>Email Address</td>
+                <td class="date-enrolled">Date Enrolled</td>
+                <td class="status" title="Inactive includes both unenrolled and invited students">Status</td>
+            </thead>
+            <tbody>
+                % for student_enrollment in ccx_student_enrollments:
+                    <tr
+                        % if not student_enrollment.is_active:
+                            title="Student is enrolled but inactive."
+                        % endif
+                    >
+                        <td>${student_enrollment.user.profile.name}</td>
+                        <td>${student_enrollment.user.username}</td>
+                        <td>${student_enrollment.user.email}</td>
+                        <td>${student_enrollment.created.strftime("%m/%d/%Y")}</td>
+                        <td class="active-flag ${'active' if student_enrollment.is_active else 'inactive'}">
+                            <i class="fa fa-circle "></i>
+                            ${'Active' if student_enrollment.is_active else 'Inactive'}
+                        </td>
+                    </tr>
+                % endfor
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section id="student_admin-progress" class="student_admin hidden">
+    <div class="action-bar">
+        <button class="btn export-completion-report">Export Interactives Completion Report</button>
+        <i class="fa fa-refresh fa-lg refresh-list-btn"></i>
+    </div>
+    <span class="status-info"></span>
+    <div class="student_admin-wrapper">
+            <table class="files-table">
+                <thead>
+                    <th class="type">Type</th>
+                    <th class="creation-date">Created at</th>
+                    <th class="action">Action</th>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+</section>
+
+<script>
+    function extractDate(filename) {
+        var regex = /(\d{4}-\d{2}-\d{2}-\d{4})/;
+        var date = regex.exec(filename)[1];
+
+        var mDate = moment(date, 'YYYY-MM-DD-hhmm');
+        return mDate.format('MMMM Do YYYY, hh:mm');
+    }
+
+    function extractType(filename) {
+        var regex = /_ccx_(\w*)_\d*/;
+        var type = regex.exec(filename)[1];
+        var typeMap = {
+            'affiliate_report': 'Affiliate',
+            'affiliates_report': 'Affiliate',
+            'completion_report': 'Course Completion',
+            'course_report': 'Affiliate Course',
+            'courses': 'Affiliate Course',
+            'interactives_completion_report': 'Interactives Completion',
+            'report': 'Affiliate',
+            'time_report': 'Course Time',
+            'user_report': 'User',
+        };
+
+        return typeMap[type] || '';
+    }
+
+    function toggleSection(linkCls, sectionId) {
+        $('nav.sub-nav a').removeClass('active');
+        $(linkCls).addClass('active');
+        $('section.student_admin').addClass('hidden');
+        $(sectionId).removeClass('hidden');
+    }
+
+    function populateReportsList() {
+        var $refreshBtn = $('.refresh-list-btn');
+        $refreshBtn.addClass('fa-spin');
+
+        $('span.status-info').text('');
+        $.ajax({
+            method: 'GET',
+            url: 'ccx_report_list',
+            success: function(data) {
+                var $tbody = $('table.files-table > tbody');
+                $tbody.empty();
+
+                for (var i = 0; i < data.length; i++) {
+                    var filename = data[i].filename;
+                    var url = data[i].url;
+                    var type = extractType(filename);
+                    var creationDate = extractDate(filename);
+
+                    $tbody.append(
+                        '<tr>' +
+                            '<td class="type">' + type + '</td>' +
+                            '<td class="creation-date">' + creationDate + '</td>' +
+                            '<td class="action"><a href="' + url + '">Download</td>' +
+                        '</tr>'
+                    );
+                }
+                $refreshBtn.removeClass('fa-spin');
+            },
+            error: function(data) { console.log("ERROR: ", data) }
+        });
+    }
+
+    $(document).ready(function() {
+
+        populateReportsList();
+
+        $('a.student-list-btn').click(function() { toggleSection(this, '#student_admin-students') });
+        $('a.student-progress-btn').click(function() { toggleSection(this, '#student_admin-progress') });
+        $('.refresh-list-btn').click(populateReportsList);
+
+        $('button.export-completion-report').click(function() {
+            $('span.status-info').text('Generating report, this will take a few minutes. Refresh table to see the download link.');
+            $.ajax({
+                method: 'POST',
+                data: {report_type: 'export_interactives_completion_report'},
+                url: 'ccx_export_report',
+                error: function (data) {
+                    $('span.status-info').text('An error occurred.')
+                    console.log("Interactives report error: ", data)
+                },
+            });
+        });
+    });
+</script>

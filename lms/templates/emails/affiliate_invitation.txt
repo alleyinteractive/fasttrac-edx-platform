@@ -1,4 +1,4 @@
-Hello - you have been added to the {{ affiliate_name }} affiliate as a {{ role }}.
+Hello - you have been added to the {{ affiliate_name|safe }} affiliate as a {{ role }}.
 
 Click here to register and get started: http://{{ site_name }}/register
 

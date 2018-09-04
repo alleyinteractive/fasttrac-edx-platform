@@ -1,48 +1,56 @@
-from django.http import HttpResponseForbidden
 from functools import wraps
-from .models import AffiliateMembership, AffiliateEntity
+
+from django.db.models import Q
+from django.http import HttpResponseForbidden
+
+from .models import AffiliateMembership
+
 
 def only_program_director(function):
-    """Only allow access to global staff or affiliate staff user(Program Director)"""
+    """Only allow access to global staff or the affiliate's Program Director."""
     @wraps(function)
     def wrapped_view(request, *args, **kwargs):
         """Wrapper for the view function."""
         if request.user.is_anonymous():
             return HttpResponseForbidden()
-        elif request.user.is_staff:
-            return function(request, *args, **kwargs)
-        else:
-            affiliate = AffiliateEntity.objects.get(slug=kwargs['slug'])
 
-            has_pd_role_in_affiliate = AffiliateMembership.objects.filter(member=request.user, affiliate=affiliate, role='staff').exists()
+        if request.user.is_staff:
+            return function(request, *args, **kwargs)
+
+        if 'slug' in kwargs:
+            has_pd_role_in_affiliate = AffiliateMembership.objects.filter(
+                member=request.user,
+                affiliate__slug=kwargs['slug'],
+                role=AffiliateMembership.STAFF
+            ).exists()
 
             if has_pd_role_in_affiliate:
                 return function(request, *args, **kwargs)
-            else:
-                return HttpResponseForbidden()
+        return HttpResponseForbidden()
 
     return wrapped_view
 
 
 def only_staff(function):
-    """Only allow access to global staff or affiliate staff user(Program Director)"""
+    """Only allow access to global staff or affiliate staff (Program Director or Course Manager)."""
     @wraps(function)
     def wrapped_view(request, *args, **kwargs):
         """Wrapper for the view function."""
         if request.user.is_anonymous():
             return HttpResponseForbidden()
-        elif request.user.is_staff:
+
+        if request.user.is_staff:
             return function(request, *args, **kwargs)
-        else:
-            affiliate = AffiliateEntity.objects.get(slug=kwargs['slug'])
 
-            has_pd_role_in_affiliate = AffiliateMembership.objects.filter(member=request.user, affiliate=affiliate, role='staff').exists()
-            has_cm_role_in_affiliate = AffiliateMembership.objects.filter(member=request.user, affiliate=affiliate, role='instructor').exists()
+        if 'slug' in kwargs:
+            has_pd_or_cm_role_in_affiliate = AffiliateMembership.objects.filter(
+                Q(role=AffiliateMembership.STAFF) | Q(role=AffiliateMembership.INSTRUCTOR),
+                member=request.user,
+                affiliate__slug=kwargs['slug']
+            ).exists()
 
-            if has_pd_role_in_affiliate or has_cm_role_in_affiliate:
+            if has_pd_or_cm_role_in_affiliate:
                 return function(request, *args, **kwargs)
-            else:
-                return HttpResponseForbidden()
-
+        return HttpResponseForbidden()
 
     return wrapped_view

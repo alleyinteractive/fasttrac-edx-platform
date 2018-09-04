@@ -2,10 +2,12 @@
 git+https://github.com/mbareta/edx-search@fasttrac#egg=edx-search==0.1.3
 
 # Custom input problem type
-git+https://github.com/vukoviciv/ft-input-problem-type-xblock.git#egg=ft-input-problem-type-xblock
+git+https://github.com/ExtensionEngine/ft-input-problem-type-xblock.git@FT-1.0#egg=ft-input-problem-type-xblock==FT-1.0
 
 # Fork poll/survey
 git+https://github.com/ExtensionEngine/xblock-poll.git@FT-1.0#egg=xblock-poll==FT-1.0
 
 # Fork Done XBlock
 git+https://github.com/ExtensionEngine/DoneXBlock.git@FT-1.1#egg=done-xblock==FT-1.1
+
+openpyxl==2.5.4

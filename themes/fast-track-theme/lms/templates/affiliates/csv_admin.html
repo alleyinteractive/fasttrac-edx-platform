@@ -1,0 +1,150 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">Affiliates CSV Actions</%block>
+
+<style>
+  .container {
+    max-width: 80%!important;
+  }
+
+  .flash-message {
+    width: 80%;
+    padding: 1rem;
+    margin: 2rem;
+    border: 1px solid #777;
+  }
+
+  #csv-actions {
+    line-height: 40px;
+  }
+
+  #csv-actions a {
+    display: inline-block;
+    border: 1px solid;
+    padding: 0 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  #csv-actions a:active { text-decoration: none; }
+  #csv-actions a:hover { text-decoration: none; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  td, th {
+    border: 1px solid #999;
+    padding: 0.5rem;
+    height: 30px;
+    line-height: 30px;
+  }
+
+  table thead { background-color: #b9b9b9; }
+
+  table tbody tr:hover { background-color: #f7f7f7; }
+
+  table tbody .creation-date {
+    width: 200px;
+    text-align: right;
+  }
+
+  table tbody .type { width: 200px; }
+
+  #csv-files h3 {
+    margin-bottom: 1rem;
+  }
+</style>
+
+<section class="container">
+  % if messages:
+    % for message in messages:
+      <p class="flash-message">${message}</p>
+    % endfor
+  % endif
+
+  <h1 class="title">Affiliate data export</h1>
+
+  <div id="csv-actions">
+    <a class="csv-action-btn" href="csv_export?report_type=export_csv_affiliate_report">
+      Export Affiliate Report
+    </a>
+    <a class="csv-action-btn" href="csv_export?report_type=export_csv_affiliate_course_report">
+      Export Affiliate Course Report
+    </a>
+    <a class="csv-action-btn" href="csv_export?report_type=export_csv_user_report">
+      Export User Report
+    </a>
+    <a class="csv-action-btn" href="csv_export?report_type=export_csv_time_report">
+      Export Course Time Report
+    </a>
+    <a class="csv-action-btn" href="csv_export?report_type=export_csv_completion_report">
+      Export Course Completion Report
+    </a>
+    <a class="csv-action-btn" href="csv_export?report_type=export_completion_report">
+      Export Course Interactives Completion Report
+    </a>
+  </div>
+
+  <div id="csv-files">
+    <h3>Click on the filename to download the report.</h3>
+    <table>
+      <thead>
+        <th>Report Type</th>
+        <th>Filename</th>
+        <th>Created at</th>
+      </thead>
+      <tbody>
+        % for name, url in csv_files:
+        <tr>
+          <td class="type"></td>
+          <td class="filename">
+            <a href="${url}">${name}</a>
+          </td>
+          <td class="creation-date"></td>
+        </tr>
+        % endfor
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+  function extractDate(filename) {
+    var regex = /(\d{4}-\d{2}-\d{2}-\d{4})\.csv$/;
+    var date = regex.exec(filename)[1];
+
+    var mDate = moment(date, 'YYYY-MM-DD-hhmm');
+    return mDate.format('MMMM Do YYYY, hh:mm');
+  }
+
+  function extractType(filename) {
+    var regex = /^affiliates_(\w*)_\d*/;
+    var type = regex.exec(filename)[1];
+    var typeMap = {
+      'affiliate_report': 'Affiliate',
+      'affiliates_report': 'Affiliate',
+      'completion_report': 'Course Completion',
+      'course_report': 'Affiliate Course',
+      'courses': 'Affiliate Course',
+      'interactives_completion_report': 'Interactives Completion',
+      'report': 'Affiliate',
+      'time_report': 'Course Time',
+      'user_report': 'User',
+    };
+
+    return typeMap[type] || '';
+  }
+
+  $(document).ready(function() {
+    $('#csv-files table tbody tr').each(function(index, el) {
+      var filename = $('.filename a', el).text();
+
+      $('.type', el).text(extractType(filename));
+      $('.creation-date', el).text(extractDate(filename));
+    });
+  });
+</script>

@@ -126,14 +126,33 @@
       </div>
       <div class="course-summary">
         % if affiliate.is_parent:
-          <span>Sub-affiliates of ${affiliate.name}:</span>
+          <h4>Sub-affiliates of ${affiliate.name}:</h4>
           % for aff in subaffiliates:
+            <a class="affiliate-box" href="/affiliates/${aff.slug}">
             <div class="sub-affiliate">
-              <h4><a href="/affiilates/${aff.name}">${aff.name}</a></h4>
+              <div class="affiliate-image">
+                <img src="${affiliate.image_url}">
+              </div>
+              <div class="affiliate-info">
+                <div class="affiliate-name">${aff.name}</div>
+                <div class="affiliate-address">${aff.name}, ${aff.state}</div>
+              </div>
             </div>
+            </a>
           % endfor
         % elif affiliate.is_child:
-          <span>This is a sub-affiliate of <a href="/affiliates/${affiliate.parent.name}">${affiliate.parent.name}</a></span>
+            <h4>Parent Affiliate:</h4>
+            <a class="affiliate-box" href="/affiliates/${affiliate.parent.slug}">
+            <div class="parent-affiliate">
+              <div class="affiliate-image">
+                <img src="${affiliate.image_url}">
+              </div>
+              <div class="affiliate-info">
+                <div class="affiliate-name">${affiliate.parent.name}</div>
+                <div class="affiliate-address">${affiliate.parent.name}, ${affiliate.parent.state}</div>
+              </div>
+            </div>
+            </a>
         % endif
       </div>
     </div>
