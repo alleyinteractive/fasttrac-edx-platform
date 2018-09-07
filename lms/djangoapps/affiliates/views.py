@@ -4,11 +4,12 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.core import serializers
+from django.http import HttpResponseNotFound
 from django.shortcuts import redirect
 from django.db.models import Q
 from django.views.generic import View
 from django_countries import countries
-from edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response, render_to_string
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
@@ -108,7 +109,10 @@ def index(request):
 
 
 def show(request, slug):
-    affiliate = AffiliateEntity.objects.get(slug=slug)
+    try:
+        affiliate = AffiliateEntity.objects.get(slug=slug)
+    except AffiliateEntity.DoesNotExist:
+        return HttpResponseNotFound(render_to_string('static_templates/404.html', {}, request=request))
     return render_to_response('affiliates/show.html', {
         'affiliate': affiliate,
         'subaffiliates': affiliate.children.all(),
