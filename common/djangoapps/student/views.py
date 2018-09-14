@@ -753,11 +753,27 @@ def dashboard(request):
     else:
         redirect_message = ''
 
+    ccx_ids = [enr.course.id.ccx for enr in course_enrollments if hasattr(enr.course.id, 'ccx')]
+    archived_ccxs = CustomCourseForEdX.objects.filter(
+        ~Q(end_date=None),
+        Q(end_date__lt=datetime.datetime.now(UTC)),
+        id__in=ccx_ids
+    )
+    archived_ccx_ids = [ccx.ccx_course_id.ccx for ccx in archived_ccxs]
+
+    archived_ccx_enrollments = [
+        enr for enr in course_enrollments
+        if hasattr(enr.course.id, 'ccx') and int(enr.course.id.ccx) in archived_ccx_ids
+    ]
+    active_enrollments = [enr for enr in course_enrollments if enr not in archived_ccx_enrollments]
+
     context = {
         'affiliate_ids': affiliate_ids,
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
         'course_enrollments': course_enrollments,
+        'active_enrollments': active_enrollments,
+        'archived_ccx_enrollments': archived_ccx_enrollments,
         'course_optouts': course_optouts,
         'message': message,
         'staff_access': staff_access,
