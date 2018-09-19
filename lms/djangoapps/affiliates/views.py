@@ -155,7 +155,7 @@ def create(request):
             setattr(affiliate, key, post_data[key])
 
     affiliate.save()
-    if post_data['affiliate-type'] == 'parent':
+    if request.user.is_staff and post_data['affiliate-type'] == 'parent':
         subs = dict(request.POST)['sub-affiliates']
         AffiliateEntity.objects.filter(id__in=subs).update(parent=affiliate)
 
@@ -181,22 +181,23 @@ def edit(request, slug):
 
         # If a parent affiliate is changed to be a standalone or a sub-affiliate
         # we remove all of that parent's children references.
-        affiliate_type = request.POST['affiliate-type']
-        if affiliate.is_parent and affiliate_type in ['standalone', 'sub-affiliate']:
-            affiliate.children.all().update(parent=None)
+        if request.user.is_staff:
+            affiliate_type = request.POST['affiliate-type']
+            if affiliate.is_parent and affiliate_type in ['standalone', 'sub-affiliate']:
+                affiliate.children.all().update(parent=None)
 
-        if affiliate_type in ['parent', 'standalone']:
-            affiliate.parent = None
+            if affiliate_type in ['parent', 'standalone']:
+                affiliate.parent = None
 
-        if affiliate_type == 'parent':
-            subs = dict(request.POST)['sub-affiliates'] if 'sub-affiliates' in request.POST else []
-            affiliate.children.exclude(id__in=subs).update(parent=None)
-            affiliates.filter(id__in=subs).update(parent=affiliate)
+            if affiliate_type == 'parent':
+                subs = dict(request.POST)['sub-affiliates'] if 'sub-affiliates' in request.POST else []
+                affiliate.children.exclude(id__in=subs).update(parent=None)
+                affiliates.filter(id__in=subs).update(parent=affiliate)
 
         for key in request.POST:
             if key == 'year_of_birth':
                 setattr(affiliate, key, int(request.POST[key]))
-            elif key == 'parent':
+            elif request.user.is_staff and key == 'parent':
                 if affiliate_type == 'sub-affiliate' and int(request.POST[key]):
                     parent = AffiliateEntity.objects.get(id=request.POST[key])
                 else:
