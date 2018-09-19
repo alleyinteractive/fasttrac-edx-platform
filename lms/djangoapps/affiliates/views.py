@@ -57,6 +57,17 @@ class SiteAdminView(IsStaffMixin, View):
         return render_to_response(self.template_name, context)
 
 
+class ImpersonateView(IsStaffMixin, View):
+    template_name = 'affiliates/impersonate.html'
+
+    def get(self, request):
+        context = {
+            'workspace_logout_url': '{}/users/logout/?no_redirect=1'.format(settings.WORKSPACE_URL),
+            'impersonated_email': request.GET.get('impersonated_email')
+        }
+        return render_to_response(self.template_name, context)
+
+
 def index(request):
     affiliate_id = request.GET.get('affiliate_id', '')
     affiliate_city = request.GET.get('affiliate_city', '')
