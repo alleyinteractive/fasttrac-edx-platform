@@ -38,27 +38,37 @@ class ImpersonateView(APIView):
     """
     permission_classes = (IsAdminUser,)
 
-    def post(self, request):
-        email = request.POST.get('email')
-
+    def get_user(self, email):
         try:
             user = User.objects.get(email=email)
-            if not hasattr(request.user, 'backend'):
-                user.backend = _get_path_of_arbitrary_backend_for_user(user)
-            login(request, user)
-            LOG.info('Impersonating %s', email)
-            return Response(
-                data={'msg': 'User logged in.'},
-                status=200,
-                content_type='application/json'
-            )
+            return user
         except User.DoesNotExist:
-            LOG.info('Impersonation for %s failed', email)
+            return None
+
+    def post(self, request):
+        email = request.POST.get('email')
+        check_user = request.POST.get('check_user')
+
+        user = self.get_user(email)
+        if not user:
             return Response(
                 data={'msg': 'User with email {} does not exist.'.format(email)},
-                status=400,
+                status=404,
                 content_type='application/json'
             )
+        if check_user:
+            return Response(status=200)
+
+        if not hasattr(request.user, 'backend'):
+            user.backend = _get_path_of_arbitrary_backend_for_user(user)
+        login(request, user)
+
+        LOG.info('Impersonating %s', email)
+        return Response(
+            data={'msg': 'User logged in.'},
+            status=200,
+            content_type='application/json'
+        )
 
 
 class DataExportView(APIView):

@@ -1,0 +1,31 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%
+  from django.utils.timezone import now
+%>
+
+<%block name="pagetitle">Impersonating user</%block>
+
+<h1>Impersonation in progress...</h1>
+
+<iframe src="${workspace_logout_url}" style="visibility: hidden"></iframe>
+<span class="hidden email" data-impersonated-email="${impersonated_email}"></span>
+
+<script>
+$(document).ready(function() {
+  var $iframes = $('iframe');
+  var email = $('span.email').data('impersonated-email');
+
+  $iframes.load(function() {
+    $.ajax({
+      url: '/api/affiliates/impersonate',
+      method: 'POST',
+      data: {email: email},
+      success: function(data) {
+        window.location.href = '/';
+      }
+    });
+  });
+});
+</script>

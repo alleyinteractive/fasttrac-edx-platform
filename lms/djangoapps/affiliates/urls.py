@@ -3,7 +3,7 @@ URLs for the Affiliate Feature.
 """
 from django.conf.urls import patterns, url
 
-from affiliates.views import SiteAdminView
+from affiliates.views import ImpersonateView, SiteAdminView
 
 
 urlpatterns = patterns(
@@ -13,6 +13,7 @@ urlpatterns = patterns(
     url(r'^payment$', 'affiliates.views.payment', name='payment'),
     url(r'^new$', 'affiliates.views.new', name='new'),
     url(r'^create$', 'affiliates.views.create', name='create'),
+    url(r'^impersonate', ImpersonateView.as_view(), name='impersonate'),
     url(r'^(?P<slug>[^/]*)$', 'affiliates.views.show', name='show'),
     url(r'^edit/(?P<slug>[^/]*)$', 'affiliates.views.edit', name='edit'),
     url(r'^delete/(?P<slug>[^/]*)$', 'affiliates.views.delete', name='delete'),

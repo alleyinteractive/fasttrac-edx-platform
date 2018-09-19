@@ -267,9 +267,9 @@
         $.ajax({
           url: '/api/affiliates/impersonate',
           method: 'POST',
-          data: {email: email},
+          data: {email: email, check_user: 1},
           success: function() {
-            window.location.href = '/';
+            window.location.href = '/affiliates/impersonate/?impersonated_email=' + email;
           },
           error: function(data) {
             showError(data.responseJSON.msg);
