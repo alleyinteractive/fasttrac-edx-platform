@@ -92,7 +92,7 @@
                    name="enrollment_end_date"
                    id="ccx_enrollment_end_date"
                    size="10"
-                   required />
+                   required/>
             <i class="fa fa-calendar" aria-hidden="true"></i>
         </div>
         <div class="horizontal-field-container">
@@ -104,7 +104,7 @@
                    name="enrollment_end_time"
                    id="ccx_enrollment_end_time"
                    size=10
-                   required />
+                   required/>
             </br>
         </div>
     </div>
@@ -191,6 +191,23 @@
         </div>
     </div>
 
+    <div class="horizontal-field-wrapper">
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('FACILITATORS')}</p>
+            <ul id="facilitators-list">
+
+            </ul>
+            <select id="facilitators" class="ccx-select">
+                % for member in facilitators:
+                    <option value="${member.id}">${'{} ({})'.format(member.profile.name, member.email)}</option>
+                % endfor
+            </select>
+            <button id="add-facilitator" class="ft-button-action" type="button">
+                Add facilitator
+            </button>
+        </div>
+    </div>
+
     <div class="field submit">
         <button id="create-ccx" class="ft-button-action" type="submit">
                 ${_('CREATE COURSE')}<i class="fa fa-plus"></i>
@@ -198,8 +215,35 @@
     </div>
 </form>
 
-  <script type="text/javascript">
+<script type="text/javascript">
     $(document).ready(function() {
-      autosize($('.autosized-textarea'));
-    })
-  </script>
+        autosize($('.autosized-textarea'));
+
+        $('#add-facilitator').click(function(event) {
+        var $selected = $('#facilitators option:selected'),
+            facilitatorId = $selected.val(),
+            facilitator = $selected.text();
+
+        $('#facilitators-list').append(
+            '<li>' +
+                '<span>' + facilitator + ' </span>' +
+                '<i class="remove-btn fa fa-times"></i>' +
+                '<input type="hidden" name="facilitators" value="' + facilitatorId + '">' +
+            '</li>'
+        );
+
+        $('#facilitators option[value="' + facilitatorId + '"]').remove();
+    });
+
+    $(document).on('click', '#facilitators-list .remove-btn', function() {
+        var $parent = $(this).parent();
+        var value = $parent.find('input').val();
+        var facilitator = $parent.find('span').text();
+        $parent.remove();
+
+        $('#facilitators').append(
+            '<option value="' + value + '">' + facilitator + '</option>'
+        );
+    });
+});
+</script>
