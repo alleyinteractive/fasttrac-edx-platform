@@ -1,0 +1,170 @@
+## mako
+<%page expression_filter="h"/>
+<%namespace name='static' file='static_content.html'/>
+
+<style>
+  #mk-footer {
+    padding: 5.25rem 0 4rem;
+  }
+
+  #mk-footer #sub-footer {
+    margin-top: 6.5rem;
+    height: 13px;
+    opacity: .65;
+  }
+
+  #mk-footer .mk-footer-copyright {
+    display: inline-block;
+    opacity: .8;
+    padding: 25px 0 20px;
+    line-height: 1rem;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 1px;
+  }
+
+  #mk-footer .mk-padding-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 1rem;
+  }
+
+  #mk-footer .mk-col-1-4 {
+    display: inline-flex;
+    flex-direction: row;
+    text-align: left;
+  }
+
+  #mk-footer .footer-wrapper.mk-grid {
+    max-width: 1140px;
+    margin: auto;
+  }
+
+  @media handheld, only screen and (max-width: 768px) {
+    #mk-footer .mk-padding-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    #mk-footer .mk-col-1-4 {
+      margin-bottom: 1.4rem;
+    }
+  }
+
+  #mk-footer .textwidget.custom-html-widget ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  #mk-footer .textwidget.custom-html-widget ul li a {
+    color: #969696;
+    display: inline-block;
+    margin: 0 0 8px 0;
+    text-decoration: none;
+    line-height: 18px;
+    font-size: 13px;
+  }
+
+  #mk-footer .textwidget.custom-html-widget ul li a:hover {
+    color: #f7722a;
+    border-bottom: 0 none;
+  }
+
+  #mk-footer .widgettitle {
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #5f5e5e;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+  }
+</style>
+
+<div class="wrapper wrapper-footer">
+  <footer id="footer-openedx" class="grid-container">
+    <section id="mk-footer" class="" role="contentinfo" itemscope="itemscope" itemtype="https://schema.org/WPFooter">
+      <div class="footer-wrapper mk-grid">
+        <div class="mk-padding-wrapper">
+          <div class="mk-col-1-4">
+            <section id="custom_html-2" class="widget_text widget widget_custom_html mk-in-viewport">
+              <div class="widgettitle">Explore FastTrac</div>
+              <div class="textwidget custom-html-widget">
+                <ul>
+                  <li>
+                    <a href="https://fasttrac.org/must-reads/">Must Reads</a>
+                  </li>
+                  <li>
+                    <a href="https://fasttrac.org/success-stories/">Success Stories</a>
+                  </li>
+                  <li>
+                    <a href="https://fasttrac.org/why-fasttrac/">Why FastTrac?</a>
+                  </li>
+                </ul>
+              </div>
+            </section>
+          </div>
+          <div class="mk-col-1-4">
+            <section id="custom_html-3" class="widget_text widget widget_custom_html mk-in-viewport">
+              <div class="widgettitle">Start FastTrac</div>
+              <div class="textwidget custom-html-widget">
+                <ul>
+                  <li>
+                    <a href="/register">Register</a>
+                  </li>
+                  <li>
+                    <a href="/courses">Find a Course</a>
+                  </li>
+                  <li>
+                    <a href="/affiliates">Find an Affiliate</a>
+                  </li>
+                </ul>
+              </div>
+            </section>
+          </div>
+          <div class="mk-col-1-4">
+            <section id="custom_html-4" class="widget_text widget widget_custom_html mk-in-viewport">
+              <div class="widgettitle">Offer FastTrac</div>
+              <div class="textwidget custom-html-widget">
+                <ul>
+                  <li>
+                    <a href="https://fasttrac.org/why-offer-fasttrac/">Why Become an Affiliate?</a>
+                  </li>
+                  <li>
+                    <a href="https://www.surveygizmo.com/s3/3392617/Affiliate-Registration">Apply to be an Affiliate</a>
+                  </li>
+                </ul>
+              </div>
+            </section>
+          </div>
+          <div class="mk-col-1-4">
+            <section id="custom_html-5" class="widget_text widget widget_custom_html mk-in-viewport">
+              <div class="widgettitle">About FastTrac</div>
+              <div class="textwidget custom-html-widget">
+                <ul>
+                  <li>
+                    <a href="https://fasttrac.org/about-us/">About Us</a>
+                  </li>
+                  <li>
+                    <a href="https://fasttrac.org/contact-us/">Contact Us</a>
+                  </li>
+                  <li>
+                    <a href="https://fasttrac.org/green/">Find Classic FastTrac</a>
+                  </li>
+                </ul>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <div id="sub-footer" class="background-pattern">
+        <div class=" mk-grid">
+          <span class="mk-footer-copyright">© 2017 Ewing Marion Kauffman Foundation
+            <br> All Rights Reserved</span>
+        </div>
+      </div>
+    </section>
+  </footer>
+</div>
