@@ -62,7 +62,7 @@ class ImpersonateView(IsStaffMixin, View):
 
     def get(self, request):
         context = {
-            'workspace_logout_url': '{}/users/logout/?no_redirect=1'.format(settings.WORKSPACE_URL),
+            'workspace_logout_url': '{}/users/logout?no_redirect=1'.format(settings.WORKSPACE_URL),
             'impersonated_email': request.GET.get('impersonated_email')
         }
         return render_to_response(self.template_name, context)
