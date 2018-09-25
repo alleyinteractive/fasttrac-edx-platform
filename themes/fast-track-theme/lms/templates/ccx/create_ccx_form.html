@@ -216,10 +216,10 @@
 </form>
 
 <script type="text/javascript">
-    $(document).ready(function() {
-        autosize($('.autosized-textarea'));
+$(document).ready(function() {
+    autosize($('.autosized-textarea'));
 
-        $('#add-facilitator').click(function(event) {
+    $('#add-facilitator').click(function(event) {
         var $selected = $('#facilitators option:selected'),
             facilitatorId = $selected.val(),
             facilitator = $selected.text();
@@ -244,6 +244,25 @@
         $('#facilitators').append(
             '<option value="' + value + '">' + facilitator + '</option>'
         );
+    });
+
+    $('form.ccx-form').submit(function() {
+        var $errorMessage = $('#ccx-create-message');
+        function scrollToError() {
+            $('html, body').animate({
+                scrollTop: $errorMessage.offset().top - 100
+            }, 200);
+        }
+
+        if(!($('#facilitators-list li').length)) {
+            $errorMessage.html('You need to add facilitators!');
+            $errorMessage.show();
+            scrollToError();
+            return false;
+        } else {
+            $errorMessage.hide();
+            return true;
+        }
     });
 });
 </script>
