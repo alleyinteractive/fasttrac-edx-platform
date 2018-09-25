@@ -161,7 +161,13 @@ def edit_ccx_context(course, ccx, user, **kwargs):
     context['grading_policy'] = json.dumps(grading_policy, indent=4)
     context['grading_policy_url'] = reverse('ccx_set_grading_policy', kwargs={'course_id': ccx_locator})
     context['STATE_CHOICES'] = STATE_CHOICES
-    context['facilitators'] = get_facilitators(user)
+
+    all_facilitators = get_facilitators(user)
+    added_facilitator_user_ids = CourseAccessRole.objects.filter(
+        course_id=ccx_locator, role=AffiliateMembership.CCX_COACH
+    ).values_list('user_id', flat=True)
+    context['added_facilitators'] = all_facilitators.filter(id__in=added_facilitator_user_ids)
+    context['not_added_facilitators'] = all_facilitators.exclude(id__in=added_facilitator_user_ids)
 
     with ccx_course(ccx_locator) as course:
         context['course'] = course
@@ -173,15 +179,13 @@ def edit_ccx_context(course, ccx, user, **kwargs):
 
 
 def get_facilitators(user):
-    affiliates = AffiliateMembership.objects.filter(
-        member=user, role=AffiliateMembership.STAFF
-    ).values_list('affiliate_id', flat=True)
-
+    """Retrieve all affiliate staff for the PD's affiliate entity."""
     member_ids = AffiliateMembership.objects.filter(
-        affiliate_id__in=affiliates
+        affiliate=user.profile.affiliate, role=AffiliateMembership.CCX_COACH
     ).values_list('member_id', flat=True).distinct()
 
     return User.objects.filter(id__in=member_ids)
+
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -264,6 +268,7 @@ def edit_ccx(request, course, ccx=None, **kwargs):
     fee = request.POST.get('fee')
     course_description = request.POST.get('course_description')
     enrollment_type = request.POST.get('enrollment_type')
+    facilitators = dict(request.POST).get('facilitators')
 
     ccx.display_name = name
     ccx.delivery_mode = delivery_mode
@@ -278,7 +283,31 @@ def edit_ccx(request, course, ccx=None, **kwargs):
     ccx.course_description = course_description
     ccx.save()
 
+    current_facilitator_ids = CourseAccessRole.objects.filter(
+        course_id=ccx.ccx_course_id, role=AffiliateMembership.CCX_COACH
+    ).values_list('user_id', flat=True)
+    removed_facilitator_ids = set(current_facilitator_ids).difference(set(facilitators))
+    added_facilitator_ids = set(facilitators).difference(set(current_facilitator_ids))
+
     ccx_id = CCXLocator.from_course_locator(course.id, ccx.pk)
+    course_obj = get_course_by_id(ccx.ccx_course_id, depth=None)
+
+    for facilitator_id in removed_facilitator_ids:
+        user = User.objects.get(id=facilitator_id)
+        revoke_access(course_obj, user, AffiliateMembership.CCX_COACH, False)
+
+    email_params = get_email_params(course, auto_enroll=True, course_key=ccx_id, display_name=ccx.display_name)
+
+    for facilitator_id in added_facilitator_ids:
+        user = User.objects.get(id=facilitator_id)
+        enroll_email(
+            course_id=ccx_id,
+            student_email=user.email,
+            auto_enroll=True,
+            email_students=True,
+            email_params=email_params
+        )
+        allow_access(course_obj, user, AffiliateMembership.CCX_COACH, False)
 
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_id})
     return redirect(url)
@@ -294,7 +323,6 @@ def create_ccx(request, course, ccx=None, **kwargs):
     if not is_ccx_coach_on_master_course(request.user, course) or not request.user.profile.affiliate:
         return HttpResponseForbidden()
 
-    affiliate = request.user.profile.affiliate
     name = request.POST.get('name')
     delivery_mode = request.POST.get('delivery_mode')
     location_city = request.POST.get('city')
@@ -391,7 +419,7 @@ def create_ccx(request, course, ccx=None, **kwargs):
                 email_students=True,
                 email_params=email_params
             )
-            allow_access(course_obj, user, 'ccx_coach', False)
+            allow_access(course_obj, user, AffiliateMembership.CCX_COACH, False)
 
     return redirect(url)
 
