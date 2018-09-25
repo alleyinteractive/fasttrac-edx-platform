@@ -219,10 +219,20 @@
 $(document).ready(function() {
     autosize($('.autosized-textarea'));
 
+    function toggleAddBtnDisable() {
+        var $selectOptions = $('#facilitators option'),
+            $addFacilitatorBtn = $('#add-facilitator');
+        $addFacilitatorBtn.attr('disabled', $selectOptions.length === 0);
+    }
+
     $('#add-facilitator').click(function(event) {
         var $selected = $('#facilitators option:selected'),
             facilitatorId = $selected.val(),
             facilitator = $selected.text();
+
+        if (typeof facilitatorId === 'undefined') {
+            return false;
+        }
 
         $('#facilitators-list').append(
             '<li>' +
@@ -233,6 +243,7 @@ $(document).ready(function() {
         );
 
         $('#facilitators option[value="' + facilitatorId + '"]').remove();
+        toggleAddBtnDisable();
     });
 
     $(document).on('click', '#facilitators-list .remove-btn', function() {
@@ -244,6 +255,8 @@ $(document).ready(function() {
         $('#facilitators').append(
             '<option value="' + value + '">' + facilitator + '</option>'
         );
+
+        toggleAddBtnDisable();
     });
 
     $('form.ccx-form').submit(function() {
