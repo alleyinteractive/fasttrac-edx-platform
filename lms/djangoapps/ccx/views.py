@@ -1,3 +1,4 @@
+# pylint: disable=unused-argument,C0411,C0412
 """
 Views related to the Custom Courses feature.
 """
@@ -8,12 +9,10 @@ import json
 import logging
 import pytz
 import ast
-import requests
 from copy import deepcopy
 from cStringIO import StringIO
 
 from django.conf import settings
-from django.views.generic import ListView
 from django.core.urlresolvers import reverse
 from django.http import (
     Http404,
@@ -22,7 +21,6 @@ from django.http import (
 )
 from django.contrib import messages
 from django.db import transaction
-from django.http import Http404
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
@@ -38,7 +36,6 @@ from courseware.grades import iterate_grades_for
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey
 from ccx_keys.locator import CCXLocator
-from student.roles import CourseCcxCoachRole
 from student.models import CourseEnrollment
 
 from instructor.views.api import _split_input_list
@@ -58,10 +55,8 @@ from lms.djangoapps.ccx.overrides import (
     bulk_delete_ccx_override_fields,
 )
 from lms.djangoapps.ccx.utils import (
-    add_master_course_staff_to_ccx,
     ccx_course,
     ccx_students_enrolling_center,
-    get_ccx_by_ccx_id,
     get_ccx_creation_dict,
     get_date,
     parse_date,
@@ -144,7 +139,7 @@ def edit_ccx_context(course, ccx, user, **kwargs):
     grading_policy = get_override_for_ccx(
         ccx, course, 'grading_policy', course.grading_policy)
 
-    context = {} # TODO:
+    context = {}
     context['ccx_locator'] = ccx_locator
     context['modify_access_url'] = reverse('modify_access', kwargs={'course_id': ccx_locator})
     context['schedule'] = json.dumps(schedule, indent=4)
@@ -152,25 +147,22 @@ def edit_ccx_context(course, ccx, user, **kwargs):
         'save_ccx', kwargs={'course_id': ccx_locator})
 
     non_student_user_ids = CourseAccessRole.objects.filter(course_id=ccx_locator).values_list('user_id', flat=True)
-    ccx_student_enrollments = CourseEnrollment.objects.filter(course_id=ccx_locator, is_active=True).exclude(user_id__in=non_student_user_ids)
+    ccx_student_enrollments = CourseEnrollment.objects.filter(
+        course_id=ccx_locator, is_active=True
+    ).exclude(user_id__in=non_student_user_ids)
 
     context['ccx_student_enrollments'] = ccx_student_enrollments
-    context['gradebook_url'] = reverse(
-        'ccx_gradebook', kwargs={'course_id': ccx_locator})
-    context['grades_csv_url'] = reverse(
-        'ccx_grades_csv', kwargs={'course_id': ccx_locator})
+    context['gradebook_url'] = reverse('ccx_gradebook', kwargs={'course_id': ccx_locator})
+    context['grades_csv_url'] = reverse('ccx_grades_csv', kwargs={'course_id': ccx_locator})
     context['grading_policy'] = json.dumps(grading_policy, indent=4)
-    context['grading_policy_url'] = reverse(
-        'ccx_set_grading_policy', kwargs={'course_id': ccx_locator})
+    context['grading_policy_url'] = reverse('ccx_set_grading_policy', kwargs={'course_id': ccx_locator})
     context['STATE_CHOICES'] = STATE_CHOICES
 
     with ccx_course(ccx_locator) as course:
         context['course'] = course
 
-    context['edit_ccx_url'] = reverse(
-            'edit_ccx', kwargs={'course_id': ccx_locator})
-    context['edit_ccx_dasboard_url'] = reverse(
-            'ccx_edit_course_view', kwargs={'course_id': ccx_locator})
+    context['edit_ccx_url'] = reverse('edit_ccx', kwargs={'course_id': ccx_locator})
+    context['edit_ccx_dasboard_url'] = reverse('ccx_edit_course_view', kwargs={'course_id': ccx_locator})
 
     return context
 
@@ -211,8 +203,12 @@ def dashboard(request, course, ccx=None, **kwargs):
 
         context['edit_current'] = False
 
-        non_student_user_ids = CourseAccessRole.objects.filter(course_id=ccx_locator).values_list('user_id', flat=True)
-        ccx_student_enrollments = CourseEnrollment.objects.filter(course_id=ccx_locator).exclude(user_id__in=non_student_user_ids)
+        non_student_user_ids = CourseAccessRole.objects.filter(
+            course_id=ccx_locator
+        ).values_list('user_id', flat=True)
+        ccx_student_enrollments = CourseEnrollment.objects.filter(
+            course_id=ccx_locator
+        ).exclude(user_id__in=non_student_user_ids)
 
         # show students on Student Admin tab
         context['ccx_student_enrollments'] = ccx_student_enrollments
@@ -237,15 +233,16 @@ def edit_ccx(request, course, ccx=None, **kwargs):
     if not ccx:
         raise Http404
 
-    # TODO instructor or staff on ccx
-
     name = request.POST.get('name')
     delivery_mode = request.POST.get('delivery_mode')
     location_city = request.POST.get('city')
     location_state = request.POST.get('state')
     location_postal_code = request.POST.get('postal_code')
     time = '{} {}Z'.format(request.POST.get('date'), request.POST.get('time'))
-    enrollment_end_date = '{} {}Z'.format(request.POST.get('enrollment_end_date'), request.POST.get('enrollment_end_time'))
+    enrollment_end_date = '{} {}Z'.format(
+        request.POST.get('enrollment_end_date'),
+        request.POST.get('enrollment_end_time')
+    )
     end_date = '{} {}Z'.format(request.POST.get('end_date'), request.POST.get('end_time'))
     fee = request.POST.get('fee')
     course_description = request.POST.get('course_description')
@@ -286,7 +283,10 @@ def create_ccx(request, course, ccx=None, **kwargs):
     location_state = request.POST.get('state')
     location_postal_code = request.POST.get('postal_code')
     time = '{} {}Z'.format(request.POST.get('date'), request.POST.get('time'))
-    enrollment_end_date = '{} {}Z'.format(request.POST.get('enrollment_end_date'), request.POST.get('enrollment_end_time'))
+    enrollment_end_date = '{} {}Z'.format(
+        request.POST.get('enrollment_end_date'),
+        request.POST.get('enrollment_end_time')
+    )
     end_date = '{} {}Z'.format(request.POST.get('end_date'), request.POST.get('end_time'))
     fee = request.POST.get('fee')
     course_description = request.POST.get('course_description')
@@ -693,6 +693,7 @@ def ccx_grades_csv(request, course, ccx=None, **kwargs):
 
         return response
 
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
@@ -710,17 +711,18 @@ def ccx_messages(request, course, ccx=None, **kwargs):
     if not ccx:
         raise Http404
 
-    messages = CourseUpdates.objects.filter(ccx=ccx)
+    msgs = CourseUpdates.objects.filter(ccx=ccx)
     ccx_id = unicode(CCXLocator.from_course_locator(course.id, unicode(ccx.id)))
 
     context = {
         'create_message_url': reverse('ccx_messages_create', kwargs={'course_id': ccx_id}),
         'delete_message_url': 'ccx_messages/delete/',
-        'messages': messages,
+        'messages': msgs,
         'course': get_course_by_id(ccx.ccx_course_id, depth=2)
     }
 
     return render_to_response('ccx/ccx_messages_dashboard.html', context)
+
 
 @transaction.non_atomic_requests
 @coach_dashboard
@@ -741,6 +743,7 @@ def ccx_messages_create(request, course, ccx=None, **kwargs):
     ccx_id = unicode(CCXLocator.from_course_locator(course.id, unicode(ccx.id)))
 
     return redirect(reverse('ccx_messages', kwargs={'course_id': ccx_id}))
+
 
 @transaction.non_atomic_requests
 @coach_dashboard
