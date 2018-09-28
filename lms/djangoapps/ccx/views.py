@@ -38,6 +38,7 @@ from opaque_keys.edx.keys import CourseKey
 from ccx_keys.locator import CCXLocator
 from student.models import CourseEnrollment
 
+from instructor.access import allow_access, revoke_access
 from instructor.views.api import _split_input_list
 from instructor.views.gradebook_api import get_grade_book_page
 from instructor.enrollment import (
@@ -63,6 +64,9 @@ from lms.djangoapps.ccx.utils import (
     prep_course_for_grading,
     is_ccx_coach_on_master_course
 )
+
+from affiliates.models import AffiliateMembership
+
 
 log = logging.getLogger(__name__)
 TODAY = datetime.datetime.today  # for patching in tests
@@ -158,6 +162,13 @@ def edit_ccx_context(course, ccx, user, **kwargs):
     context['grading_policy_url'] = reverse('ccx_set_grading_policy', kwargs={'course_id': ccx_locator})
     context['STATE_CHOICES'] = STATE_CHOICES
 
+    all_facilitators = get_facilitators(user)
+    added_facilitator_user_ids = CourseAccessRole.objects.filter(
+        course_id=ccx_locator, role=AffiliateMembership.CCX_COACH
+    ).values_list('user_id', flat=True)
+    context['added_facilitators'] = all_facilitators.filter(id__in=added_facilitator_user_ids)
+    context['not_added_facilitators'] = all_facilitators.exclude(id__in=added_facilitator_user_ids)
+
     with ccx_course(ccx_locator) as course:
         context['course'] = course
 
@@ -165,6 +176,15 @@ def edit_ccx_context(course, ccx, user, **kwargs):
     context['edit_ccx_dasboard_url'] = reverse('ccx_edit_course_view', kwargs={'course_id': ccx_locator})
 
     return context
+
+
+def get_facilitators(user):
+    """Retrieve all affiliate staff for the PD's affiliate entity."""
+    member_ids = AffiliateMembership.objects.filter(
+        affiliate=user.profile.affiliate, role=AffiliateMembership.CCX_COACH
+    ).values_list('member_id', flat=True).distinct()
+
+    return User.objects.filter(id__in=member_ids)
 
 
 @ensure_csrf_cookie
@@ -186,6 +206,7 @@ def dashboard(request, course, ccx=None, **kwargs):
         'is_ccx_coach': False,
         'is_staff': False,
         'is_from_fasttrac_course': partial_course_key in unicode(course.id),
+        'facilitators': get_facilitators(request.user)
     }
 
     context.update(get_ccx_creation_dict(course))
@@ -247,6 +268,7 @@ def edit_ccx(request, course, ccx=None, **kwargs):
     fee = request.POST.get('fee')
     course_description = request.POST.get('course_description')
     enrollment_type = request.POST.get('enrollment_type')
+    facilitators = dict(request.POST).get('facilitators')
 
     ccx.display_name = name
     ccx.delivery_mode = delivery_mode
@@ -261,7 +283,31 @@ def edit_ccx(request, course, ccx=None, **kwargs):
     ccx.course_description = course_description
     ccx.save()
 
+    current_facilitator_ids = CourseAccessRole.objects.filter(
+        course_id=ccx.ccx_course_id, role=AffiliateMembership.CCX_COACH
+    ).values_list('user_id', flat=True)
+    removed_facilitator_ids = set(current_facilitator_ids).difference(set(facilitators))
+    added_facilitator_ids = set(facilitators).difference(set(current_facilitator_ids))
+
     ccx_id = CCXLocator.from_course_locator(course.id, ccx.pk)
+    course_obj = get_course_by_id(ccx.ccx_course_id, depth=None)
+
+    for facilitator_id in removed_facilitator_ids:
+        user = User.objects.get(id=facilitator_id)
+        revoke_access(course_obj, user, AffiliateMembership.CCX_COACH, False)
+
+    email_params = get_email_params(course, auto_enroll=True, course_key=ccx_id, display_name=ccx.display_name)
+
+    for facilitator_id in added_facilitator_ids:
+        user = User.objects.get(id=facilitator_id)
+        enroll_email(
+            course_id=ccx_id,
+            student_email=user.email,
+            auto_enroll=True,
+            email_students=True,
+            email_params=email_params
+        )
+        allow_access(course_obj, user, AffiliateMembership.CCX_COACH, False)
 
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_id})
     return redirect(url)
@@ -291,6 +337,7 @@ def create_ccx(request, course, ccx=None, **kwargs):
     fee = request.POST.get('fee')
     course_description = request.POST.get('course_description')
     enrollment_type = request.POST.get('enrollment_type')
+    facilitators = dict(request.POST).get('facilitators')
 
     if hasattr(course, 'ccx_connector') and course.ccx_connector:
         # if ccx connector url is set in course settings then inform user that he can
@@ -357,6 +404,22 @@ def create_ccx(request, course, ccx=None, **kwargs):
         email_students=True,
         email_params=email_params,
     )
+
+    # Add facilitators
+    if facilitators:
+        course_obj = get_course_by_id(ccx.ccx_course_id, depth=None)
+        facilitator_ids = [int(i) for i in facilitators]
+
+        for user_id in facilitator_ids:
+            user = User.objects.get(id=user_id)
+            enroll_email(
+                course_id=ccx_id,
+                student_email=user.email,
+                auto_enroll=True,
+                email_students=True,
+                email_params=email_params
+            )
+            allow_access(course_obj, user, AffiliateMembership.CCX_COACH, False)
 
     return redirect(url)
 

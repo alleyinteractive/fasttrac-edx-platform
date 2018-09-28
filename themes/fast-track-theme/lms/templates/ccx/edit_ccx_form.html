@@ -188,6 +188,30 @@
             </select>
         </div>
     </div>
+
+    <div class="horizontal-field-wrapper">
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('FACILITATORS')}</p>
+            <ul id="facilitators-list">
+                % for facilitator in added_facilitators:
+                <li>
+                    <span>${facilitator.profile.name} (${facilitator.email})</span>
+                    <i class="remove-btn fa fa-times"></i>
+                    <input type="hidden" name="facilitators" value="${facilitator.id}">
+                </li>
+                % endfor
+            </ul>
+            <select id="facilitators" class="ccx-select">
+                % for facilitator in not_added_facilitators:
+                    <option value="${facilitator.id}">${'{} ({})'.format(facilitator.profile.name, facilitator.email)}</option>
+                % endfor
+            </select>
+            <button id="add-facilitator" class="ft-button-action" type="button">
+                Add facilitator
+            </button>
+        </div>
+    </div>
+
     <div class="field submit">
         <button id="create-ccx" class="ft-button-action" type="submit">
             ${_('UPDATE COURSE')}
@@ -196,20 +220,75 @@
 </form>
 
 <script>
-    // select current values in dropdown menus
-    $(function () {
-        var options = $('.ccx-form').find('.ccx-select');
-        options.each(function () {
-            var value = $(this).data('current-value');
-            $(this).find('option').each(function () {
-                if ($(this).val() == value) {
-                    $(this).attr("selected","selected");
-                }
-            });
+// select current values in dropdown menus
+$(function () {
+    var options = $('.ccx-form').find('.ccx-select');
+    options.each(function () {
+        var value = $(this).data('current-value');
+        $(this).find('option').each(function () {
+            if ($(this).val() == value) {
+                $(this).attr("selected","selected");
+            }
         });
-    })
+    });
+})
 
-    $(document).ready(function() {
-      autosize($('.autosized-textarea'));
-    })
+$(document).ready(function() {
+    autosize($('.autosized-textarea'));
+
+    function toggleAddBtnDisable() {
+        var $selectOptions = $('#facilitators option'),
+            $addFacilitatorBtn = $('#add-facilitator');
+        $addFacilitatorBtn.attr('disabled', $selectOptions.length === 0);
+    }
+
+    $('#add-facilitator').click(function(event) {
+        var $selected = $('#facilitators option:selected'),
+            facilitatorId = $selected.val(),
+            facilitator = $selected.text();
+
+        $('#facilitators-list').append(
+            '<li>' +
+                '<span>' + facilitator + '</span>' +
+                '<i class="remove-btn fa fa-times"></i>' +
+                '<input type="hidden" name="facilitators" value="' + facilitatorId + '">' +
+            '</li>'
+        );
+
+        $('#facilitators option[value="' + facilitatorId + '"]').remove();
+        toggleAddBtnDisable();
+    });
+
+    $(document).on('click', '#facilitators-list .remove-btn', function() {
+        var $parent = $(this).parent();
+        var value = $parent.find('input').val();
+        var facilitator = $parent.find('span').text();
+        $parent.remove();
+
+        $('#facilitators').append(
+            '<option value="' + value + '">' + facilitator + '</option>'
+        );
+
+        toggleAddBtnDisable();
+    });
+
+    $('form.ccx-form').submit(function() {
+        var $errorMessage = $('#ccx-create-message');
+        function scrollToError() {
+            $('html, body').animate({
+                scrollTop: $errorMessage.offset().top - 100
+            }, 200);
+        }
+
+        if(!($('#facilitators-list li').length)) {
+            $errorMessage.html('You need to add facilitators!');
+            $errorMessage.show();
+            scrollToError();
+            return false;
+        } else {
+            $errorMessage.hide();
+            return true;
+        }
+    });
+})
 </script>
