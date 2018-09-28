@@ -3,6 +3,7 @@ import logging
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
+from django.contrib.auth.models import User
 from django.core import serializers
 from django.http import HttpResponseNotFound
 from django.shortcuts import redirect
@@ -14,6 +15,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from lms.envs.common import STATE_CHOICES
+from opaque_keys.edx.keys import CourseKey
 from student.models import CourseEnrollment
 
 from .decorators import only_program_director, only_staff
@@ -36,23 +38,67 @@ class IsStaffMixin(object):
 class SiteAdminView(IsStaffMixin, View):
     template_name = 'affiliates/admin.html'
 
+    def user_statistics(self):
+        """
+        Returns a dictionary of the user statistics (count of):
+            * users: unique users registered for the site
+            * learners: unique learners
+            * staff: FastTrac staff
+            * affiliate_users: affiliate staff + affiliate enrolled users
+            * affiliate_learners: unique learners in affiliate courses
+            * affiliate_staff: PD's, Facilitators, Course Managers
+            * fasttrac_learners: learners enrolled in the FT course but NOT in a CCX course
+        """
+        fasttrac_course_id = CourseKey.from_string(settings.FASTTRAC_COURSE_KEY)
+        facilitator_course_id = CourseKey.from_string('course-v1:FastTrac+101+101')
+        users = User.objects.count()
+
+        affiliate_staff_ids = AffiliateMembership.objects.all().values_list('member_id', flat=True).distinct()
+        learners = User.objects.filter(
+            Q(is_staff=False) | Q(is_superuser=False),
+            ~Q(id__in=affiliate_staff_ids)
+        ).count()
+
+        non_affiliate_global_staff = User.objects.filter(
+            Q(is_staff=True) | Q(is_superuser=True),
+            ~Q(id__in=affiliate_staff_ids)
+        ).count()
+
+        staff = len(affiliate_staff_ids) + non_affiliate_global_staff
+
+        affiliate_course_enrollment_user_ids = CourseEnrollment.objects.filter(
+            ~Q(course_id=fasttrac_course_id),
+            ~Q(course_id=facilitator_course_id)
+        ).values_list('user_id', flat=True).distinct()
+
+        affiliate_users = len(affiliate_course_enrollment_user_ids)
+        affiliate_staff = len(affiliate_staff_ids)
+        affiliate_learners = len(affiliate_course_enrollment_user_ids) - affiliate_staff
+
+        fasttrac_learners = CourseEnrollment.objects.filter(
+            ~Q(user_id__in=affiliate_course_enrollment_user_ids), course_id=fasttrac_course_id
+        ).values_list('user_id', flat=True).distinct().count()
+
+        return {
+            'users': users,
+            'learners': learners,
+            'staff': staff,
+            'affiliate_users': affiliate_users,
+            'affiliate_learners': affiliate_learners,
+            'affiliate_staff': affiliate_staff,
+            'fasttrac_learners': fasttrac_learners
+        }
+
     def get(self, request, *args, **kwargs):    # pylint: disable=unused-argument
         affiliates = AffiliateEntity.objects.all().order_by('name')
         ccxs = CustomCourseForEdX.objects.all()
         fasttrac_course_key = settings.FASTTRAC_COURSE_KEY
-        active_enrollments = CourseEnrollment.objects.filter(is_active=True)
-
-        total_learners = active_enrollments.count()
-        total_fasttrac_learners = active_enrollments.filter(course_id__startswith=fasttrac_course_key).count()
-        total_affiliate_learners = active_enrollments.exclude(course_id__startswith=fasttrac_course_key).count()
 
         context = {
             'affiliates': affiliates,
             'ccxs': ccxs,
             'partial_course_key': fasttrac_course_key.split(':')[1],
-            'total_learners': total_learners,
-            'total_fasttrac_learners': total_fasttrac_learners,
-            'total_affiliate_learners': total_affiliate_learners
+            'statistics': self.user_statistics()
         }
         return render_to_response(self.template_name, context)
 
