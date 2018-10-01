@@ -229,7 +229,7 @@ from affiliates.models import AffiliateMembership
       <div class="inner-wrapper">
         % if ccx:
           % if is_program_director:
-            <a href="delete_ccx">
+            <a href="delete_ccx" class="delete-ccx" data-ccx-key="${ccx.ccx_course_id}" data-ccx-name="${ccx.display_name}">
               <i class="fa fa-times"></i>
               Delete this course
             </a>
@@ -369,3 +369,35 @@ from affiliates.models import AffiliateMembership
 %endif
 
 <%include file="../video_modal.html" />
+
+<script>
+$(document).ready(function() {
+  function redirectToDashboard() {
+    window.location.href = '/';
+  }
+
+  $('a.delete-ccx').click(function(event) {
+    event.stopImmediatePropagation();
+
+    var ccxKey = $(this).data('ccx-key');
+    var ccxName = $(this).data('ccx-name');
+
+    var response = confirm('Are you sure you want to delete this course?');
+    if (response) {
+      $.ajax({
+        url: '/api/ccx/v0/ccx/' + ccxKey,
+        method: 'DELETE',
+        success: function() {
+          alert(ccxName + ' has been successfully deleted.');
+          redirectToDashboard();
+        },
+        error: function() {
+          alert('Something went wrong when trying to delete course.');
+        }
+      });
+    }
+
+    return false;
+  });
+});
+</script>
