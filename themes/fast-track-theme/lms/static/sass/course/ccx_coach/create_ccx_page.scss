@@ -122,3 +122,12 @@ form.ccx-form {
 button.ccx-button-link {
   color: #f76b1c;
 }
+
+.no-facilitator-msg {
+  font-style: italic;
+  color: red;
+
+  a {
+    color: blue;
+  }
+}
