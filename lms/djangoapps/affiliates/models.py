@@ -355,8 +355,19 @@ def remove_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: 
 
 @receiver(pre_delete, sender=AffiliateMembership, dispatch_uid="validate_course_dependency")
 def validate_course_dependency(sender, instance, **kwargs):  # pylint: disable=unused-argument
-    count_affiliate_memberships_of_member = AffiliateMembership.objects.filter(member=instance.member).count()
-    ccxs_for_member_exist = CustomCourseForEdX.objects.filter(coach=instance.member).exists()
+    """
+    An affiliate needs to have at least one Program Director, so we don't allow removing the
+    only PD in an affiliate. Also if the removed member is a coach in any CCX we change the coach
+    to be the first program director.
+    """
+    other_pd_membership = AffiliateMembership.objects.filter(
+        affiliate=instance.affiliate, role=AffiliateMembership.STAFF
+    ).exclude(id=instance.id).first()
 
-    if ccxs_for_member_exist and count_affiliate_memberships_of_member == 1:
-        raise ValueError('Cannot delete this member because they have affiliate custom courses.')
+    if instance.role == AffiliateMembership.STAFF and not other_pd_membership:
+        raise ValueError('Affiliate needs to have at least one program director.')
+
+    ccxs = CustomCourseForEdX.objects.filter(coach=instance.member, affiliate=instance.affiliate)
+    for ccx in ccxs:
+        ccx.coach = other_pd_membership.member
+        ccx.save()
