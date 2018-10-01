@@ -1,6 +1,7 @@
 """HTTP end-points for the User API. """
 import copy
 import json
+import logging
 
 from opaque_keys import InvalidKeyError
 from django.conf import settings
@@ -42,6 +43,8 @@ from .accounts import (
 )
 from .accounts.api import check_account_exists
 from .serializers import UserSerializer, UserPreferenceSerializer
+
+LOG = logging.getLogger(__name__)
 
 
 class LoginSessionView(APIView):
@@ -1258,6 +1261,7 @@ class ChangePasswordView(APIView):
 
         user.set_password(password)
         user.save()
+        LOG.info('Changed password for user %s', user.username)
 
         return HttpResponse(json.dumps({'id': user.id, 'username': user.username}), content_type="application/json")
 
