@@ -76,10 +76,13 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
   <%
       course_target = reverse('info', args=[unicode(course_overview.id)])
       course = courses.get_course_by_id(enrollment.course_id)
+      create_ccx_class = ''
+      affiliate_slug = user.profile.affiliate.slug
 
       if not is_ccx and enrollment.coach_on_master_course and user.profile.affiliate and course.enable_ccx:
         button_target = '/courses/{0}/ccx_coach'.format(enrollment.course_id)
         button_label = 'Create Custom Course'
+        create_ccx_class = 'create-ccx-link'
       elif is_ccx and is_staff_or_instructor:
         button_target = '/courses/{0}/ccx_coach'.format(ccx_custom_course.ccx_course_id)
         button_label = 'Edit Course'
@@ -159,7 +162,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
                 % endif
               % else:
                 % if not is_course_blocked:
-                  <a href="${button_target}" class="enter-course" data-course-key="${enrollment.course_id}">${_(button_label)}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
+                  <a href="${button_target}" class="enter-course ${create_ccx_class}" data-course-key="${enrollment.course_id}" data-affiliate-slug="${affiliate_slug}">${_(button_label)}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
                 % else:
                   <a class="enter-course-blocked" data-course-key="${enrollment.course_id}">${_(button_label)}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
                 % endif
@@ -353,12 +356,11 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
 </div>
 </li>
 <script>
-           $( document ).ready(function() {
-
-               if("${is_course_blocked | n, dump_js_escaped_json}" == 'true'){
-                   $( "#unregister_block_course" ).click(function() {
-                       $('.disable-look-unregister').click();
-                   });
-               }
-           });
+$( document ).ready(function() {
+    if("${is_course_blocked | n, dump_js_escaped_json}" == 'true'){
+        $( "#unregister_block_course" ).click(function() {
+            $('.disable-look-unregister').click();
+        });
+    }
+});
 </script>

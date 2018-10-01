@@ -206,7 +206,8 @@ def dashboard(request, course, ccx=None, **kwargs):
         'is_ccx_coach': False,
         'is_staff': False,
         'is_from_fasttrac_course': partial_course_key in unicode(course.id),
-        'facilitators': get_facilitators(request.user)
+        'facilitators': get_facilitators(request.user),
+        'affiliate': request.user.profile.affiliate
     }
 
     context.update(get_ccx_creation_dict(course))

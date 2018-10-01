@@ -197,6 +197,7 @@
             <ul id="facilitators-list">
 
             </ul>
+            % if facilitators:
             <select id="facilitators" class="ccx-select">
                 % for member in facilitators:
                     <option value="${member.id}">${'{} ({})'.format(member.profile.name, member.email)}</option>
@@ -205,6 +206,12 @@
             <button id="add-facilitator" class="ft-button-action" type="button">
                 Add facilitator
             </button>
+            % else:
+            <p class="no-facilitator-msg">
+                You currently don't have any facilitators assigned.
+                Please <a href="/affiliates/edit/${affiliate.slug}">add facilitators</a> to your affiliate before creating a new course.
+            </p>
+            % endif
         </div>
     </div>
 

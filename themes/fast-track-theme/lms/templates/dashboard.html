@@ -265,3 +265,29 @@ from openedx.core.djangolib.markup import HTML, Text
     </form>
   </div>
 </div>
+
+<script>
+  $(document).ready(function() {
+    $('a.create-ccx-link').click(function(event) {
+      event.stopImmediatePropagation();
+
+      var slug = $(this).data('affiliate-slug'),
+          course_key = $(this).data('course-key')
+
+      $.ajax({
+        url: '/api/affiliates/' + slug + '/membership?role=ccx_coach',
+        method: 'GET',
+        success: function(data) {
+          if (!data.length) {
+            var redirect = confirm('You must designate at least one facilitator on your staff before creating a course. Add facilitator now?');
+            if (redirect) {
+              window.location.href = '/affiliates/edit/' + slug;
+            }
+          } else {
+            window.location.href = '/courses/' + course_key + '/ccx_coach';
+          }
+        }
+      });
+    });
+  });
+  </script>
