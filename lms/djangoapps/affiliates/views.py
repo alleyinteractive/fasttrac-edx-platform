@@ -155,7 +155,7 @@ def create(request):
             setattr(affiliate, key, post_data[key])
 
     affiliate.save()
-    if request.user.is_staff and post_data['affiliate-type'] == 'parent':
+    if request.user.is_staff and post_data.get('affiliate-type') == 'parent':
         subs = dict(request.POST)['sub-affiliates']
         AffiliateEntity.objects.filter(id__in=subs).update(parent=affiliate)
 
