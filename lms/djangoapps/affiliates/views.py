@@ -58,10 +58,10 @@ class SiteAdminView(IsStaffMixin, View):
         ).count()
         learners = users - admins
 
-        affiliate_course_enrollment_user_ids = CourseEnrollment.objects.filter(
+        affiliate_course_enrollment_user_ids = set(CourseEnrollment.objects.filter(
             ~Q(course_id=fasttrac_course_id),
             ~Q(course_id=facilitator_course_id)
-        ).values_list('user_id', flat=True).distinct()
+        ).values_list('user_id', flat=True))
 
         affiliate_users = len(affiliate_course_enrollment_user_ids)
         affiliate_staff = AffiliateMembership.objects.all().values_list('member_id', flat=True).distinct().count()
