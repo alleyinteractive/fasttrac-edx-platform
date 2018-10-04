@@ -63,9 +63,10 @@ class SiteAdminView(IsStaffMixin, View):
             ~Q(course_id=facilitator_course_id)
         ).values_list('user_id', flat=True))
 
-        affiliate_users = len(affiliate_course_enrollment_user_ids)
-        affiliate_staff = AffiliateMembership.objects.all().values_list('member_id', flat=True).distinct().count()
-        affiliate_learners = affiliate_users - affiliate_staff
+        affiliate_staff_ids = set(AffiliateMembership.objects.all().values_list('member_id', flat=True))
+        affiliate_staff = len(affiliate_staff_ids)
+        affiliate_learners = len(affiliate_course_enrollment_user_ids - affiliate_staff_ids)
+        affiliate_users = affiliate_staff + affiliate_learners
 
         fasttrac_learners = CourseEnrollment.objects.filter(
             ~Q(user_id__in=affiliate_course_enrollment_user_ids), course_id=fasttrac_course_id
