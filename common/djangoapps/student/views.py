@@ -9,6 +9,7 @@ import warnings
 from collections import defaultdict
 from urlparse import urljoin, urlsplit, parse_qs, urlunsplit
 
+import requests
 from django.views.generic import TemplateView
 from pytz import UTC
 from requests import HTTPError
@@ -2476,6 +2477,19 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
             log.warning('Unable to send confirmation email to old address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': user.email})
             transaction.set_rollback(True)
+            return response
+
+        resp = requests.post(
+            url=settings.WORKSPACE_URL + '/api/responses/change_email',
+            data={
+                'oldEmail': user.email,
+                'newEmail': pec.new_email,
+            },
+            headers={'Authorization': settings.WORKSPACE_API_KEY}
+        )
+        if resp.status_code not in [200, 404]:
+            log.error('Change email failed on workspace: %s', resp.content)
+            response = render_to_response("email_change_failed.html", {'email': pec.new_email})
             return response
 
         user.email = pec.new_email

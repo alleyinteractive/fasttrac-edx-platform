@@ -709,6 +709,33 @@ label.u-field-title {
   width: 100%;
 }
 
+.u-field-email {
+  .u-field-header {
+    display: none;
+  }
+
+  .u-field-footer .u-field-message {
+    margin-top: -20px;
+  }
+
+  .email-change-info {
+    display: block;
+    font-style: italic;
+    font-size: 10px;
+    margin-bottom: 20px;
+  }
+
+  &.mode-display {
+    a {
+      color: #222;
+    }
+  }
+
+  &.mode-edit {
+    height: unset;
+  }
+}
+
 %confirmation-modal {
   display: flex;
   justify-content: center;
