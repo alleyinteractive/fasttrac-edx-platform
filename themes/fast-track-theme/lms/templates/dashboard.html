@@ -271,20 +271,16 @@ from openedx.core.djangolib.markup import HTML, Text
     $('a.create-ccx-link').click(function(event) {
       event.stopImmediatePropagation();
 
-      var slug = $(this).data('affiliate-slug'),
-          course_key = $(this).data('course-key')
+      var courseKey = $(this).data('course-key');
 
       $.ajax({
-        url: '/api/affiliates/' + slug + '/membership?role=ccx_coach',
+        url: '/api/affiliates/check-membership/',
         method: 'GET',
         success: function(data) {
           if (!data.length) {
-            var redirect = confirm('You must designate at least one facilitator on your staff before creating a course. Add facilitator now?');
-            if (redirect) {
-              window.location.href = '/affiliates/edit/' + slug;
-            }
+            alert('You must designate at least one facilitator on your staff before creating a course.');
           } else {
-            window.location.href = '/courses/' + course_key + '/ccx_coach';
+            window.location.href = '/courses/' + courseKey + '/ccx_coach';
           }
         }
       });

@@ -1,5 +1,6 @@
 import logging
 
+from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import login, load_backend
 from django.contrib.auth.models import User
@@ -36,6 +37,26 @@ class IsStaffOrProgramDirector(BasePermission):
             ).exists()
         return AffiliateMembership.objects.filter(
             member=request.user, role=AffiliateMembership.STAFF
+        ).exists()
+
+
+class IsGlobalStaffOrAffiliateStaff(BasePermission):
+    def has_permission(self, request, view):
+        """Returns True for global staff and affiliate staff (PD or CM)."""
+        if request.user.is_staff:
+            return True
+
+        affiliate_slug = view.kwargs.get('affiliate_slug')
+        affiliate_staff_roles = [
+            AffiliateMembership.STAFF,
+            AffiliateMembership.INSTRUCTOR
+        ]
+        if affiliate_slug:
+            return AffiliateMembership.objects.filter(
+                member=request.user, role__in=affiliate_staff_roles, affiliate__slug=affiliate_slug
+            ).exists()
+        return AffiliateMembership.objects.filter(
+            member=request.user, role__in=affiliate_staff_roles
         ).exists()
 
 
@@ -127,6 +148,36 @@ class AffiliateEntityDetailsViewSet(AffiliateViewMixin, APIView):
         """Deletes the affiliate."""
         AffiliateEntity.objects.get(slug=affiliate_slug).remove()
         return Response(status=204)
+
+
+class AffiliateEntityFacilitators(APIView):
+    permission_classes = (IsGlobalStaffOrAffiliateStaff,)
+
+    def get_staff_affiliate_ids(self, user):
+        """Return all affiliate entities IDs where the user is a PD or CM."""
+        affiliate_ids = AffiliateMembership.objects.filter(
+            Q(role=AffiliateMembership.STAFF) | Q(role=AffiliateMembership.INSTRUCTOR),
+            member=user
+        ).values_list('affiliate_id', flat=True)
+        return set(affiliate_ids)
+
+    def get(self, request):
+        """
+        Returns a list of facilitators of affiliates where the user (either the request user
+        or the user with the passed in user ID) are affiliate staff (PD or CM).
+        """
+        user_id = request.GET.get('user-id')
+        if user_id:
+            user = User.objects.get(id=user_id)
+        else:
+            user = request.user
+
+        affiliate_ids = self.get_staff_affiliate_ids(user)
+        memberships = AffiliateMembership.objects.filter(
+            role=AffiliateMembership.CCX_COACH, affiliate_id__in=affiliate_ids
+        )
+        response_data = AffiliateMembershipSerializer(memberships, many=True).data
+        return Response(data=response_data)
 
 
 class AffiliateEntityMembershipViewSet(APIView):
