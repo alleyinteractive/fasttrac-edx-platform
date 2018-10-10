@@ -12,6 +12,7 @@ import ast
 from copy import deepcopy
 from cStringIO import StringIO
 
+from django.db.models import Q
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import (
@@ -65,7 +66,7 @@ from lms.djangoapps.ccx.utils import (
     is_ccx_coach_on_master_course
 )
 
-from affiliates.models import AffiliateMembership
+from affiliates.models import AffiliateEntity, AffiliateMembership
 
 
 log = logging.getLogger(__name__)
@@ -162,7 +163,7 @@ def edit_ccx_context(course, ccx, user, **kwargs):
     context['grading_policy_url'] = reverse('ccx_set_grading_policy', kwargs={'course_id': ccx_locator})
     context['STATE_CHOICES'] = STATE_CHOICES
 
-    all_facilitators = get_facilitators(user)
+    all_facilitators = get_facilitators(ccx.affiliate)
     added_facilitator_user_ids = CourseAccessRole.objects.filter(
         course_id=ccx_locator, role=AffiliateMembership.CCX_COACH
     ).values_list('user_id', flat=True)
@@ -178,13 +179,30 @@ def edit_ccx_context(course, ccx, user, **kwargs):
     return context
 
 
-def get_facilitators(user):
-    """Retrieve all affiliate staff for the PD's affiliate entity."""
+def get_facilitators(affiliate):
+    """Retrieve all affiliate staff for the passed-in affiliate entity."""
     member_ids = AffiliateMembership.objects.filter(
-        affiliate=user.profile.affiliate, role=AffiliateMembership.CCX_COACH
+        affiliate=affiliate, role=AffiliateMembership.CCX_COACH
     ).values_list('member_id', flat=True).distinct()
 
     return User.objects.filter(id__in=member_ids)
+
+
+def get_serialized_affiliate_facilitators(affiliates):
+    """
+    Returns a list of dictionaries consisting of the affiliate object
+    and a list of its facilitators. Affiliates without facilitators are
+    skipped.
+    """
+    affiliate_facilitators = []
+    for aff in affiliates:
+        facilitators = get_facilitators(aff)
+        if facilitators:
+            affiliate_facilitators.append({
+                'affiliate': aff,
+                'facilitators': facilitators
+            })
+    return affiliate_facilitators
 
 
 @ensure_csrf_cookie
@@ -195,6 +213,13 @@ def dashboard(request, course, ccx=None, **kwargs):
     Display the CCX Coach Dashboard
     """
     partial_course_key = settings.FASTTRAC_COURSE_KEY.split(':')[1]
+    affiliate_ids = AffiliateMembership.objects.filter(
+        Q(role=AffiliateMembership.STAFF) | Q(role=AffiliateMembership.INSTRUCTOR),
+        member=request.user
+    ).values_list('affiliate_id', flat=True)
+    affiliate_facilitators = get_serialized_affiliate_facilitators(
+        AffiliateEntity.objects.filter(id__in=affiliate_ids)
+    )
 
     context = {
         'course': course,
@@ -206,8 +231,7 @@ def dashboard(request, course, ccx=None, **kwargs):
         'is_ccx_coach': False,
         'is_staff': False,
         'is_from_fasttrac_course': partial_course_key in unicode(course.id),
-        'facilitators': get_facilitators(request.user),
-        'affiliate': request.user.profile.affiliate
+        'affiliate_facilitators': affiliate_facilitators
     }
 
     context.update(get_ccx_creation_dict(course))
@@ -324,6 +348,7 @@ def create_ccx(request, course, ccx=None, **kwargs):
     if not is_ccx_coach_on_master_course(request.user, course) or not request.user.profile.affiliate:
         return HttpResponseForbidden()
 
+    affiliate_id = request.POST.get('affiliate')
     name = request.POST.get('name')
     delivery_mode = request.POST.get('delivery_mode')
     location_city = request.POST.get('city')
@@ -340,10 +365,18 @@ def create_ccx(request, course, ccx=None, **kwargs):
     enrollment_type = request.POST.get('enrollment_type')
     facilitators = dict(request.POST).get('facilitators')
 
+    context = get_ccx_creation_dict(course)
+    if not affiliate_id:
+        messages.error(request, 'Affiliate not selected.')
+        return render_to_response('ccx/coach_dashboard.html', context)
+
+    if not facilitators:
+        messages.error(request, 'No facilitators added.')
+        return render_to_response('ccx/coach_dashboard.html', context)
+
     if hasattr(course, 'ccx_connector') and course.ccx_connector:
         # if ccx connector url is set in course settings then inform user that he can
         # only create ccx by using ccx connector url.
-        context = get_ccx_creation_dict(course)
         messages.error(request, context['use_ccx_con_error_message'])
         return render_to_response('ccx/coach_dashboard.html', context)
 
@@ -356,7 +389,10 @@ def create_ccx(request, course, ccx=None, **kwargs):
         url = reverse('ccx_coach_dashboard', kwargs={'course_id': course.id})
         return redirect(url)
 
+    affiliate = AffiliateEntity.objects.get(id=affiliate_id)
+
     ccx = CustomCourseForEdX(
+        affiliate=affiliate,
         course_id=course.id,
         coach=request.user,
         display_name=name,
@@ -406,21 +442,19 @@ def create_ccx(request, course, ccx=None, **kwargs):
         email_params=email_params,
     )
 
-    # Add facilitators
-    if facilitators:
-        course_obj = get_course_by_id(ccx.ccx_course_id, depth=None)
-        facilitator_ids = [int(i) for i in facilitators]
+    course_obj = get_course_by_id(ccx.ccx_course_id, depth=None)
+    facilitator_ids = [int(i) for i in facilitators]
 
-        for user_id in facilitator_ids:
-            user = User.objects.get(id=user_id)
-            enroll_email(
-                course_id=ccx_id,
-                student_email=user.email,
-                auto_enroll=True,
-                email_students=True,
-                email_params=email_params
-            )
-            allow_access(course_obj, user, AffiliateMembership.CCX_COACH, False)
+    for user_id in facilitator_ids:
+        user = User.objects.get(id=user_id)
+        enroll_email(
+            course_id=ccx_id,
+            student_email=user.email,
+            auto_enroll=True,
+            email_students=True,
+            email_params=email_params
+        )
+        allow_access(course_obj, user, AffiliateMembership.CCX_COACH, False)
 
     return redirect(url)
 

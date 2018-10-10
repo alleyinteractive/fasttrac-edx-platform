@@ -10,6 +10,22 @@
 
 <form action="${create_ccx_url}" class="ccx-form" method="POST" onsubmit="return validateForm(this)">
     <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+
+    % if len(affiliate_facilitators) > 1:
+    <div class="field-wrapper">
+        <p class="field-name">AFFILIATE</p>
+        <p>Select for which affiliate you are creating this course. You can choose only affiliates that have facilitators.</p>
+        <select name="affiliate" id="affiliate" required>
+            <option selected disabled value="">select option...</option>
+            % for af_fac in affiliate_facilitators:
+            <option value="${af_fac['affiliate'].id}">${af_fac['affiliate'].name}</option>
+            % endfor
+        </select>
+    </div>
+    % else:
+    <input name="affiliate" class="hidden" type="text" value="${affiliate-facilitators[0]['affiliate'].id}">
+    % endif
+
     <div class="field-wrapper">
         <p class="field-name">${_('COURSE NAME')}</p>
         <div class="field">
@@ -191,29 +207,44 @@
         </div>
     </div>
 
+    % if len(affiliate_facilitators) == 1:
+    <% af_fac = affiliate_facilitators[0] %>
     <div class="horizontal-field-wrapper">
         <div class="horizontal-field-container">
             <p class="field-name">${_('FACILITATORS')}</p>
-            <ul id="facilitators-list">
+            <ul class="facilitators-list">
 
             </ul>
-            % if facilitators:
-            <select id="facilitators" class="ccx-select">
-                % for member in facilitators:
+            <select class="ccx-select facilitator-options">
+                % for member in af_fac['facilitators']:
                     <option value="${member.id}">${'{} ({})'.format(member.profile.name, member.email)}</option>
                 % endfor
             </select>
-            <button id="add-facilitator" class="ft-button-action" type="button">
+            <button class="ft-button-action add-facilitator" type="button">
                 Add facilitator
             </button>
-            % else:
-            <p class="no-facilitator-msg">
-                You currently don't have any facilitators assigned.
-                Please <a href="/affiliates/edit/${affiliate.slug}">add facilitators</a> to your affiliate before creating a new course.
-            </p>
-            % endif
         </div>
     </div>
+    % else:
+        % for af_fac in affiliate_facilitators:
+            <div id="affiliate-facilitators-${af_fac['affiliate'].id}" class="affiliate-facilitators horizontal-field-wrapper hidden">
+                <div class="horizontal-field-container">
+                    <p class="field-name">${_('FACILITATORS')}</p>
+                    <ul class="facilitators-list">
+
+                    </ul>
+                    <select class="ccx-select facilitator-options">
+                        % for member in af_fac['facilitators']:
+                            <option value="${member.id}">${'{} ({})'.format(member.profile.name, member.email)}</option>
+                        % endfor
+                    </select>
+                    <button class="ft-button-action add-facilitator" type="button">
+                        Add facilitator
+                    </button>
+                </div>
+            </div>
+        % endfor
+    % endif
 
     <div class="field submit">
         <button id="create-ccx" class="ft-button-action" type="submit">
@@ -226,14 +257,80 @@
 $(document).ready(function() {
     autosize($('.autosized-textarea'));
 
-    function toggleAddBtnDisable() {
-        var $selectOptions = $('#facilitators option'),
-            $addFacilitatorBtn = $('#add-facilitator');
+    /**
+    * Adds or removes the disabled attribute from the 'Add Facilitator' buttons.
+    * @param {jquery Object} $el - the div element which contains the button and select element.
+    */
+    function toggleAddBtnDisable($el) {
+        var $selectOptions = $el.find('.facilitator-options option'),
+            $addFacilitatorBtn = $el.find('.add-facilitator');
         $addFacilitatorBtn.attr('disabled', $selectOptions.length === 0);
     }
 
-    $('#add-facilitator').click(function(event) {
-        var $selected = $('#facilitators option:selected'),
+    /**
+    * Removes all the selected affiliates from all the lists and moves them back
+    * into the select element as options. This happens every time the affiliate is
+    * changed in the top affiliate dropdown.
+    */
+    function removeAllSelectedFacilitators() {
+        var $facilitatorLists = $('.facilitators-list');
+
+        $facilitatorLists.each(function(i, el) {
+            var $parent = $(el).parent();
+            var $facilitatorSelectEl = $parent.find('.facilitator-options');
+            var $selectedFacilitators = $(el).find('li');
+
+            $selectedFacilitators.each(function(i, fac) {
+                var value = $(fac).find('input').val();
+                var name = $(fac).find('span').text();
+
+                $facilitatorSelectEl.append(
+                    '<option value="' + value + '">' + facilitator + '</option>'
+                );
+
+                $(fac).remove();
+            });
+            toggleAddBtnDisable($parent);
+        });
+    }
+
+    /**
+    * Resets all the facilitator lists and reveals the selected affiliate's
+    * facilitator menu.
+    * @param {int} affiliate_id - ID of the affiliate for which to show the facilitator list.
+    */
+    function toggleFacilitatorListElement(affiliate_id) {
+        removeAllSelectedFacilitators();
+        $('.affiliate-facilitators').addClass('hidden');
+        $('#affiliate-facilitators-' + affiliate_id).removeClass('hidden');
+    }
+
+    var selectedAffiliate = $('#affiliate option:selected').val();
+    if (selectedAffiliate) {
+        toggleFacilitatorListElement(selectedAffiliate);
+    }
+
+    /**
+    * Handler for when the affiliate dropdown is changed.
+    */
+    $('#affiliate').change(function() {
+        var selected = $(this).find('option:selected').val();
+        toggleFacilitatorListElement(selected);
+    });
+
+    /**
+    * Handler for when a new facilitator is added to the facilitators list
+    * by clicking the 'Add facilitator' button.
+    * The facilitator is added in form of a list item that contains:
+    * - the facilitator name
+    * - a button (icon) to remove this facilitator from the list again
+    * - a hidden input with information about the facilitator ID
+    *
+    * Once a facilitator is added to the list, the selected option is removed.
+    */
+    $('.add-facilitator').click(function() {
+        var $parent = $(this).parent();
+            $selected = $parent.find('.facilitator-options option:selected'),
             facilitatorId = $selected.val(),
             facilitator = $selected.text();
 
@@ -241,7 +338,7 @@ $(document).ready(function() {
             return false;
         }
 
-        $('#facilitators-list').append(
+        $parent.find('.facilitators-list').append(
             '<li>' +
                 '<span>' + facilitator + ' </span>' +
                 '<i class="remove-btn fa fa-times"></i>' +
@@ -249,23 +346,32 @@ $(document).ready(function() {
             '</li>'
         );
 
-        $('#facilitators option[value="' + facilitatorId + '"]').remove();
-        toggleAddBtnDisable();
+        $parent.find('.facilitator-options option[value="' + facilitatorId + '"]').remove();
+        toggleAddBtnDisable($parent);
     });
 
-    $(document).on('click', '#facilitators-list .remove-btn', function() {
+    /**
+    * Handler for when a facilitator is removed from the list of added facilitators.
+    */
+    $(document).on('click', '.facilitators-list .remove-btn', function() {
         var $parent = $(this).parent();
+        var $divEl = $(this).closest('div');
         var value = $parent.find('input').val();
         var facilitator = $parent.find('span').text();
-        $parent.remove();
 
-        $('#facilitators').append(
+        $divEl.find('.facilitator-options').append(
             '<option value="' + value + '">' + facilitator + '</option>'
         );
 
-        toggleAddBtnDisable();
+        $parent.remove();
+        toggleAddBtnDisable($divEl);
     });
 
+    /**
+    * Form validation.
+    * Currently checks for:
+    * - added facilitators. If there are none, it displays an error.
+    */
     $('form.ccx-form').submit(function() {
         var $errorMessage = $('#ccx-create-message');
         function scrollToError() {
@@ -274,7 +380,7 @@ $(document).ready(function() {
             }, 200);
         }
 
-        if(!($('#facilitators-list li').length)) {
+        if(!($('.facilitators-list li').length)) {
             $errorMessage.html('You need to add facilitators!');
             $errorMessage.show();
             scrollToError();
