@@ -296,13 +296,6 @@ class CourseUpdates(models.Model):
         return getattr(self, item)
 
 
-@receiver(post_save, sender=CustomCourseForEdX, dispatch_uid="associate_affiliate")
-def associate_affiliate(sender, instance, created, **kwargs):
-    if created:
-        instance.affiliate = instance.coach.profile.affiliate
-        instance.save()
-
-
 @receiver(post_save, sender=CustomCourseForEdX, dispatch_uid="add_affiliate_course_enrollments")
 def add_affiliate_course_enrollments(sender, instance, created, **kwargs):
     'Allow all affiliate staff and instructors access to this course.'

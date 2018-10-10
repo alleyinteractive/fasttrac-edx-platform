@@ -1,6 +1,5 @@
 import logging
 
-from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import login, load_backend
 from django.contrib.auth.models import User
@@ -275,9 +274,12 @@ class GetAffiliates(APIView):
         that have facilitators.
         """
         has_facilitators = request.GET.get('has-facilitators')
-
+        affiliate_staff_roles = [
+            AffiliateMembership.STAFF,
+            AffiliateMembership.INSTRUCTOR
+        ]
         affiliate_ids = AffiliateMembership.objects.filter(
-            Q(role=AffiliateMembership.STAFF) | Q(role=AffiliateMembership.INSTRUCTOR),
+            role__in=affiliate_staff_roles,
             member=request.user
         ).values_list('affiliate_id', flat=True)
 

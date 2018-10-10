@@ -65,7 +65,7 @@ from lms.djangoapps.ccx.utils import (
     is_ccx_coach_on_master_course
 )
 
-from affiliates.models import AffiliateMembership
+from affiliates.models import AffiliateEntity, AffiliateMembership
 
 
 log = logging.getLogger(__name__)
@@ -162,7 +162,7 @@ def edit_ccx_context(course, ccx, user, **kwargs):
     context['grading_policy_url'] = reverse('ccx_set_grading_policy', kwargs={'course_id': ccx_locator})
     context['STATE_CHOICES'] = STATE_CHOICES
 
-    all_facilitators = get_facilitators(user)
+    all_facilitators = get_facilitators(ccx.affiliate)
     added_facilitator_user_ids = CourseAccessRole.objects.filter(
         course_id=ccx_locator, role=AffiliateMembership.CCX_COACH
     ).values_list('user_id', flat=True)
@@ -178,10 +178,10 @@ def edit_ccx_context(course, ccx, user, **kwargs):
     return context
 
 
-def get_facilitators(user):
-    """Retrieve all affiliate staff for the PD's affiliate entity."""
+def get_facilitators(affiliate):
+    """Retrieve all affiliate staff for the passed-in affiliate entity."""
     member_ids = AffiliateMembership.objects.filter(
-        affiliate=user.profile.affiliate, role=AffiliateMembership.CCX_COACH
+        affiliate=affiliate, role=AffiliateMembership.CCX_COACH
     ).values_list('member_id', flat=True).distinct()
 
     return User.objects.filter(id__in=member_ids)
@@ -195,6 +195,12 @@ def dashboard(request, course, ccx=None, **kwargs):
     Display the CCX Coach Dashboard
     """
     partial_course_key = settings.FASTTRAC_COURSE_KEY.split(':')[1]
+    affiliate_slug = request.GET.get('affiliate')
+    affiliate = None
+    facilitators = None
+    if affiliate_slug:
+        affiliate = AffiliateEntity.objects.get(slug=affiliate_slug)
+        facilitators = get_facilitators(affiliate)
 
     context = {
         'course': course,
@@ -206,8 +212,8 @@ def dashboard(request, course, ccx=None, **kwargs):
         'is_ccx_coach': False,
         'is_staff': False,
         'is_from_fasttrac_course': partial_course_key in unicode(course.id),
-        'facilitators': get_facilitators(request.user),
-        'affiliate': request.user.profile.affiliate
+        'facilitators': facilitators,
+        'affiliate': affiliate
     }
 
     context.update(get_ccx_creation_dict(course))
@@ -324,6 +330,7 @@ def create_ccx(request, course, ccx=None, **kwargs):
     if not is_ccx_coach_on_master_course(request.user, course) or not request.user.profile.affiliate:
         return HttpResponseForbidden()
 
+    affiliate_slug = request.POST.get('affiliate')
     name = request.POST.get('name')
     delivery_mode = request.POST.get('delivery_mode')
     location_city = request.POST.get('city')
@@ -340,10 +347,19 @@ def create_ccx(request, course, ccx=None, **kwargs):
     enrollment_type = request.POST.get('enrollment_type')
     facilitators = dict(request.POST).get('facilitators')
 
+    context = get_ccx_creation_dict(course)
+
+    if not affiliate_slug:
+        messages.error(request, 'Affiliate not selected.')
+        return render_to_response('ccx/coach_dashboard.html', context)
+
+    if not facilitators:
+        messages.error(request, 'No facilitators added.')
+        return render_to_response('ccx/coach_dashboard.html', context)
+
     if hasattr(course, 'ccx_connector') and course.ccx_connector:
         # if ccx connector url is set in course settings then inform user that he can
         # only create ccx by using ccx connector url.
-        context = get_ccx_creation_dict(course)
         messages.error(request, context['use_ccx_con_error_message'])
         return render_to_response('ccx/coach_dashboard.html', context)
 
@@ -356,7 +372,9 @@ def create_ccx(request, course, ccx=None, **kwargs):
         url = reverse('ccx_coach_dashboard', kwargs={'course_id': course.id})
         return redirect(url)
 
+    affiliate = AffiliateEntity.objects.get(slug=affiliate_slug)
     ccx = CustomCourseForEdX(
+        affiliate=affiliate,
         course_id=course.id,
         coach=request.user,
         display_name=name,
