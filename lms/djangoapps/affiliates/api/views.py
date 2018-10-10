@@ -1,5 +1,6 @@
 import logging
 
+from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import login, load_backend
 from django.contrib.auth.models import User
@@ -36,6 +37,25 @@ class IsStaffOrProgramDirector(BasePermission):
             ).exists()
         return AffiliateMembership.objects.filter(
             member=request.user, role=AffiliateMembership.STAFF
+        ).exists()
+
+
+class IsGlobalStaffOrAffiliateStaff(BasePermission):
+    def has_permission(self, request, view):
+        """Returns True for global staff and affiliate staff (PD or CM)."""
+        if request.user.is_staff:
+            return True
+        affiliate_slug = view.kwargs.get('affiliate_slug')
+        affiliate_staff_roles = [
+            AffiliateMembership.STAFF,
+            AffiliateMembership.INSTRUCTOR
+        ]
+        if affiliate_slug:
+            return AffiliateMembership.objects.filter(
+                member=request.user, role__in=affiliate_staff_roles, affiliate__slug=affiliate_slug
+            ).exists()
+        return AffiliateMembership.objects.filter(
+            member=request.user, role__in=affiliate_staff_roles
         ).exists()
 
 
@@ -236,3 +256,35 @@ class DataExportView(APIView):
             export_csv_interactives_completion_report.delay()
 
         return Response(status=200)
+
+
+class GetAffiliates(APIView):
+    permission_classes = (IsGlobalStaffOrAffiliateStaff, )
+
+    def has_facilitators(self, affiliate_id):
+        return AffiliateMembership.objects.filter(
+            role=AffiliateMembership.CCX_COACH, affiliate_id=affiliate_id
+        ).exists()
+
+    def get(self, request):
+        """
+        Returns all the affiliates of the user making the request.
+        Where the user is a PD or CM.
+
+        If 'has-facilitators' parameter is sent, then returns only those affiliates
+        that have facilitators.
+        """
+        has_facilitators = request.GET.get('has-facilitators')
+
+        affiliate_ids = AffiliateMembership.objects.filter(
+            Q(role=AffiliateMembership.STAFF) | Q(role=AffiliateMembership.INSTRUCTOR),
+            member=request.user
+        ).values_list('affiliate_id', flat=True)
+
+        if has_facilitators:
+            affiliate_ids = [aff_id for aff_id in affiliate_ids if self.has_facilitators(aff_id)]
+
+        affiliates = AffiliateEntity.objects.filter(id__in=affiliate_ids)
+
+        response_data = AffiliateEntitySerializer(affiliates, many=True).data
+        return Response(data=response_data)

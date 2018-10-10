@@ -80,7 +80,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
       affiliate_slug = user.profile.affiliate.slug
 
       if not is_ccx and enrollment.coach_on_master_course and user.profile.affiliate and course.enable_ccx:
-        button_target = '/courses/{0}/ccx_coach'.format(enrollment.course_id)
+        button_target = '#affiliate-select-modal'
         button_label = 'Create Custom Course'
         create_ccx_class = 'create-ccx-link'
       elif is_ccx and is_staff_or_instructor:
