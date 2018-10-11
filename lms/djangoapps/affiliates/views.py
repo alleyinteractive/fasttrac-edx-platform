@@ -198,6 +198,8 @@ def create(request):
         setattr(affiliate, 'image', request.FILES['image'])
 
     for key in post_data:
+        if key == 'program-director':
+            continue
         if key == 'year_of_birth':
             setattr(affiliate, key, int(post_data[key]))
         elif key == 'parent':
@@ -209,6 +211,23 @@ def create(request):
             setattr(affiliate, key, post_data[key])
 
     affiliate.save()
+
+    program_director_email = post_data.get('program-director')
+    if program_director_email:
+        try:
+            program_director = User.objects.get(email=program_director_email)
+            membership = AffiliateMembership.objects.create(
+                member=program_director,
+                role=AffiliateMembership.STAFF,
+                affiliate=affiliate
+            )
+            LOG.info(
+                'Created new Program Director membership [%s] for affiliate [%s]',
+                membership.id, affiliate.slug
+            )
+        except User.DoesNotExist:
+            invite_new_user(affiliate, program_director_email, AffiliateMembership.STAFF, request.user)
+
     if request.user.is_staff and post_data.get('affiliate-type') == 'parent':
         subs = dict(request.POST)['sub-affiliates']
         AffiliateEntity.objects.filter(id__in=subs).update(parent=affiliate)
@@ -304,7 +323,7 @@ def add_member(request, slug):
     role = request.POST.get('role')
     affiliate = AffiliateEntity.objects.get(slug=slug)
 
-    if role == 'staff' and not request.user.is_staff:
+    if role == AffiliateMembership.STAFF and not request.user.is_staff:
         messages.add_message(request, messages.INFO, 'You are not allowed to do that.')
         return redirect('affiliates:edit', slug=slug)
 
