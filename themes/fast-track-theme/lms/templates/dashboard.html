@@ -336,6 +336,7 @@ from openedx.core.djangolib.markup import HTML, Text
       var $affiliateSelect = $('#affiliates-list'),
           courseKey = $(this).data('course-key');
 
+      $mainDiv.data('course-key', courseKey);
       showSection('check');
 
       $.ajax({
