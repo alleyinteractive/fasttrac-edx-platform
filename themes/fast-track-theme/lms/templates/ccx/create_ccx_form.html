@@ -15,9 +15,10 @@
         <div class="field">
             <label class="sr" for="ccx_name">${_('Name your CCX')}</label>
             <input name="name" id="ccx_name" class="ccx-input-field"
-                   placeholder="${_('Name of your course...')}" required/><br/>
+            placeholder="${_('Name of your course...')}" required/><br/>
         </div>
     </div>
+    <input type="hidden" name="affiliate" value="${affiliate.slug}"/>
     <div class="field-wrapper">
         <p class="field-name">${_('COURSE DESCRIPTION')}</p>
         <p> The first part of what you enter here will display when entrepreneurs are searching by courses.
@@ -225,6 +226,8 @@
 <script type="text/javascript">
 $(document).ready(function() {
     autosize($('.autosized-textarea'));
+
+
 
     function toggleAddBtnDisable() {
         var $selectOptions = $('#facilitators option'),

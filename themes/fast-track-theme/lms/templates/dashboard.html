@@ -266,30 +266,78 @@ from openedx.core.djangolib.markup import HTML, Text
   </div>
 </div>
 
+<div class="modal" id="affiliate-select-modal" aria-hidden="true">
+  <div class="check-wrapper">
+    <h1>Checking affiliates...</h1>
+  </div>
+  <div class="error-wrapper hidden">
+    <h1>An error happened</h1>
+    <p class="error">You do not have facilitators assigned in your affiliate(s). Please add facilitators and try again.</p>
+    <div class="action-btns">
+      <button class="close">Close</button>
+    </div>
+  </div>
+  <div class="select-wrapper hidden">
+    <h1>Affiliate Select</h1>
+    <p>You can only choose the affiliate that has assigned facilitators.</p>
+    <select id="affiliates-list"></select>
+    <div class="action-btns">
+      <button class="create-ccx">Select</button>
+      <button class="close">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
   $(document).ready(function() {
-    $('a.create-ccx-link').click(function(event) {
-      event.stopImmediatePropagation();
+    var $errorWrapper = $('#affiliate-select-modal .error-wrapper'),
+        $checkWrapper = $('#affiliate-select-modal .check-wrapper'),
+        $selectWrapper = $('#affiliate-select-modal .select-wrapper');
 
-      var slug = $(this).data('affiliate-slug'),
-          course_key = $(this).data('course-key')
+    function showSection(section) {
+        $errorWrapper.toggleClass('hidden', !(section === 'error'));
+        $checkWrapper.toggleClass('hidden', !(section === 'check'));
+        $selectWrapper.toggleClass('hidden', !(section === 'select'));
+    }
+
+    $('a.create-ccx-link').leanModal({closeButton: '.close'});
+
+    $('a.create-ccx-link').click(function(event) {
+      var $affiliateSelect = $('#affiliates-list'),
+          courseKey = $(this).data('course-key');
+
+      showSection('check');
 
       $.ajax({
-        url: '/api/affiliates/' + slug + '/membership?role=ccx_coach',
+        url: '/api/affiliates/get-affiliates/?has-facilitators=1',
         method: 'GET',
         success: function(data) {
+          $affiliateSelect.empty();
           if (!data.length) {
-            var redirect = confirm('You must designate at least one facilitator on your staff before creating a course. Add facilitator now?');
-            if (redirect) {
-              window.location.href = '/affiliates/edit/' + slug;
-            }
+            showSection('error');
+          } else if (data.length === 1) {
+            window.location.href = '/courses/' + courseKey + '/ccx_coach?affiliate=' + data[0].slug;
           } else {
-            window.location.href = '/courses/' + course_key + '/ccx_coach';
+            showSection('select');
+            data.forEach(function(it) {
+              $affiliateSelect.append(
+                '<option value="' + it.slug + '">' + it.name + '</option>'
+              )
+            });
           }
+          $('#affiliate-select-modal').data('course-key', courseKey);
+        },
+        error: function(err) {
+          console.log("ERROR: ", err)
         }
       });
+    });
 
-      return false;
+    $('#affiliate-select-modal .create-ccx').click(function() {
+      var value = $('#affiliates-list option:selected').val(),
+          courseKey = $('#affiliate-select-modal').data('course-key');
+
+      window.location.href = '/courses/' + courseKey + '/ccx_coach?affiliate=' + value;
     });
   });
   </script>

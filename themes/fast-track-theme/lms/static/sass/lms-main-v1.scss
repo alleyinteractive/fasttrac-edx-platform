@@ -1042,3 +1042,40 @@ label.u-field-title {
     }
   }
 }
+
+
+#affiliate-select-modal {
+  padding: 10px;
+  background: #fafafa;
+
+  .error {
+    color: red;
+  }
+
+  #affiliates-list {
+    margin-top: 10px;
+  }
+
+  .action-btns {
+    margin-top: 20px;
+    text-align: right;
+
+    .create-ccx {
+      @include ft-button;
+    }
+
+    .close {
+      @include ft-button;
+      height: 33px;
+      background-color: #fafafa;
+      color: #222;
+      border: 1px solid #222;
+
+      &:hover {
+        background-color: #fafafa;
+        color: #222;
+        border: 1px solid #222;
+      }
+    }
+  }
+}
