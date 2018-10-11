@@ -26,6 +26,9 @@ LOG = logging.getLogger(__name__)
 
 class IsStaffOrProgramDirector(BasePermission):
     def has_permission(self, request, view):
+        if request.user.is_anonymous():
+            return False
+
         if request.user.is_staff:
             return True
 
@@ -42,8 +45,12 @@ class IsStaffOrProgramDirector(BasePermission):
 class IsGlobalStaffOrAffiliateStaff(BasePermission):
     def has_permission(self, request, view):
         """Returns True for global staff and affiliate staff (PD or CM)."""
+        if request.user.is_anonymous():
+            return False
+
         if request.user.is_staff:
             return True
+
         affiliate_slug = view.kwargs.get('affiliate_slug')
         affiliate_staff_roles = [
             AffiliateMembership.STAFF,
