@@ -1,6 +1,5 @@
 from functools import wraps
 
-from django.db.models import Q
 from django.http import HttpResponseForbidden
 
 from .models import AffiliateMembership
@@ -44,7 +43,7 @@ def only_staff(function):
 
         if 'slug' in kwargs:
             has_pd_or_cm_role_in_affiliate = AffiliateMembership.objects.filter(
-                Q(role=AffiliateMembership.STAFF) | Q(role=AffiliateMembership.INSTRUCTOR),
+                role__in=AffiliateMembership.STAFF_ROLES,
                 member=request.user,
                 affiliate__slug=kwargs['slug']
             ).exists()

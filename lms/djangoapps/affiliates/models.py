@@ -191,6 +191,11 @@ class AffiliateMembership(models.Model):
         STAFF: 'Program Director',
     }
 
+    STAFF_ROLES = [
+        STAFF,
+        INSTRUCTOR
+    ]
+
     role_choices = (
         (CCX_COACH, 'Facilitator'),
         (INSTRUCTOR, 'Course Manager'),
@@ -300,7 +305,7 @@ def add_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: dis
     # Program Director and Course Manager needs to be CCX coach on FastTrac course
     course_overviews = CourseOverview.objects.exclude(id__startswith='ccx-')
 
-    if instance.role == AffiliateMembership.STAFF or instance.role == AffiliateMembership.INSTRUCTOR:
+    if instance.role in AffiliateMembership.STAFF_ROLES:
         for course_overview in course_overviews:
             course_id = course_overview.id
             course = get_course_by_id(course_id)
@@ -344,7 +349,7 @@ def remove_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: 
         revoke_access(course, instance.member, instance.role, False)
 
     # Remove CCX coach on FastTrac course
-    if instance.role == AffiliateMembership.STAFF or instance.role == AffiliateMembership.INSTRUCTOR:
+    if instance.role in AffiliateMembership.STAFF_ROLES:
         course_overviews = CourseOverview.objects.exclude(id__startswith='ccx-')
         for course_overview in course_overviews:
             course_id = course_overview.id
