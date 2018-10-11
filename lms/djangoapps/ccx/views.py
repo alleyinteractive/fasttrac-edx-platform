@@ -373,6 +373,15 @@ def create_ccx(request, course, ccx=None, **kwargs):
         return redirect(url)
 
     affiliate = AffiliateEntity.objects.get(slug=affiliate_slug)
+    affiliate_staff_roles = [
+        AffiliateMembership.STAFF,
+        AffiliateMembership.INSTRUCTOR,
+    ]
+    if not request.user.is_staff and not AffiliateMembership.objects.filter(
+        member=request.user, affiliate=affiliate, role__in=affiliate_staff_roles
+    ).exists():
+        return HttpResponseForbidden()
+
     ccx = CustomCourseForEdX(
         affiliate=affiliate,
         course_id=course.id,
