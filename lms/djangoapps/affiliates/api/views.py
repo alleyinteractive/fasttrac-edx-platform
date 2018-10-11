@@ -295,5 +295,18 @@ class GetAffiliates(APIView):
 
         affiliates = AffiliateEntity.objects.filter(id__in=affiliate_ids)
 
-        response_data = AffiliateEntitySerializer(affiliates, many=True).data
+        response_data = []
+        for aff in affiliates:
+            is_pd = AffiliateMembership.objects.filter(
+                affiliate=aff, member=request.user, role=AffiliateMembership.STAFF
+            ).exists()
+            response_data.append({
+                'is_pd': is_pd,
+                'affiliate': {
+                    'name': aff.name,
+                    'slug': aff.slug
+                },
+                'has_facilitators': self.has_facilitators(aff)
+            })
+
         return Response(data=response_data)
