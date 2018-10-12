@@ -289,11 +289,7 @@ class GetAffiliates(APIView):
 
         response_data = []
         for aff in affiliates:
-            is_pd = AffiliateMembership.objects.filter(
-                affiliate=aff, member=request.user, role=AffiliateMembership.STAFF
-            ).exists()
             response_data.append({
-                'is_pd': is_pd,
                 'affiliate': {
                     'name': aff.name,
                     'slug': aff.slug
