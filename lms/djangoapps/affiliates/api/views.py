@@ -52,16 +52,12 @@ class IsGlobalStaffOrAffiliateStaff(BasePermission):
             return True
 
         affiliate_slug = view.kwargs.get('affiliate_slug')
-        affiliate_staff_roles = [
-            AffiliateMembership.STAFF,
-            AffiliateMembership.INSTRUCTOR
-        ]
         if affiliate_slug:
             return AffiliateMembership.objects.filter(
-                member=request.user, role__in=affiliate_staff_roles, affiliate__slug=affiliate_slug
+                member=request.user, role__in=AffiliateMembership.STAFF_ROLES, affiliate__slug=affiliate_slug
             ).exists()
         return AffiliateMembership.objects.filter(
-            member=request.user, role__in=affiliate_staff_roles
+            member=request.user, role__in=AffiliateMembership.STAFF_ROLES
         ).exists()
 
 
@@ -281,12 +277,8 @@ class GetAffiliates(APIView):
         that have facilitators.
         """
         has_facilitators = request.GET.get('has-facilitators')
-        affiliate_staff_roles = [
-            AffiliateMembership.STAFF,
-            AffiliateMembership.INSTRUCTOR
-        ]
         affiliate_ids = AffiliateMembership.objects.filter(
-            role__in=affiliate_staff_roles,
+            role__in=AffiliateMembership.STAFF_ROLES,
             member=request.user
         ).values_list('affiliate_id', flat=True)
 
