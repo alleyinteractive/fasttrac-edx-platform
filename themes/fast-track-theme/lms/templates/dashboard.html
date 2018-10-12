@@ -274,18 +274,11 @@ from openedx.core.djangolib.markup import HTML, Text
     <h1>An error happened</h1>
     <p class="error">You are not affiliated with any affiliates.</p>
   </div>
-  <div class="no-facilitator-wrapper hidden">
-    <h1>An error happened</h1>
-    <p>You do not have facilitators assigned in your affiliate(s). Please add facilitators and try again.</p>
-    <div class="add-facilitators"></div>
-    <div class="action-btns">
-      <button class="close">Close</button>
-    </div>
-  </div>
   <div class="select-wrapper hidden">
     <h1>Affiliate Select</h1>
     <p>You can only choose the affiliate that has assigned facilitators.</p>
     <select id="affiliates-list"></select>
+    <div class="add-facilitators"></div>
     <div class="action-btns">
       <button class="create-ccx">Select</button>
       <button class="close">Close</button>
@@ -296,45 +289,40 @@ from openedx.core.djangolib.markup import HTML, Text
 <script>
   $(document).ready(function() {
     var $mainDiv = $('#affiliate-select-modal'),
-        $noFacWrapper = $mainDiv.find('.no-facilitator-wrapper'),
-        $checkWrapper = $mainDiv.find('.check-wrapper'),
-        $noAffWrapper = $mainDiv.find('.no-affiliate-wrapper'),
-        $selectWrapper = $mainDiv.find('.select-wrapper');
+        $selectWrapper = $mainDiv.find('.select-wrapper'),
+        $affiliateSelect = $('#affiliates-list');
 
     function showSection(section) {
-        $noFacWrapper.toggleClass('hidden', !(section === 'nofac'));
-        $checkWrapper.toggleClass('hidden', !(section === 'check'));
-        $noAffWrapper.toggleClass('hidden', !(section === 'noaff'));
-        $selectWrapper.toggleClass('hidden', !(section === 'select'));
-    }
-
-    function numOfAffiliatesWithFacilitators(data) {
-      var hasFac = 0;
-      data.forEach(function(it) {
-        if (it.has_facilitators) {
-          hasFac++;
-        }
-      });
-      return hasFac;
+      $mainDiv.find('.check-wrapper').toggleClass('hidden', !(section === 'check'));
+      $mainDiv.find('.no-affiliate-wrapper').toggleClass('hidden', !(section === 'noaff'));
+      $selectWrapper.toggleClass('hidden', !(section === 'select'));
     }
 
     function populateAddFacilitatorLinks(data) {
-      var $addFacDiv = $noFacWrapper.find('.add-facilitators');
+      var $addFacDiv = $selectWrapper.find('.add-facilitators');
       $addFacDiv.empty();
+
       data.forEach(function(it) {
-        if (it.is_pd) {
-          $addFacDiv.append(
-            '<a href="/affiliates/edit/' + it.affiliate.slug + '">Add facilitators to ' + it.affiliate.name + ' affiliate</a>'
-          );
-        }
+        $addFacDiv.append(
+          '<a class="hidden ' + it.affiliate.slug + '" href="/affiliates/edit/' + it.affiliate.slug + '">Add facilitators to ' + it.affiliate.name + ' affiliate</a>'
+        );
+      });
+    }
+
+    function populateAffiliateOptions(data) {
+      $affiliateSelect.empty();
+      $affiliateSelect.append('<option value="0">-</option>');
+      data.forEach(function(it) {
+        $affiliateSelect.append(
+          '<option value="' + it.affiliate.slug + '" data-has-fac="' + it.has_facilitators + '">' + it.affiliate.name + '</option>'
+        )
       });
     }
 
     $('a.create-ccx-link').leanModal({closeButton: '.close'});
 
     $('a.create-ccx-link').click(function(event) {
-      var $affiliateSelect = $('#affiliates-list'),
-          courseKey = $(this).data('course-key');
+      var courseKey = $(this).data('course-key');
 
       $mainDiv.data('course-key', courseKey);
       showSection('check');
@@ -343,34 +331,31 @@ from openedx.core.djangolib.markup import HTML, Text
         url: '/api/affiliates/get-affiliates/',
         method: 'GET',
         success: function(data) {
-          var affiliatesWithFacilitators = numOfAffiliatesWithFacilitators(data);
-          $affiliateSelect.empty();
           if (data.length === 0) {
             showSection('noaff');
+          } else if (data.length === 1 && data[0].has_facilitators) {
+              window.location.href = '/courses/' + courseKey + '/ccx_coach?affiliate=' + data[0].affiliate.slug;
           } else {
-            if (affiliatesWithFacilitators) {
-              if (affiliatesWithFacilitators === 1) {
-                window.location.href = '/courses/' + courseKey + '/ccx_coach?affiliate=' + data[0].affiliate.slug;
-              } else {
-                showSection('select');
-                data.forEach(function(it) {
-                  if (it.has_facilitators) {
-                    $affiliateSelect.append(
-                      '<option value="' + it.affiliate.slug + '">' + it.affiliate.name + '</option>'
-                    )
-                  }
-                });
-              }
-            } else {
-              showSection('nofac');
-              populateAddFacilitatorLinks(data);
-            }
+            showSection('select');
+            populateAffiliateOptions(data);
+            populateAddFacilitatorLinks(data);
           }
-        },
-        error: function(err) {
-          console.log("ERROR: ", err)
         }
       });
+    });
+
+    $mainDiv.find('#affiliates-list').change(function() {
+      var $selectedOption = $(this).find('option:selected'),
+          $addFacLinks = $mainDiv.find('.add-facilitators'),
+          $selectBtn = $mainDiv.find('button.create-ccx');
+
+      $addFacLinks.find('a').addClass('hidden');
+      $selectBtn.attr('disabled', false);
+
+      if (!$selectedOption.data('has-fac')) {
+        $selectBtn.attr('disabled', true);
+        $addFacLinks.find('a.' + $selectedOption.val()).removeClass('hidden');
+      }
     });
 
     $mainDiv.find('.create-ccx').click(function() {
