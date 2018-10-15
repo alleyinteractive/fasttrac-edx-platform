@@ -1045,7 +1045,7 @@ label.u-field-title {
 
 
 #affiliate-select-modal {
-  padding: 10px;
+  padding: 20px;
   background: #fafafa;
 
   .error {
@@ -1054,15 +1054,14 @@ label.u-field-title {
 
   .add-facilitators {
     margin-top: 40px;
-
-    a {
-      display: block;
-      margin-top: 10px;
-    }
   }
 
   #affiliates-list {
-    margin-top: 10px;
+    margin-top: 20px;
+    border-radius: 4px;
+    height: 35px;
+    width: 250px;
+    background-color: white;
   }
 
   .action-btns {
