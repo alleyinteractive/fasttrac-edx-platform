@@ -83,3 +83,115 @@
   border-style: solid;
   border-color: transparent black transparent transparent;
 }
+
+
+@mixin header-nav-link {
+  display: inline-block;
+  margin-right: 20px;
+  margin-bottom: 100px;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 1.7rem;
+  color: $ft-gray;
+  transition-duration: 0.2s;
+
+  &:hover {
+    cursor: pointer;
+    color: $ft-orange;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &.active {
+    color: $ft-orange;
+  }
+}
+
+@mixin affiliate-course-card {
+  position: relative;
+  display: inline-block;
+  width: 20rem;
+  height: 20rem;
+  max-height: 20rem;
+  min-height: 20rem;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  margin-bottom: 3rem;
+  margin-right: 1rem;
+
+  .image {
+    height: 12rem;
+    border-bottom: 1px solid #aaa;
+    width: 20rem;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    display: block;
+  }
+
+  // text ellipsis
+  .name, .description {
+    width: 18rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .name {
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #999;
+    margin: 1rem 1rem 0;
+    min-height: 3rem;
+  }
+
+  .description {
+    padding: 1rem;
+    color: #555;
+    font-size: .9rem;
+    padding-top: 0;
+  }
+
+  .card-footer {
+    position: absolute;
+    bottom: 0;
+    right: 1rem;
+    width: 100%;
+    text-align: right;
+
+    & > span {
+      width: 30%;
+      display: inline-block;
+      text-align: center;
+      padding: .5rem 0;
+      text-transform: uppercase;
+      color: #777;
+
+      .fa-arrow-circle-o-right {
+        color: $ft-orange;
+      }
+    }
+
+    a {
+      color: $ft-orange;
+    }
+
+    .skewed-footer-item {
+      transform: skewX(-24deg);
+      border-right: 1px solid #ddd;
+
+      & > span {
+        display: inline-block;
+        transform: skewX(24deg);
+      }
+    }
+
+    .delivery-mode-item {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: bottom;
+      white-space: nowrap;
+    }
+  }
+}

@@ -1,0 +1,429 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%
+  from django.utils.timezone import now
+%>
+
+<%block name="pagetitle">Affiliate Administration</%block>
+
+<div id="affiliate-admin" class="container">
+  <nav class="affiliate-nav">
+    <ul>
+
+    </ul>
+  </nav>
+  <nav class="top-nav">
+    <ul>
+      <li class="affiliate-mngmt-link active">Affiliate Management</li>
+      <li class="course-mngmt-link">Course Management</li>
+    </ul>
+  </nav>
+
+  <section id="affiliate-mngmt">
+      % if error_message:
+        <div class="image-upload-error-message">${error_message}</div>
+      % endif
+
+      % if messages:
+        % for message in messages:
+          <p class="image-upload-error-message">${message}</p>
+        % endfor
+      % endif
+
+      % if affiliate.pk:
+        <div class="edit-affiliate-container">
+          <h1 class="explore-header">
+            Staff
+
+            % if request.user.is_staff:
+              <form
+                action="/affiliates/toggle_active_status/${affiliate.slug}"
+                class="affiliate-activation"
+              >
+                <input
+                  type="submit"
+                  class="affiliate-activation-btn"
+                  value="${'Deactivate' if affiliate.active else 'Activate'}"
+                />
+              </form>
+            % endif
+          </h1>
+          <form action="${affiliate.slug}/add_member" method="POST" id="add_member_form">
+            <input type="text" name="member_identifier" placeholder="Staff email" required />
+            <select name="role">
+              % for role_choice in role_choices:
+                <option value="${role_choice[0]}">${role_choice[1]}</option>
+              % endfor
+            </select>
+            <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+            <input type="submit" value="Add" id="add_member_submit" />
+          </form>
+
+
+          <h2>Affiliate Users</h2>
+          <table id="affiliate_membership_table">
+            <thead>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th></th>
+            </thead>
+            % for membership in affiliate.memberships.order_by('member__profile__name'):
+            <tr>
+              <td>${membership.member.profile.name}</td>
+              <td>${membership.member.email}</td>
+              <td>${membership.get_role_display()}</td>
+              <td>
+                  % if (membership.role == 'staff' and user.is_staff) or membership.role != 'staff':
+                    <!-- only global staff can add/remove program directors -->
+                    <a href="${affiliate.slug}/remove_member/${membership.member.id}?role=${membership.role}">
+                      <i class="fa fa-times"></i>
+                      Remove
+                    </a>
+                  % endif
+                </td>
+              </tr>
+            % endfor
+          </table>
+
+          <h2>Invited Users</h2>
+          <table id="affiliate_invites_table">
+            <thead>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Invited At</th>
+              <th></th>
+            </thead>
+            % for invite in affiliate.active_invites:
+            <tr>
+              <td>${invite.email}</td>
+              <td>${invite.get_role_display()}</td>
+              <td>${invite.invited_at.strftime("%B %d, %Y")}</td>
+              <td>
+                % if (invite.role == 'staff' and user.is_staff) or invite.role != 'staff':
+                <!-- only global staff can add/remove program directors -->
+                <a href="${affiliate.slug}/remove_invite/${invite.id}">
+                  <i class="fa fa-times"></i>
+                  Remove Invite
+                </a>
+                % endif
+              </td>
+            </tr>
+            % endfor
+          </table>
+        </div>
+      % endif
+
+      % if is_program_director or not affiliate.pk:
+        <% action_url = 'edit/{}'.format(affiliate.slug) if affiliate.slug else 'create' %>
+          <form class="edit-affiliate-container" action="/affiliates/${action_url}" method="POST" enctype="multipart/form-data">
+
+          <h1 class="explore-header">${'Affiliate Profile' if affiliate.slug else 'Create Affiliate'}</h1>
+
+          % if request.user.is_staff:
+          <%
+            aff_type = 'standalone'
+            if affiliate.is_child:
+              aff_type = 'subaff'
+            elif affiliate.is_parent:
+              aff_type = 'parent'
+          %>
+          <div class="form-control">
+            <label for="affiliate-type">Affiliate Type</label>
+
+            <div class="affiliate-type-toggle">
+              <input type="radio"
+                      name="affiliate-type"
+                      value="standalone"
+                      class="hidden"
+                      id="standalone-type"
+                      ${'checked="checked"' if aff_type == 'standalone' else ''}
+              >
+            <label for="standalone-type">Standalone</label>
+            <input type="radio"
+                    name="affiliate-type"
+                    value="parent"
+                    class="hidden"
+                    id="parent-type"
+                    ${'checked="checked"' if aff_type == 'parent' else ''}
+            >
+            <label for="parent-type">Parent</label>
+            <input type="radio"
+                    name="affiliate-type"
+                    value="sub-affiliate"
+                    id="sub-type"
+                    class="hidden"
+                    ${'checked="checked"' if aff_type == 'subaff' else ''}
+            >
+            <label for="sub-type">Sub-Affiliate</label>
+            </div>
+          </div>
+
+          <div class="form-control parent-type ${'' if aff_type == 'parent' else 'hidden'}">
+            <div class="form-control ${'' if affiliate.children.exists() else 'hidden'}">
+              <label>Sub-affiliates</label>
+              <ul class="sub-affiliates-list">
+                % for child in affiliate.children.all():
+                  <li>
+                    <a href="/affiliates/${child.slug}">${child.name}</a>
+                    <i class="remove-btn fa fa-times"></i>
+                    <input type="hidden" name="sub-affiliates" value="${child.id}">
+                  </li>
+                % endfor
+              </ul>
+            </div>
+
+            <div class="form-control">
+              <label>Add Sub-Affiliate</label>
+              <select class="affiliates-list">
+                <option value="0">-</option>
+                % for aff in available_subs:
+                <option value="${aff.id}">${aff.name}</option>
+                % endfor
+              </select>
+              <button type="button" class="add-btn">Add</button>
+            </div>
+
+          </div>
+          <div class="form-control sub-type ${'' if aff_type == 'subaff' else 'hidden'}">
+            <div class="form-control">
+              <label>Parent</label>
+              <select class="affiliates-list" name="parent">
+                <option value="0">-</option>
+                % for aff in affiliates:
+                <option value="${aff.id}" ${'selected="selected"' if affiliate.parent and affiliate.parent.id == aff.id else ''}>${aff.name}</option>
+                % endfor
+              </select>
+            </div>
+          </div>
+          % endif
+
+          <hr>
+
+          % if not affiliate.pk:
+          <div class="form-control">
+            <label for="program-director" class="program-director">Program Director</label>
+            <input type="email" id="program-director" name="program-director" required>
+            <span class="help">An invite will be sent to the specified email if the user has not registered yet.</span>
+          </div>
+          % endif
+
+          <div class="form-control">
+            <label for="" class="logo-label">Logo</label>
+            <input class="upload-profile-image" type="file" name="image">
+            <span class="help">(Recommended image resolution is 1200x800)</span>
+          </div>
+
+          <div class="form-control">
+            <label for="">Affiliate Organization</label>
+            <input type="text" value="${affiliate.name}" name="name">
+          </div>
+
+          <div class="form-control">
+            <label for="">Street Address</label>
+            <input type="text" value="${affiliate.address}" name="address">
+          </div>
+
+          <div class="form-control">
+            <label for="">Street Address 2</label>
+            <input type="text" value="${affiliate.address_2}" name="address_2">
+          </div>
+
+          <div class="form-control">
+            <label for="">City</label>
+            <input type="text" value="${affiliate.city}" name="city">
+          </div>
+
+          <div class="form-control">
+            <label for="">State</label>
+            <select name="state">
+              % for choice in state_choices:
+                <option value="${choice[0]}" ${'selected' if affiliate.state == choice[0] else ''}>${choice[1]}</option>
+              % endfor
+            </select>
+          </div>
+
+          <div class="form-control">
+            <label for="">Zip Code</label>
+            <input type="text" value="${affiliate.zipcode}" name="zipcode">
+          </div>
+
+          <div class="form-control">
+            <label for="">Country</label>
+            <select name="country">
+              % for country in countries:
+                <option value="${country[0]}" ${'selected' if affiliate.country == country[0] else ''}>${country[1]}</option>
+              % endfor
+            </select>
+          </div>
+
+          <div class="form-control">
+            <label for="">Public Contact Email</label>
+            <input type="email" value="${affiliate.email}" name="email">
+          </div>
+
+          <div class="form-control">
+            <label for="">Public Contact Phone Number</label>
+            <input type="text" value="${affiliate.phone_number}" name="phone_number">
+          </div>
+
+          <div class="form-control">
+            <label for="">Affiliate Phone Number</label>
+            <input type="text" value="${affiliate.phone_number_private}" name="phone_number_private">
+          </div>
+
+          <div class="form-control">
+            <label for="">Affiliate Website URL</label>
+            <input type="text" value="${affiliate.website}" name="website">
+          </div>
+
+          <div class="form-control">
+            <label for="">Affiliate Description</label>
+            <textarea name="description">${affiliate.description}</textarea>
+          </div>
+
+          <div class="form-control">
+            <label for="">Facebook URL</label>
+            <input type="text" value="${affiliate.facebook}" name="facebook">
+          </div>
+
+          <div class="form-control">
+            <label for="">Twitter URL</label>
+            <input type="text" value="${affiliate.twitter}" name="twitter">
+          </div>
+
+          <div class="form-control">
+            <label for="">LinkedIn URL</label>
+            <input type="text" value="${affiliate.linkedin}" name="linkedin">
+          </div>
+
+          <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+          <input type="submit" value="Save" />
+        </form>
+      % endif
+
+        <script>
+          $(document).ready(function() {
+            var parentAffiliateId = ${affiliate.parent.id if affiliate.parent else 0};
+            var $parentAffiliateArea = $('.form-control.parent-type');
+            var $subAffiliateArea = $('.form-control.sub-type');
+
+            $('input[name=affiliate-type]').change(function() {
+              var value = $(this).val();
+              if (value === 'parent') {
+                $parentAffiliateArea.removeClass('hidden');
+                $subAffiliateArea.addClass('hidden');
+              } else if (value === 'sub-affiliate') {
+                $parentAffiliateArea.addClass('hidden');
+                $subAffiliateArea.removeClass('hidden');
+
+                $('.affiliates-list', $subAffiliateArea).val(parentAffiliateId);
+              } else {
+                $parentAffiliateArea.addClass('hidden');
+                $subAffiliateArea.addClass('hidden');
+
+                $('.affiliates-list', $subAffiliateArea).val(0);
+              }
+            });
+
+            $('.parent-type .add-btn').click(function() {
+              var affValue = $('.parent-type .affiliates-list').val();
+              var affName = $('.parent-type .affiliates-list option:selected').text();
+              var $list = $('.sub-affiliates-list');
+              $list.append(
+                '<li value="' + affValue + '">' +
+                '<a href="/affiliates/' + affName + '">' + affName + '</a>' +
+                '<i class="remove-btn fa fa-times"></i>' +
+                '<input type="hidden" name="sub-affiliates" value="' + affValue + '">' +
+                '</li>'
+              );
+
+              $('.parent-type .affiliates-list option[value=' + affValue + ']').remove();
+              $list.parent().removeClass('hidden');
+            });
+
+            $(document).on('click', '.parent-type .remove-btn', function() {
+              var $parent = $(this).parent();
+              var value = $parent.find('input').val();
+              var name = $parent.find('a').text();
+              $parent.remove();
+              $('.parent-type .affiliates-list').append(
+                '<option value="' + value + '">' + name + '</option>'
+              );
+
+              if (!$('.sub-affiliates-list li').length) {
+                $('.sub-affiliates-list').parent().addClass('hidden');
+              }
+            });
+          });
+        </script>
+
+  </section>
+
+  <section id="course-mngmt" class="hidden">
+    <ul>
+      % for course in courses:
+      <li class="affiliate-course-card">
+          <div class="image" style="background-image: url(${affiliate.image_url});"></div>
+          <div class="name">
+            ${course.display_name}
+          </div>
+          <div class="description">
+            % if len(course.course_description) > 90:
+              <span>${course.course_description[:90] + '...'}</span>
+            % else:
+                <span>${course.course_description}</span>
+            % endif
+          </div>
+          <div class="card-footer">
+            <span class="delivery-mode-item">
+              % if course.delivery_mode == 'IN_PERSON':
+                  <i class="fa fa-users"></i>
+              % elif course.delivery_mode == 'BLENDED':
+                  <i class="fa fa-exchange"></i>
+              % else:
+                  <i class="fa fa-globe"></i>
+              % endif
+              ${course.get_delivery_mode_display()}
+            </span>
+            <span class="skewed-footer-item">
+              <span>
+                <span class="fa fa-map-marker"></span>
+                ${course.location_state}
+              </span>
+            </span>
+            <span>
+              <a href="/courses/${course.ccx_course_id}/about">
+                View
+                <span class="fa fa-arrow-circle-o-right"></span>
+              </a>
+            </span>
+          </div>
+        </li>
+      % endfor
+    </ul>
+  </section>
+
+</div>
+
+<script>
+  $(document).ready(function() {
+    // TOP NAVIGATION
+    var $affiliateSection = $('section#affiliate-mngmt');
+    var $courseSection = $('section#course-mngmt');
+
+    $('nav.top-nav li').click(function() {
+      $('#affiliate-admin section').addClass('hidden');
+      $('nav.top-nav li').removeClass('active');
+
+      if ($(this).hasClass('affiliate-mngmt-link')) {
+        $(this).addClass('active');
+        $affiliateSection.removeClass('hidden');
+      } else if ($(this).hasClass('course-mngmt-link')) {
+        $(this).addClass('active');
+        $courseSection.removeClass('hidden');
+      }
+    });
+  });
+</script>

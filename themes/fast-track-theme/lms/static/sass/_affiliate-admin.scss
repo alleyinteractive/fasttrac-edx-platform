@@ -1,0 +1,17 @@
+#affiliate-admin {
+  nav.top-nav {
+    li {
+      @include header-nav-link;
+    }
+  }
+
+  .edit-affiliate-container {
+    width: unset;
+  }
+
+  #course-mngmt {
+    li.affiliate-course-card {
+      @include affiliate-course-card;
+    }
+  }
+}
