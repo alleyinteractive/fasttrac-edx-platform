@@ -276,7 +276,7 @@ from openedx.core.djangolib.markup import HTML, Text
   </div>
   <div class="select-wrapper hidden">
     <h1>Affiliate Select</h1>
-    <p>You can only choose the affiliate that has assigned facilitators.</p>
+    <p>Choose an affiliate. You can only choose affiliates that have facilitators assigned.</p>
     <select id="affiliates-list"></select>
     <div class="add-facilitators"></div>
     <div class="action-btns">
@@ -304,7 +304,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
       data.forEach(function(it) {
         $addFacDiv.append(
-          '<a class="hidden ' + it.affiliate.slug + '" href="/affiliates/edit/' + it.affiliate.slug + '">Add facilitators to ' + it.affiliate.name + ' affiliate</a>'
+          '<p class="hidden ' + it.affiliate.slug + '">' + it.affiliate.name + ' does not have facilitators. <a href="/affiliates/edit/' + it.affiliate.slug + '">Add facilitators.</a></p>'
         );
       });
     }
@@ -349,12 +349,12 @@ from openedx.core.djangolib.markup import HTML, Text
           $addFacLinks = $mainDiv.find('.add-facilitators'),
           $selectBtn = $mainDiv.find('button.create-ccx');
 
-      $addFacLinks.find('a').addClass('hidden');
+      $addFacLinks.find('p').addClass('hidden');
       $selectBtn.attr('disabled', false);
 
       if (!$selectedOption.data('has-fac')) {
         $selectBtn.attr('disabled', true);
-        $addFacLinks.find('a.' + $selectedOption.val()).removeClass('hidden');
+        $addFacLinks.find('p.' + $selectedOption.val()).removeClass('hidden');
       }
     });
 
