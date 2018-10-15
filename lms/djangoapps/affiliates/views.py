@@ -18,21 +18,11 @@ from lms.envs.common import STATE_CHOICES
 from opaque_keys.edx.keys import CourseKey
 from student.models import CourseEnrollment
 
+from affiliates.permissions import IsStaffMixin, IsGlobalStaffOrAffiliateStaff
 from .decorators import only_program_director, only_staff
 from .models import AffiliateEntity, AffiliateMembership, AffiliateInvite
 
 LOG = logging.getLogger(__name__)
-
-
-class IsStaffMixin(object):
-    def has_permissions(self):
-        return self.request.user.is_staff
-
-    def dispatch(self, request, *args, **kwargs):
-        if not self.has_permissions():
-            LOG.info('Unauthorized attempt to access site admin by %s', self.request.user.username)
-            return redirect('root')
-        return super(IsStaffMixin, self).dispatch(request, *args, **kwargs)
 
 
 class SiteAdminView(IsStaffMixin, View):
