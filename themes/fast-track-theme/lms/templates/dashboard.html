@@ -324,6 +324,7 @@ from openedx.core.djangolib.markup import HTML, Text
     $('a.create-ccx-link').click(function(event) {
       var courseKey = $(this).data('course-key');
 
+      $mainDiv.find('button.create-ccx').attr('disabled', true);
       $mainDiv.data('course-key', courseKey);
       showSection('check');
 
