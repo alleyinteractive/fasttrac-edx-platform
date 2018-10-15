@@ -274,6 +274,13 @@ from openedx.core.djangolib.markup import HTML, Text
     <h1>An error happened</h1>
     <p class="error">You are not affiliated with any affiliates.</p>
   </div>
+  <div class="no-facilitators-wrapper hidden">
+      <h1>An error happened</h1>
+      <p class="error">no facilitator</p>
+      <div class="action-btns">
+        <button class="close">Close</button>
+      </div>
+    </div>
   <div class="select-wrapper hidden">
     <h1>Affiliate Select</h1>
     <p>Choose an affiliate. You can only choose affiliates that have facilitators assigned.</p>
@@ -295,6 +302,7 @@ from openedx.core.djangolib.markup import HTML, Text
     function showSection(section) {
       $mainDiv.find('.check-wrapper').toggleClass('hidden', !(section === 'check'));
       $mainDiv.find('.no-affiliate-wrapper').toggleClass('hidden', !(section === 'noaff'));
+      $mainDiv.find('.no-facilitators-wrapper').toggleClass('hidden', !(section === 'nofac'));
       $selectWrapper.toggleClass('hidden', !(section === 'select'));
     }
 
@@ -335,7 +343,9 @@ from openedx.core.djangolib.markup import HTML, Text
           if (data.length === 0) {
             showSection('noaff');
           } else if (data.length === 1 && data[0].has_facilitators) {
-              window.location.href = '/courses/' + courseKey + '/ccx_coach?affiliate=' + data[0].affiliate.slug;
+            window.location.href = '/courses/' + courseKey + '/ccx_coach?affiliate=' + data[0].affiliate.slug;
+          } else if (data.length === 1 && !data[0].has_facilitators) {
+            showSection('nofac');
           } else {
             showSection('select');
             populateAffiliateOptions(data);
