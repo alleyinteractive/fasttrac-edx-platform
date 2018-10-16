@@ -275,8 +275,11 @@ from openedx.core.djangolib.markup import HTML, Text
     <p class="error">You are not affiliated with any affiliates.</p>
   </div>
   <div class="no-facilitators-wrapper hidden">
-      <h1>An error happened</h1>
-      <p class="error">no facilitator</p>
+      <h1>No facilitators found</h1>
+      <p>
+        Please add at least one facilitator to your affiliate profile before creating a course.
+        You can do this <a href="">here</a>.
+      </p>
       <div class="action-btns">
         <button class="close">Close</button>
       </div>
@@ -297,12 +300,13 @@ from openedx.core.djangolib.markup import HTML, Text
   $(document).ready(function() {
     var $mainDiv = $('#affiliate-select-modal'),
         $selectWrapper = $mainDiv.find('.select-wrapper'),
+        $noFacilitatorsWrapper = $mainDiv.find('.no-facilitators-wrapper'),
         $affiliateSelect = $('#affiliates-list');
 
     function showSection(section) {
       $mainDiv.find('.check-wrapper').toggleClass('hidden', !(section === 'check'));
       $mainDiv.find('.no-affiliate-wrapper').toggleClass('hidden', !(section === 'noaff'));
-      $mainDiv.find('.no-facilitators-wrapper').toggleClass('hidden', !(section === 'nofac'));
+      $noFacilitatorsWrapper.toggleClass('hidden', !(section === 'nofac'));
       $selectWrapper.toggleClass('hidden', !(section === 'select'));
     }
 
@@ -346,6 +350,10 @@ from openedx.core.djangolib.markup import HTML, Text
             window.location.href = '/courses/' + courseKey + '/ccx_coach?affiliate=' + data[0].affiliate.slug;
           } else if (data.length === 1 && !data[0].has_facilitators) {
             showSection('nofac');
+            $noFacilitatorsWrapper.find('a').attr(
+              'href',
+              '/affiliates/edit/' + data[0].affiliate.slug
+            );
           } else {
             showSection('select');
             populateAffiliateOptions(data);
