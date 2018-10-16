@@ -9,6 +9,9 @@ from affiliates.views import AffiliateAdminView, ImpersonateView, SiteAdminView
 urlpatterns = patterns(
     '',
     url(r'^$', 'affiliates.views.index', name='index'),
+    # When no slug is provided it will be redirected to the
+    # affiliate admin page of the request user's default affiliate.
+    url(r'^affiliate-admin$', AffiliateAdminView.as_view(), name='affiliate-admin-redirect'),
     url(r'^affiliate-admin/(?P<affiliate_slug>[^/]*)$', AffiliateAdminView.as_view(), name='affiliate-admin'),
     url(r'^admin$', SiteAdminView.as_view(), name='admin'),
     url(r'^payment$', 'affiliates.views.payment', name='payment'),

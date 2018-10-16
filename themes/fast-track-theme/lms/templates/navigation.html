@@ -280,6 +280,11 @@ site_status_msg = get_site_status_msg(course_id)
           <li class="ft-header-item">
               <a href="${settings.WORKSPACE_URL}">Workspace</a>
           </li>
+          % if user.profile.is_affiliate_staff:
+            <li class="ft-header-item">
+              <a href="/affiliates/affiliate-admin/${user.profile.affiliate.slug}">Affiliate Admin</a>
+            </li>
+          % endif
           % if user.is_staff:
             <li class="ft-header-item">
                 <a href="/affiliates/admin">Site Admin</a>

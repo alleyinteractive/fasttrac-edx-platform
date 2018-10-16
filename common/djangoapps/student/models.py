@@ -403,6 +403,13 @@ class UserProfile(models.Model):
         return self.user.affiliatemembership_set.exists()
 
     @property
+    def is_affiliate_staff(self):
+        staff_roles = self.user.affiliatemembership_set.model.STAFF_ROLES
+        return self.user.affiliatemembership_set.filter(
+            role__in=staff_roles
+        ).exists()
+
+    @property
     def default_affiliate_membership(self):
         if self.is_affiliate_user:
             return self.user.affiliatemembership_set.first()

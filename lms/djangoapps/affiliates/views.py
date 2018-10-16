@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core import serializers
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseNotFound
 from django.shortcuts import redirect
 from django.db.models import Q
@@ -433,6 +434,10 @@ class AffiliateAdminView(IsGlobalStaffOrAffiliateStaff, View):
             'state_choices': STATE_CHOICES
         }
 
-    def get(self, request, affiliate_slug):
+    def get(self, request, affiliate_slug=None):
+        if not affiliate_slug:
+            affiliate = request.user.profile.affiliate
+            return redirect(reverse('affiliates:affiliate-admin', kwargs={'affiliate_slug': affiliate.slug}))
+
         context = self.get_context(request.user, affiliate_slug)
         return render_to_response(self.template_name, context)
