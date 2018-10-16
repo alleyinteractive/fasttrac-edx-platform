@@ -1,0 +1,38 @@
+#affiliate-admin {
+  .affiliate-select-wrapper {
+    margin-bottom: 40px;
+    border-bottom: 1px solid $ft-gray;
+
+    select#affiliate-select {
+      @include header-nav-link;
+
+      height: 50px;
+      margin-left: 20px;
+      margin-bottom: 0px;
+      color: #222;
+      border: none;
+      outline: none;
+      background: transparent;
+
+      option {
+        @include header-nav-link;
+      }
+    }
+  }
+
+  nav.top-nav {
+    li {
+      @include header-nav-link;
+    }
+  }
+
+  .edit-affiliate-container {
+    width: unset;
+  }
+
+  #course-mngmt {
+    li.affiliate-course-card {
+      @include affiliate-course-card;
+    }
+  }
+}

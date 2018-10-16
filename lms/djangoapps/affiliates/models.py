@@ -202,6 +202,11 @@ class AffiliateMembership(models.Model):
         (STAFF, 'Program Director'),
     )
 
+    non_pd_role_choices = (
+        (CCX_COACH, 'Facilitator'),
+        (INSTRUCTOR, 'Course Manager'),
+    )
+
     mailchimp_interests = {
         CCX_COACH: '1b920c7fe2',
         INSTRUCTOR: '738d5d6873',

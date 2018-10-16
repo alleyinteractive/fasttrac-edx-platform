@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core import serializers
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseNotFound
 from django.shortcuts import redirect
 from django.db.models import Q
@@ -18,21 +19,11 @@ from lms.envs.common import STATE_CHOICES
 from opaque_keys.edx.keys import CourseKey
 from student.models import CourseEnrollment
 
+from affiliates.permissions import IsStaffMixin, IsGlobalStaffOrAffiliateStaff
 from .decorators import only_program_director, only_staff
 from .models import AffiliateEntity, AffiliateMembership, AffiliateInvite
 
 LOG = logging.getLogger(__name__)
-
-
-class IsStaffMixin(object):
-    def has_permissions(self):
-        return self.request.user.is_staff
-
-    def dispatch(self, request, *args, **kwargs):
-        if not self.has_permissions():
-            LOG.info('Unauthorized attempt to access site admin by %s', self.request.user.username)
-            return redirect('root')
-        return super(IsStaffMixin, self).dispatch(request, *args, **kwargs)
 
 
 class SiteAdminView(IsStaffMixin, View):
@@ -396,9 +387,57 @@ def is_program_director(user, affiliate):
         return False
     else:
         return user.is_staff or AffiliateMembership.objects.filter(
-            member=user, affiliate=affiliate, role='staff'
+            member=user, affiliate=affiliate, role=AffiliateMembership.STAFF
         ).exists()
 
 
 def invite_new_user(affiliate, user_email, role, current_user):
     AffiliateInvite.objects.create(affiliate=affiliate, email=user_email, role=role, invited_by=current_user)
+
+
+class AffiliateAdminView(IsGlobalStaffOrAffiliateStaff, View):
+    template_name = 'affiliates/affiliate_admin.html'
+
+    def get_affiliates(self, user):
+        membership_affiliate_ids = AffiliateMembership.objects.filter(
+            member=user, role__in=AffiliateMembership.STAFF_ROLES
+        ).values_list('affiliate_id', flat=True)
+        return AffiliateEntity.objects.filter(id__in=membership_affiliate_ids)
+
+    def get_context(self, user, affiliate_slug):
+        all_affiliates = AffiliateEntity.objects.all()
+        staff_affiliates = self.get_affiliates(user)
+
+        # Staff user does not have to an affiliate staff member in a CCX to see it.
+        if user.is_staff:
+            current_affiliate = all_affiliates.get(slug=affiliate_slug)
+        else:
+            current_affiliate = staff_affiliates.get(slug=affiliate_slug)
+
+        role_choices = AffiliateMembership.role_choices
+        if not user.is_staff:
+            role_choices = AffiliateMembership.non_pd_role_choices
+
+        available_subs = all_affiliates.exclude(
+            id__in=current_affiliate.children.all().values_list('id', flat=True)
+        )
+
+        return {
+            'affiliate': current_affiliate,
+            'affiliates': all_affiliates,
+            'available_subs': available_subs,
+            'countries': countries,
+            'courses': CustomCourseForEdX.objects.filter(affiliate=current_affiliate),
+            'is_program_director': is_program_director(user, current_affiliate),
+            'role_choices': role_choices,
+            'staff_affiliates': staff_affiliates,
+            'state_choices': STATE_CHOICES
+        }
+
+    def get(self, request, affiliate_slug=None):
+        if not affiliate_slug:
+            affiliate = request.user.profile.affiliate
+            return redirect(reverse('affiliates:affiliate-admin', kwargs={'affiliate_slug': affiliate.slug}))
+
+        context = self.get_context(request.user, affiliate_slug)
+        return render_to_response(self.template_name, context)
