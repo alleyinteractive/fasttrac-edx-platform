@@ -429,6 +429,7 @@ class AffiliateAdminView(IsGlobalStaffOrAffiliateStaff, View):
             'courses': CustomCourseForEdX.objects.filter(affiliate=current_affiliate),
             'is_program_director': is_program_director(user, current_affiliate),
             'role_choices': role_choices,
+            'staff_affiliates': staff_affiliates,
             'state_choices': STATE_CHOICES
         }
 

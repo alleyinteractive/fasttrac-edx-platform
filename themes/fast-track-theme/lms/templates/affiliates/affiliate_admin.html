@@ -8,11 +8,15 @@
 <%block name="pagetitle">Affiliate Administration</%block>
 
 <div id="affiliate-admin" class="container">
-  <nav class="affiliate-nav">
-    <ul>
+  <div class="affiliate-select-wrapper">
+    <span>Current affiliate: </span>
+    <select id="affiliate-select">
+      % for aff in staff_affiliates:
+      <option value="${aff.slug}" ${'selected' if aff.slug == affiliate.slug else ''}>${aff.name}</option>
+      % endfor
+    </select>
+  </div>
 
-    </ul>
-  </nav>
   <nav class="top-nav">
     <ul>
       <li class="affiliate-mngmt-link active">Affiliate Management</li>
@@ -409,6 +413,12 @@
 
 <script>
   $(document).ready(function() {
+    // AFFILIATE SELECT
+    $('#affiliate-select').change(function() {
+      var selectedValue = $(this).find('option:selected').val();
+      window.location.href = '/affiliates/affiliate-admin/' + selectedValue;
+    });
+
     // TOP NAVIGATION
     var $affiliateSection = $('section#affiliate-mngmt');
     var $courseSection = $('section#course-mngmt');
