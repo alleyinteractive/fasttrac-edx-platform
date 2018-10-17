@@ -140,8 +140,7 @@ class AffiliateEntityDetailsViewSet(AffiliateViewMixin, APIView):
 
     def patch(self, request, affiliate_slug):
         """Updates the affiliate."""
-        affiliate = AffiliateEntity.objects.get(slug=affiliate_slug)
-        affiliate = self.create_or_update_affiliate(affiliate, request)
+        affiliate = self.update_affiliate(affiliate_slug, request)
         response_data = AffiliateEntitySerializer(affiliate).data
         return Response(data=response_data, status=200)
 

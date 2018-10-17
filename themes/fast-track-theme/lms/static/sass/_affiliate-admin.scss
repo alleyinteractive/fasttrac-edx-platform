@@ -28,6 +28,15 @@
 
   .edit-affiliate-container {
     width: unset;
+
+    h1.explore-header {
+      cursor: unset;
+    }
+
+    .toggle-affiliate-status {
+      @include ft-button;
+      float: right;
+    }
   }
 
   #course-mngmt {

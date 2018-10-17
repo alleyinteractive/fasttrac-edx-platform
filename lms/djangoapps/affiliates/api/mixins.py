@@ -4,28 +4,37 @@ from affiliates.models import AffiliateEntity, AffiliateMembership
 
 
 class AffiliateViewMixin(object):
-    def get_affiliate_attributes_data(self, request):
-        return {
-            'address': request.POST.get('address'),
-            'address_2': request.POST.get('address_2'),
-            'city': request.POST.get('city'),
-            'country': request.POST.get('country'),
-            'description': request.POST.get('description'),
-            'email': request.POST.get('email'),
-            'facebook': request.POST.get('facebook'),
-            'image': request.FILES.get('image') if request.FILES else None,
-            'linkedin': request.POST.get('linkedin'),
-            'name': request.POST.get('name'),
-            'phone_number': request.POST.get('phone_number'),
-            'phone_number_private': request.POST.get('phone_number_private'),
-            'state': request.POST.get('state'),
-            'twitter': request.POST.get('twitter'),
-            'website': request.POST.get('website'),
-            'zipcode': request.POST.get('zipcode')
-        }
+    UPDATEABLE_ATTRIBUTES = [
+        'address', 'address_2', 'city', 'country', 'description', 'email', 'facebook', 'image', 'active',
+        'linkedin', 'name', 'phone_number', 'phone_number_private', 'state', 'twitter', 'website', 'zipcode'
+    ]
+
+    def _clean_attribute(self, attr):
+        """
+        Cleans the attributes in the requests. E.g. a boolean from JS is received
+        as 'true' or 'false', this will convert them to boolean objects.
+        """
+        if attr == 'true':
+            return True
+        if attr == 'false':
+            return False
+        return attr
+
+    def get_affiliate_attributes_data(self, request_data):
+        """
+        Returns a dictionary of the updatedable attributes in the request data.
+        """
+        attributes = {}
+
+        for attr in self.UPDATEABLE_ATTRIBUTES:
+            if attr in request_data:
+                attributes = {
+                    attr: self._clean_attribute(request_data.get(attr))
+                }
+        return attributes
 
     def create_new_affiliate(self, request):
-        affiliate_request_data = self.get_affiliate_attributes_data(request)
+        affiliate_request_data = self.get_affiliate_attributes_data(request.POST)
         affiliate = AffiliateEntity(**affiliate_request_data)
 
         if request.user.is_staff:
@@ -54,8 +63,11 @@ class AffiliateViewMixin(object):
 
         return affiliate
 
-    def update_affiliate(self, affiliate, request):
-        affiliate_request_data = self.get_affiliate_attributes_data(request)
-        values = dict((k, v) for k, v in affiliate_request_data.iteritems() if v)
-        affiliate.update(**values)
-        return affiliate
+    def update_affiliate(self, affiliate_slug, request):
+        affiliate_update_attributes = self.get_affiliate_attributes_data(request.data)
+
+        # We are using filter here to get a QS list on which .update() can be called,
+        # even though only one affiliate matches one slug.
+        matching_affiliates = AffiliateEntity.objects.filter(slug=affiliate_slug)
+        matching_affiliates.update(**affiliate_update_attributes)
+        return matching_affiliates.first()

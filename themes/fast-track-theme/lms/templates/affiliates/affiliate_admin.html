@@ -7,7 +7,7 @@
 
 <%block name="pagetitle">Affiliate Administration</%block>
 
-<div id="affiliate-admin" class="container">
+<div id="affiliate-admin" class="container" data-affiliate-slug="${affiliate.slug}">
   <div class="affiliate-select-wrapper">
     <span>Current affiliate: </span>
     <select id="affiliate-select">
@@ -41,16 +41,8 @@
             Staff
 
             % if request.user.is_staff:
-              <form
-                action="/affiliates/toggle_active_status/${affiliate.slug}"
-                class="affiliate-activation"
-              >
-                <input
-                  type="submit"
-                  class="affiliate-activation-btn"
-                  value="${'Deactivate' if affiliate.active else 'Activate'}"
-                />
-              </form>
+                <button class="btn toggle-affiliate-status deactivate ${'hidden' if not affiliate.active else ''}">Deactivate</button>
+                <button class="btn toggle-affiliate-status activate ${'hidden' if affiliate.active else ''}">Activate</button>
             % endif
           </h1>
           <form action="${affiliate.slug}/add_member" method="POST" id="add_member_form">
@@ -362,7 +354,6 @@
             });
           });
         </script>
-
   </section>
 
   <section id="course-mngmt" class="hidden">
@@ -413,6 +404,8 @@
 
 <script>
   $(document).ready(function() {
+    var AFFILIATE_SLUG = $('#affiliate-admin').data('affiliate-slug');
+
     // AFFILIATE SELECT
     $('#affiliate-select').change(function() {
       var selectedValue = $(this).find('option:selected').val();
@@ -434,6 +427,22 @@
         $(this).addClass('active');
         $courseSection.removeClass('hidden');
       }
+    });
+
+    // TOGGLE AFFILIATE STATUS BUTTON
+    $('button.toggle-affiliate-status').click(function() {
+      var active = $(this).hasClass('activate');
+      $.ajax({
+        url: '/api/affiliates/' + AFFILIATE_SLUG,
+        method: 'PATCH',
+        data: {
+          'active': active
+        },
+        success: function(data) {
+          $('button.toggle-affiliate-status.activate').toggleClass('hidden', data.active);
+          $('button.toggle-affiliate-status.deactivate').toggleClass('hidden', !data.active);
+        }
+      });
     });
   });
 </script>
