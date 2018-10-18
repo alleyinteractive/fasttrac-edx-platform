@@ -213,6 +213,9 @@ class AffiliateMembership(models.Model):
         STAFF: 'c6f38d6306'
     }
 
+    class Meta:
+        unique_together = ('member', 'affiliate', 'role')
+
     member = models.ForeignKey(User)
     affiliate = models.ForeignKey(AffiliateEntity, on_delete=models.CASCADE)
     role = models.CharField(choices=role_choices, max_length=255)
