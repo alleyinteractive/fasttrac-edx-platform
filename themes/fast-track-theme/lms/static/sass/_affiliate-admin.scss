@@ -29,6 +29,27 @@
   .edit-affiliate-container {
     width: unset;
 
+    #add_member_form {
+      margin-bottom: 40px;
+
+      input.add-member-email {
+        width: 40%;
+        margin-bottom: 0px;
+        margin-left: 0px;
+      }
+
+      select.add-member-role {
+        width: 20%;
+        margin-right: 10px;
+        margin-bottom: 0px;
+      }
+
+      button.add-member-btn {
+        @include ft-button;
+        text-align: center;
+      }
+    }
+
     h1.explore-header {
       cursor: unset;
     }

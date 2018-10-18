@@ -45,16 +45,17 @@
                 <button class="btn toggle-affiliate-status activate ${'hidden' if affiliate.active else ''}">Activate</button>
             % endif
           </h1>
-          <form action="${affiliate.slug}/add_member" method="POST" id="add_member_form">
-            <input type="text" name="member_identifier" placeholder="Staff email" required />
-            <select name="role">
+          <div id="add_member_form">
+            <input type="email" class="add-member-email" placeholder="Staff email" required />
+            <select class="add-member-role">
               % for role_choice in role_choices:
                 <option value="${role_choice[0]}">${role_choice[1]}</option>
               % endfor
             </select>
             <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
-            <input type="submit" value="Add" id="add_member_submit" />
-          </form>
+            <button id="add_member_submit" class="btn add-member-btn">Add</button>
+            <p class="error hidden"></p>
+          </div>
 
 
           <h2>Affiliate Users</h2>
@@ -441,6 +442,53 @@
         success: function(data) {
           $('button.toggle-affiliate-status.activate').toggleClass('hidden', data.active);
           $('button.toggle-affiliate-status.deactivate').toggleClass('hidden', !data.active);
+        }
+      });
+    });
+
+    $('.add-member-btn').click(function() {
+      var $emailField = $('.add-member-email'),
+          email = $emailField.val(),
+          role = $('select.add-member-role option:selected').val(),
+          roleName = $('select.add-member-role option:selected').text();
+          $errorField = $('#add_member_form p.error');
+
+      $errorField.addClass('hidden');
+      if (!email) {
+        $errorField.text('Email field cannot be empty!')
+                   .removeClass('hidden');
+      }
+
+      $.ajax({
+        url: '/api/affiliates/' + AFFILIATE_SLUG + '/membership',
+        method: 'POST',
+        data: {
+          email: email,
+          role: role
+        },
+        success: function(data) {
+          $emailField.val('');
+
+          if (data.membership) {
+            var ms = data.membership;
+            $('#affiliate_membership_table tbody').append(
+              '<tr><td>' + ms.member.username + '</td><td>' + email + '</td><td>' + roleName + '</td><td>' +
+              '<a class="remove-member" data-membership-id="' + ms.id + '">' +
+              '<i class="fa fa-times"></i> Remove' +
+              '</a></td></tr>'
+            )
+          } else if (data.invite) {
+            var inv = data.invite;
+            $('#affiliate_invites_table tbody').append(
+              '<tr><td>' + inv.email + '</td><td>' + roleName + '</td><td>' + inv.invited_at + '</td><td>' +
+              '<a class="remove-invite" data-membership-id="' + inv.id + '">' +
+              '<i class="fa fa-times"></i> Remove' +
+              '</a></td></tr>'
+            )
+          }
+        },
+        error: function(data) {
+          $errorField.text(data.responseJSON.error).removeClass('hidden');
         }
       });
     });
