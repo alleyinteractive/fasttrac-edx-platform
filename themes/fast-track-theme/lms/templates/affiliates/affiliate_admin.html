@@ -74,7 +74,7 @@
               <td>
                   % if (membership.role == 'staff' and user.is_staff) or membership.role != 'staff':
                     <!-- only global staff can add/remove program directors -->
-                    <a href="${affiliate.slug}/remove_member/${membership.member.id}?role=${membership.role}">
+                    <a class="remove-member" data-membership-id="${membership.id}">
                       <i class="fa fa-times"></i>
                       Remove
                     </a>
@@ -100,7 +100,7 @@
               <td>
                 % if (invite.role == 'staff' and user.is_staff) or invite.role != 'staff':
                 <!-- only global staff can add/remove program directors -->
-                <a href="${affiliate.slug}/remove_invite/${invite.id}">
+                <a class="remove-invite" data-membership-id="${invite.id}">
                   <i class="fa fa-times"></i>
                   Remove Invite
                 </a>
@@ -489,6 +489,22 @@
         },
         error: function(data) {
           $errorField.text(data.responseJSON.error).removeClass('hidden');
+        }
+      });
+    });
+
+    $('a.remove-member').click(function() {
+      var $tableRow = $(this).closest('tr'),
+          membershipId = $(this).data('membership-id');
+
+      $.ajax({
+        url: '/api/affiliates/' + AFFILIATE_SLUG + '/membership/' + membershipId,
+        method: 'DELETE',
+        success: function(data) {
+          $tableRow.remove();
+        },
+        error: function(data) {
+          console.log("Error: ", data);
         }
       });
     });

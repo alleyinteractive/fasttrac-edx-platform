@@ -155,7 +155,7 @@ class AffiliateEntityDetailsViewSet(AffiliateViewMixin, APIView):
         return Response(status=204)
 
 
-class AffiliateEntityMembershipViewSet(APIView):
+class AffiliateMembershipViewSet(APIView):
     """Views for creating and removing affiliate memberships."""
     permission_classes = (IsStaffOrProgramDirector,)
 
@@ -242,6 +242,14 @@ class AffiliateEntityMembershipViewSet(APIView):
 
         membership.delete()
         return self.success_response('', status=204)
+
+
+class AffiliateMembershipDetailsViewSet(APIView):
+    permission_classes = (IsStaffOrProgramDirector,)
+
+    def delete(self, request, affiliate_slug, membership_id):
+        AffiliateMembership.objects.get(id=membership_id).delete()
+        return Response(status=204)
 
 
 class DataExportView(APIView):

@@ -50,6 +50,13 @@
       }
     }
 
+    a.remove-member {
+      &:hover {
+        text-decoration: none;
+        cursor: pointer;
+      }
+    }
+
     h1.explore-header {
       cursor: unset;
     }
