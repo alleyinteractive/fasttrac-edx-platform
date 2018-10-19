@@ -228,7 +228,7 @@ def create(request):
         member = get_student_from_identifier(program_director_identifier)
         AffiliateMembership.objects.create(affiliate=affiliate, member=member, role='staff')
 
-    return redirect('affiliates:show', slug=affiliate.slug)
+    return redirect('affiliates:affiliate-admin', affiliate_slug=affiliate.slug)
 
 
 @only_staff
@@ -272,7 +272,7 @@ def edit(request, slug):
 
         affiliate.save()
 
-        return redirect('affiliates:show', slug=affiliate.slug)
+        return redirect('affiliates:affiliate-admin', affiliate_slug=affiliate.slug)
 
     role_choices = AffiliateMembership.role_choices
 
