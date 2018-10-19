@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from affiliates.models import AffiliateEntity, AffiliateMembership
+from affiliates.models import AffiliateEntity, AffiliateMembership, AffiliateInvite
 
 
 class AffiliateEntitySerializer(serializers.ModelSerializer):
@@ -24,3 +24,13 @@ class AffiliateMembershipSerializer(serializers.ModelSerializer):
             'username': obj.member.username,
             'email': obj.member.email,
         }
+
+
+class AffiliateInviteSerializer(serializers.ModelSerializer):
+    readable_invited_at = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AffiliateInvite
+
+    def get_readable_invited_at(self, obj):
+        return obj.invited_at.strftime('%B %d, %Y')

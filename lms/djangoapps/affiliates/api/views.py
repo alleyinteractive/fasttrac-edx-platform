@@ -3,6 +3,7 @@ import logging
 from django.conf import settings
 from django.contrib.auth import login, load_backend
 from django.contrib.auth.models import User
+from django.db.utils import IntegrityError
 from rest_framework.permissions import BasePermission, IsAdminUser
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -11,7 +12,11 @@ from instructor_task.models import ReportStore
 
 from affiliates.api.mixins import AffiliateViewMixin
 from affiliates.models import AffiliateEntity, AffiliateMembership, AffiliateInvite
-from affiliates.api.serializers import AffiliateEntitySerializer, AffiliateMembershipSerializer
+from affiliates.api.serializers import (
+    AffiliateEntitySerializer,
+    AffiliateMembershipSerializer,
+    AffiliateInviteSerializer
+)
 from affiliates.tasks import (
     export_csv_user_report,
     export_csv_affiliate_course_report,
@@ -140,8 +145,7 @@ class AffiliateEntityDetailsViewSet(AffiliateViewMixin, APIView):
 
     def patch(self, request, affiliate_slug):
         """Updates the affiliate."""
-        affiliate = AffiliateEntity.objects.get(slug=affiliate_slug)
-        affiliate = self.create_or_update_affiliate(affiliate, request)
+        affiliate = self.update_affiliate(affiliate_slug, request)
         response_data = AffiliateEntitySerializer(affiliate).data
         return Response(data=response_data, status=200)
 
@@ -151,7 +155,7 @@ class AffiliateEntityDetailsViewSet(AffiliateViewMixin, APIView):
         return Response(status=204)
 
 
-class AffiliateEntityMembershipViewSet(APIView):
+class AffiliateMembershipViewSet(APIView):
     """Views for creating and removing affiliate memberships."""
     permission_classes = (IsStaffOrProgramDirector,)
 
@@ -159,9 +163,15 @@ class AffiliateEntityMembershipViewSet(APIView):
         """Returns a rejection response with the passed in text and status code."""
         return Response(data={'error': '{}'.format(text)}, status=status, content_type='application/json')
 
-    def success_response(self, text, status=201):
-        """Returns a success response with the passed in text and status code."""
-        return Response(data={'result': '{}'.format(text)}, status=status, content_type='application/json')
+    def success_response(self, status=201, invite_object=None, membership_object=None):
+        """Returns a success response with serialized object and status code."""
+        response = {}
+        if invite_object:
+            response['invite'] = AffiliateInviteSerializer(invite_object).data
+        if membership_object:
+            response['membership'] = AffiliateMembershipSerializer(membership_object).data
+
+        return Response(data=response, status=status, content_type='application/json')
 
     def get(self, request, affiliate_slug):
         role = request.GET.get('role')
@@ -179,8 +189,11 @@ class AffiliateEntityMembershipViewSet(APIView):
         Creates a new affiliate membership.
         If the invited user is not yet registered on the platform it creates a new invite for tha user.
         """
-        user_id = request.POST.get('member_identifier')
+        email = request.POST.get('email')
         role = request.POST.get('role')
+
+        if not email:
+            return self.rejection_response('Email is empty.')
 
         if role not in AffiliateMembership.ROLES:
             return self.rejection_response('Role invalid.')
@@ -190,22 +203,25 @@ class AffiliateEntityMembershipViewSet(APIView):
         affiliate = AffiliateEntity.objects.get(slug=affiliate_slug)
 
         try:
-            user = User.objects.get(email=user_id)
+            user = User.objects.get(email=email)
         except User.DoesNotExist:
-            AffiliateInvite.objects.create(
+            invite = AffiliateInvite.objects.create(
                 affiliate=affiliate,
-                email=user_id,
+                email=email,
                 role=role,
                 invited_by=request.user
             )
-            return self.success_response('user_invited')
+            return self.success_response(invite_object=invite)
 
-        AffiliateMembership.objects.create(
-            affiliate=affiliate,
-            member=user,
-            role=role
-        )
-        return self.success_response('user_added')
+        try:
+            membership = AffiliateMembership.objects.create(
+                affiliate=affiliate,
+                member=user,
+                role=role
+            )
+        except IntegrityError:
+            return self.rejection_response('An error happened.')
+        return self.success_response(membership_object=membership)
 
     def delete(self, request, affiliate_slug):
         """Removes an existing affiliate membership."""
@@ -225,7 +241,23 @@ class AffiliateEntityMembershipViewSet(APIView):
             return self.rejection_response('Membership not found.', status=404)
 
         membership.delete()
-        return self.success_response('', status=204)
+        return self.success_response(status=204)
+
+
+class AffiliateMembershipDetailsViewSet(APIView):
+    permission_classes = (IsStaffOrProgramDirector,)
+
+    def delete(self, request, affiliate_slug, membership_id):
+        AffiliateMembership.objects.get(id=membership_id).delete()
+        return Response(status=204)
+
+
+class AffiliateInviteDetailsViewSet(APIView):
+    permission_classes = (IsStaffOrProgramDirector,)
+
+    def delete(self, request, affiliate_slug, invite_id):
+        AffiliateInvite.objects.get(id=invite_id).delete()
+        return Response(status=204)
 
 
 class DataExportView(APIView):
