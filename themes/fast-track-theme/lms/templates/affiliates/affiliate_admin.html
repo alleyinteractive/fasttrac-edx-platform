@@ -92,6 +92,7 @@
               <th>Invited At</th>
               <th></th>
             </thead>
+            <tbody>
             % for invite in affiliate.active_invites:
             <tr>
               <td>${invite.email}</td>
@@ -100,7 +101,7 @@
               <td>
                 % if (invite.role == 'staff' and user.is_staff) or invite.role != 'staff':
                 <!-- only global staff can add/remove program directors -->
-                <a class="remove-invite" data-membership-id="${invite.id}">
+                <a class="remove-invite" data-invite-id="${invite.id}">
                   <i class="fa fa-times"></i>
                   Remove Invite
                 </a>
@@ -108,6 +109,7 @@
               </td>
             </tr>
             % endfor
+            </tbody>
           </table>
         </div>
       % endif
@@ -480,9 +482,9 @@
           } else if (data.invite) {
             var inv = data.invite;
             $('#affiliate_invites_table tbody').append(
-              '<tr><td>' + inv.email + '</td><td>' + roleName + '</td><td>' + inv.invited_at + '</td><td>' +
-              '<a class="remove-invite" data-membership-id="' + inv.id + '">' +
-              '<i class="fa fa-times"></i> Remove' +
+              '<tr><td>' + inv.email + '</td><td>' + roleName + '</td><td>' + inv.readable_invited_at + '</td><td>' +
+              '<a class="remove-invite" data-invite-id="' + inv.id + '">' +
+              '<i class="fa fa-times"></i> Remove Invite' +
               '</a></td></tr>'
             )
           }
@@ -499,6 +501,22 @@
 
       $.ajax({
         url: '/api/affiliates/' + AFFILIATE_SLUG + '/membership/' + membershipId,
+        method: 'DELETE',
+        success: function(data) {
+          $tableRow.remove();
+        },
+        error: function(data) {
+          console.log("Error: ", data);
+        }
+      });
+    });
+
+    $('a.remove-invite').click(function() {
+      var $tableRow = $(this).closest('tr'),
+          inviteId = $(this).data('invite-id');
+
+      $.ajax({
+        url: '/api/affiliates/' + AFFILIATE_SLUG + '/membership/invite/' + inviteId,
         method: 'DELETE',
         success: function(data) {
           $tableRow.remove();

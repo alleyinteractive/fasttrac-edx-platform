@@ -241,7 +241,7 @@ class AffiliateMembershipViewSet(APIView):
             return self.rejection_response('Membership not found.', status=404)
 
         membership.delete()
-        return self.success_response('', status=204)
+        return self.success_response(status=204)
 
 
 class AffiliateMembershipDetailsViewSet(APIView):
@@ -249,6 +249,14 @@ class AffiliateMembershipDetailsViewSet(APIView):
 
     def delete(self, request, affiliate_slug, membership_id):
         AffiliateMembership.objects.get(id=membership_id).delete()
+        return Response(status=204)
+
+
+class AffiliateInviteDetailsViewSet(APIView):
+    permission_classes = (IsStaffOrProgramDirector,)
+
+    def delete(self, request, affiliate_slug, invite_id):
+        AffiliateInvite.objects.get(id=invite_id).delete()
         return Response(status=204)
 
 

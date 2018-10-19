@@ -27,5 +27,10 @@ class AffiliateMembershipSerializer(serializers.ModelSerializer):
 
 
 class AffiliateInviteSerializer(serializers.ModelSerializer):
+    readable_invited_at = serializers.SerializerMethodField()
+
     class Meta:
         model = AffiliateInvite
+
+    def get_readable_invited_at(self, obj):
+        return obj.invited_at.strftime('%B %d, %Y')

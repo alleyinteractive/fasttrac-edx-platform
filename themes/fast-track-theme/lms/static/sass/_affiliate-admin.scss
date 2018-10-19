@@ -50,7 +50,8 @@
       }
     }
 
-    a.remove-member {
+    a.remove-member,
+    a.remove-invite {
       &:hover {
         text-decoration: none;
         cursor: pointer;
