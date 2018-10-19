@@ -495,7 +495,7 @@
       });
     });
 
-    $('a.remove-member').click(function() {
+    $(document).on('click', 'a.remove-member', function() {
       var $tableRow = $(this).closest('tr'),
           membershipId = $(this).data('membership-id');
 
@@ -511,7 +511,7 @@
       });
     });
 
-    $('a.remove-invite').click(function() {
+    $(document).on('click', 'a.remove-invite', function() {
       var $tableRow = $(this).closest('tr'),
           inviteId = $(this).data('invite-id');
 
