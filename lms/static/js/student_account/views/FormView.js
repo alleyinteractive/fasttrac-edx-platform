@@ -175,6 +175,17 @@
                             $el.addClass('error');
                             $label.addClass('error');
                         }
+
+                        if (key === 'confirm_email') {
+                            if (!this.validateConfirmEmail()) {
+                                errors.push('<li>The email fields to not match.</li>');
+                                $el.addClass('error');
+                                $label.addClass('error');
+                            } else {
+                                $el.removeClass('error');
+                                $label.removeClass('error');
+                            }
+                        }
                     }
                 }
 
@@ -214,7 +225,7 @@
             },
 
             /* Allows extended views to add non-form attributes
-             * to the data before saving it to model 
+             * to the data before saving it to model
              */
             setExtraData: function( data ) {
                 return data;
@@ -269,6 +280,24 @@
                 if (this.$submitButton) {
                     this.$submitButton.attr('disabled', disabled);
                 }
+            },
+
+            /**
+             * Check if the confirm email field value matches the email field value.
+             */
+            validateConfirmEmail: function () {
+                var elements = this.$form[0].elements;
+                var email, confirmEmail;
+
+                for(var i=0; i<elements.length; i++) {
+                    if (elements[i].name === 'email') {
+                        email = elements[i].value;
+                    } else if (elements[i].name === 'confirm_email') {
+                        confirmEmail = elements[i].value;
+                    }
+                }
+
+                return email === confirmEmail;
             },
 
             validate: function( $el ) {
