@@ -77,7 +77,9 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
       course_target = reverse('info', args=[unicode(course_overview.id)])
       course = courses.get_course_by_id(enrollment.course_id)
       create_ccx_class = ''
-      affiliate_slug = user.profile.affiliate.slug
+      affiliate_slug = ''
+      if user.profile.affiliate:
+        affiliate_slug = user.profile.affiliate.slug
 
       if not is_ccx and enrollment.coach_on_master_course and user.profile.affiliate and course.enable_ccx:
         button_target = '#affiliate-select-modal'

@@ -29,6 +29,38 @@ def user_directory_path(instance, filename):
     return 'user_{0}/{1}'.format(instance.id, filename)
 
 
+def update_mailchimp_interest(affiliate_membership, value):
+    mailchimp_api_key = settings.MAILCHIMP_API_KEY
+    mailing_list_id = settings.MAILCHIMP_LIST_ID
+
+    # skip if mailchimp not configured
+    if mailchimp_api_key and mailing_list_id:
+        email_hash = hashlib.md5(affiliate_membership.member.email.lower()).hexdigest()
+        mailchimp_url = 'https://us15.api.mailchimp.com/3.0/lists/{}/members/{}'.format(mailing_list_id, email_hash)
+
+        interest_id = affiliate_membership.mailchimp_interests[affiliate_membership.role]
+        affiliate = affiliate_membership.member.profile.affiliate
+        is_affiliate_user = affiliate_membership.member.profile.is_affiliate_user
+
+        data = {
+            'email_address': affiliate_membership.member.email,
+            'status': 'subscribed',
+            'merge_fields': {
+                'AFFILIATE': (affiliate and affiliate.name) or '',
+            },
+            'interests': {
+                interest_id: value,
+                settings.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not is_affiliate_user,  # Entrepreneur User
+                settings.AFFILIATE_MAILCHIMP_INTEREST_ID: is_affiliate_user  # Affiliate User
+            }
+        }
+
+        # TODO: notify admin if this fails (send email)
+        r = requests.put(mailchimp_url, auth=('fasttrac', mailchimp_api_key), json=data)
+        if not r.status_code == 200:
+            LOG.error('Affiliate membership update error: %s', r.content)
+
+
 class AffiliateEntity(models.Model):
     slug = models.SlugField(max_length=255, unique=True, default='')
     parent = models.ForeignKey('self', related_name='children', blank=True, null=True, on_delete=models.SET_NULL)
@@ -221,68 +253,6 @@ class AffiliateMembership(models.Model):
     role = models.CharField(choices=role_choices, max_length=255)
 
 
-class AffiliateInvite(models.Model):
-    email = models.CharField(max_length=255)
-    role = models.CharField(choices=AffiliateMembership.role_choices, max_length=255)
-    affiliate = models.ForeignKey(AffiliateEntity, on_delete=models.CASCADE)
-
-    invited_by = models.ForeignKey(User)
-    invited_at = models.DateTimeField(auto_now=True)
-
-    active = models.BooleanField(default=True)
-
-
-def update_mailchimp_interest(affiliate_membership, value):
-    mailchimp_api_key = settings.MAILCHIMP_API_KEY
-    mailing_list_id = settings.MAILCHIMP_LIST_ID
-
-    # skip if mailchimp not configured
-    if mailchimp_api_key and mailing_list_id:
-        email_hash = hashlib.md5(affiliate_membership.member.email.lower()).hexdigest()
-        mailchimp_url = 'https://us15.api.mailchimp.com/3.0/lists/{}/members/{}'.format(mailing_list_id, email_hash)
-
-        interest_id = affiliate_membership.mailchimp_interests[affiliate_membership.role]
-        affiliate = affiliate_membership.member.profile.affiliate
-        is_affiliate_user = affiliate_membership.member.profile.is_affiliate_user
-
-        data = {
-            'email_address': affiliate_membership.member.email,
-            'status': 'subscribed',
-            'merge_fields': {
-                'AFFILIATE': (affiliate and affiliate.name) or '',
-            },
-            'interests': {
-                interest_id: value,
-                settings.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not is_affiliate_user,  # Entrepreneur User
-                settings.AFFILIATE_MAILCHIMP_INTEREST_ID: is_affiliate_user  # Affiliate User
-            }
-        }
-
-        # TODO: notify admin if this fails (send email)
-        r = requests.put(mailchimp_url, auth=('fasttrac', mailchimp_api_key), json=data)
-        if not r.status_code == 200:
-            LOG.error('Affiliate membership update error: %s', r.content)
-
-
-@receiver(post_save, sender=AffiliateInvite, dispatch_uid="send_invite_email")
-def send_invite_email(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
-    if created:
-        from django.core.mail import send_mail
-        from django.template import loader
-
-        context = {
-            'site_name': settings.SITE_NAME,
-            'role': instance.get_role_display(),
-            'affiliate_name': instance.affiliate.name
-        }
-
-        from_address = settings.DEFAULT_FROM_EMAIL
-        subject = 'FastTrac Affiliate Invite'
-        message = loader.render_to_string('emails/affiliate_invitation.txt', context)
-
-        send_mail(subject, message, from_address, [instance.email], fail_silently=False)
-
-
 @receiver(post_save, sender=AffiliateMembership, dispatch_uid="add_mailchimp_interests")
 def add_mailchimp_interests(sender, instance, **kwargs):  # pylint: disable=unused-argument
     update_mailchimp_interest(instance, True)
@@ -357,7 +327,10 @@ def remove_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: 
         revoke_access(course, instance.member, instance.role, False)
 
     # Remove CCX coach on FastTrac course
-    if instance.role in AffiliateMembership.STAFF_ROLES:
+    is_staff_in_other_affiliate = AffiliateMembership.objects.filter(
+        member=instance.member, role__in=AffiliateMembership.STAFF_ROLES
+    ).exists()
+    if instance.role in AffiliateMembership.STAFF_ROLES and not is_staff_in_other_affiliate:
         course_overviews = CourseOverview.objects.exclude(id__startswith='ccx-')
         for course_overview in course_overviews:
             course_id = course_overview.id
@@ -384,3 +357,33 @@ def validate_course_dependency(sender, instance, **kwargs):  # pylint: disable=u
     for ccx in ccxs:
         ccx.coach = other_pd_membership.member
         ccx.save()
+
+
+class AffiliateInvite(models.Model):
+    email = models.CharField(max_length=255)
+    role = models.CharField(choices=AffiliateMembership.role_choices, max_length=255)
+    affiliate = models.ForeignKey(AffiliateEntity, on_delete=models.CASCADE)
+
+    invited_by = models.ForeignKey(User)
+    invited_at = models.DateTimeField(auto_now=True)
+
+    active = models.BooleanField(default=True)
+
+
+@receiver(post_save, sender=AffiliateInvite, dispatch_uid="send_invite_email")
+def send_invite_email(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
+    if created:
+        from django.core.mail import send_mail
+        from django.template import loader
+
+        context = {
+            'site_name': settings.SITE_NAME,
+            'role': instance.get_role_display(),
+            'affiliate_name': instance.affiliate.name
+        }
+
+        from_address = settings.DEFAULT_FROM_EMAIL
+        subject = 'FastTrac Affiliate Invite'
+        message = loader.render_to_string('emails/affiliate_invitation.txt', context)
+
+        send_mail(subject, message, from_address, [instance.email], fail_silently=False)
