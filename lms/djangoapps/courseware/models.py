@@ -376,7 +376,14 @@ class StudentTimeTracker(TimeStampedModel):
 
     @classmethod
     def update_time(cls, course_id, unit_location, student, time_duration):
-        student_time_tracker, _ = cls.objects.get_or_create(course_id=course_id, unit_location=unit_location, student=student)
+        # Used to be a get_or_create() here, but Django's get_or_create()
+        # has pecularities when unique_together is introduced so it is
+        # broken down into a try-except block to omit those issues.
+        try:
+            student_time_tracker = cls.objects.get(course_id=course_id, unit_location=unit_location, student=student)
+        except cls.DoesNotExist:
+            student_time_tracker = cls.objects.create(course_id=course_id, unit_location=unit_location, student=student)
+
         if student_time_tracker.time_duration:
             student_time_tracker.time_duration = student_time_tracker.time_duration + long(time_duration)
         else:
