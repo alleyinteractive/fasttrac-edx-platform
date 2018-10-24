@@ -178,7 +178,7 @@
 
                         if (key === 'confirm_email') {
                             if (!this.validateConfirmEmail()) {
-                                errors.push('<li>The email fields to not match.</li>');
+                                errors.push('<li>The email fields do not match.</li>');
                                 $el.addClass('error');
                                 $label.addClass('error');
                             } else {
