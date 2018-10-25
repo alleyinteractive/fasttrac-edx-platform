@@ -48,7 +48,6 @@
 
         <label for="unique_student_identifier">Add Facilitator</label>
         <select name="unique_student_identifier" autocomplete="off">
-            <option selected disabled> Select affiliate user </option>
             % for member in facilitator_dropdown_choices:
                 <option value="${member.username}">
                     ${member.profile.name}
@@ -59,15 +58,27 @@
 
         <input type="hidden" name="action" value="allow" />
         <input type="hidden" name="rolename" value="ccx_coach" />
-        <button class="add-button" value="submit">Add Facilitator</button>
+        <button class="add-button" value="submit" ${'disabled' if not facilitator_dropdown_choices else ''}>Add Facilitator</button>
     </form>
     <%include file="/modal/error_modal.html" />
 </div>
 
 <script>
     $(document).ready(function() {
+        var $addFacilitatorBtn = $('#add-coach-form .add-button');
         $('#add-coach-form').on('submit', addCoachEventHandler);
         $('.team-mgmt-table').on('click', '.remove-coach-button', removeCoachEventHandler);
+
+        $('#add-coach-form select').change(function() {
+            var $selectedOption = $(this).find('option:selected');
+            if (!$selectedOption.val()) {
+                $addFacilitatorBtn.attr('disabled', true);
+            }
+        });
+
+        function getFacilitatorOptionsNumber() {
+            return $('select[name=unique_student_identifier] option').length;
+        }
 
         function addCoachEventHandler(event) {
             event.preventDefault();
@@ -91,7 +102,11 @@
                     }
                     else {
                         addCoachRow(responseData, url, $selectedOption.text());
-                        $selectedOption.remove()
+                        $selectedOption.remove();
+                        var numOfOptions = $('select[name=unique_student_identifier] option').length;
+                        if (!(numOfOptions)) {
+                            $addFacilitatorBtn.attr('disabled', true);
+                        }
                     }
                 }
             });
@@ -115,7 +130,8 @@
                 },
                 success: function() {
                     $button.parent().parent().remove();
-                    $('#add-coach-form select').append('<option value="'+ uniqueStudentIdentifier +'">'+ coachName +'</option>')
+                    $('#add-coach-form select').append('<option value="'+ uniqueStudentIdentifier +'">'+ coachName +'</option>');
+                    $addFacilitatorBtn.attr('disabled', false);
                 }
             });
         }
