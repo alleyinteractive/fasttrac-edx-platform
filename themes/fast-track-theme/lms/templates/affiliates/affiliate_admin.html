@@ -245,7 +245,7 @@
 
           <div class="form-control">
             <label for="">Zip Code</label>
-            <input type="text" value="${affiliate.zipcode}" name="zipcode">
+            <input type="number" value="${affiliate.zipcode}" name="zipcode">
           </div>
 
           <div class="form-control">
@@ -274,7 +274,7 @@
 
           <div class="form-control">
             <label for="">Affiliate Website URL</label>
-            <input type="text" value="${affiliate.website}" name="website">
+            <input type="url" value="${affiliate.website}" name="website">
           </div>
 
           <div class="form-control">
@@ -284,17 +284,17 @@
 
           <div class="form-control">
             <label for="">Facebook URL</label>
-            <input type="text" value="${affiliate.facebook}" name="facebook">
+            <input type="url" value="${affiliate.facebook}" name="facebook">
           </div>
 
           <div class="form-control">
             <label for="">Twitter URL</label>
-            <input type="text" value="${affiliate.twitter}" name="twitter">
+            <input type="url" value="${affiliate.twitter}" name="twitter">
           </div>
 
           <div class="form-control">
             <label for="">LinkedIn URL</label>
-            <input type="text" value="${affiliate.linkedin}" name="linkedin">
+            <input type="url" value="${affiliate.linkedin}" name="linkedin">
           </div>
 
           <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
@@ -459,6 +459,11 @@
       if (!email) {
         $errorField.text('Email field cannot be empty!')
                    .removeClass('hidden');
+        return;
+      } else if (!$emailField[0].checkValidity()) {
+        $errorField.text('Invalid email!')
+                   .removeClass('hidden');
+        return;
       }
 
       $.ajax({

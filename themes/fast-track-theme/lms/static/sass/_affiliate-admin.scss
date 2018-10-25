@@ -48,6 +48,12 @@
         @include ft-button;
         text-align: center;
       }
+
+      p.error {
+        padding: 10px 0;
+        color: red;
+        font-style: italic;
+      }
     }
 
     a.remove-member,
@@ -65,6 +71,16 @@
     .toggle-affiliate-status {
       @include ft-button;
       float: right;
+    }
+
+    input[type=number] {
+      width: calc(100% - 357px);
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
   }
 

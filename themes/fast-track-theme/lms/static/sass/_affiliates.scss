@@ -243,6 +243,16 @@ h1.explore-header {
   width: 60%;
   margin: auto;
 
+  input[type=number] {
+    width: calc(100% - 357px);
+  }
+
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
   * {
     text-align: left;
   }

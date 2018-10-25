@@ -201,24 +201,30 @@ class AffiliateMembershipViewSet(APIView):
             return self.rejection_response('You are not allowed to do that.')
 
         affiliate = AffiliateEntity.objects.get(slug=affiliate_slug)
+        params = {
+            'affiliate': affiliate,
+            'role': role
+        }
 
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            invite = AffiliateInvite.objects.create(
-                affiliate=affiliate,
-                email=email,
-                role=role,
-                invited_by=request.user
-            )
+            params['email'] = email
+            params['invited_by'] = request.user
+            params['active'] = True
+
+            if AffiliateInvite.objects.filter(**params).exists():
+                return self.rejection_response('Invite already exists.')
+
+            invite = AffiliateInvite.objects.create(**params)
             return self.success_response(invite_object=invite)
 
+        params['member'] = user
+        if AffiliateMembership.objects.filter(**params).exists():
+            return self.rejection_response('Membership already exists.')
+
         try:
-            membership = AffiliateMembership.objects.create(
-                affiliate=affiliate,
-                member=user,
-                role=role
-            )
+            membership = AffiliateMembership.objects.create(**params)
         except IntegrityError:
             return self.rejection_response('An error happened.')
         return self.success_response(membership_object=membership)
