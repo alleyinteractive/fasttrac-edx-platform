@@ -42,6 +42,7 @@
             </tr>
         %endfor
     </table>
+    <p class="error hidden"></p>
     <br>
     <form id="add-coach-form" action="${modify_access_url}" method="POST">
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
@@ -65,11 +66,15 @@
 
 <script>
     $(document).ready(function() {
-        var $addFacilitatorBtn = $('#add-coach-form .add-button');
-        $('#add-coach-form').on('submit', addCoachEventHandler);
-        $('.team-mgmt-table').on('click', '.remove-coach-button', removeCoachEventHandler);
+        var $addFacilitatorBtn = $('#add-coach-form .add-button'),
+            $facilitatorSelectElement = $('#add-coach-form select'),
+            $teamManagementTable = $('.team-mgmt-table'),
+            $tableErrorField = $('.error');
 
-        $('#add-coach-form select').change(function() {
+        $('#add-coach-form').on('submit', addCoachEventHandler);
+        $teamManagementTable.on('click', '.remove-coach-button', removeCoachEventHandler);
+
+        $facilitatorSelectElement.change(function() {
             var $selectedOption = $(this).find('option:selected');
             if (!$selectedOption.val()) {
                 $addFacilitatorBtn.attr('disabled', true);
@@ -82,6 +87,7 @@
 
         function addCoachEventHandler(event) {
             event.preventDefault();
+            $tableErrorField.addClass('hidden');
 
             var $form = $(event.target);
             var url = $form.attr('action');
@@ -120,6 +126,16 @@
             var rolename = $button.data('rolename');
             var coachName = $button.data('name');
 
+            $tableErrorField.addClass('hidden');
+
+            // If there is only one facilitator in the table.
+            // (1 tr is the header, 1 is the single facilitator)
+            if ($teamManagementTable.find('tr').length === 2) {
+                $tableErrorField.text('Need to have at least one facilitator.')
+                                .removeClass('hidden');
+                return;
+            }
+
             $.ajax({
                 type: 'POST',
                 url: url,
@@ -130,7 +146,7 @@
                 },
                 success: function() {
                     $button.parent().parent().remove();
-                    $('#add-coach-form select').append('<option value="'+ uniqueStudentIdentifier +'">'+ coachName +'</option>');
+                    $facilitatorSelectElement.append('<option value="'+ uniqueStudentIdentifier +'">'+ coachName +'</option>');
                     $addFacilitatorBtn.attr('disabled', false);
                 }
             });
