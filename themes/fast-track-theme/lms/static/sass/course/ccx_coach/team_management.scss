@@ -53,10 +53,13 @@
   }
 
   #add-coach-form {
+    select {
+      min-width: 150px;
+      height: 28px;
+    }
 
     .add-button {
       position: relative;
-      top: 2px;
     }
   }
 

@@ -246,7 +246,12 @@ def dashboard(request, course, ccx=None, **kwargs):
 
         # facilitator dropdown choices
         facilitator_ids = [ccx_coach_permissions.user.id for ccx_coach_permissions in context['ccx_coach_permissions']]
-        context['facilitator_dropdown_choices'] = ccx.affiliate.members.exclude(id__in=facilitator_ids)
+        facilitator_choices_ids = AffiliateMembership.objects.filter(
+            affiliate=ccx.affiliate, role=AffiliateMembership.CCX_COACH
+        ).exclude(
+            member_id__in=facilitator_ids
+        ).values_list('member_id', flat=True)
+        context['facilitator_dropdown_choices'] = User.objects.filter(id__in=facilitator_choices_ids)
     else:
         context['create_ccx_url'] = reverse(
             'create_ccx', kwargs={'course_id': course.id})
