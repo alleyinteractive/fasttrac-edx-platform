@@ -9,6 +9,8 @@ from xmodule.tabs import CourseTab
 from student.roles import CourseCcxCoachRole
 from courseware.access import has_access
 
+from affiliates.models import AffiliateMembership
+
 
 class CcxCourseTab(CourseTab):
     """
@@ -25,10 +27,10 @@ class CcxCourseTab(CourseTab):
         """
         Returns true if CCX has been enabled and the specified user is a coach
         """
-        if not settings.FEATURES.get('CUSTOM_COURSES_EDX', False) or not course.enable_ccx:
+        if not settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
             # If ccx is not enable do not show ccx coach tab.
             return False
-        if not user.profile.affiliate:
+        if not AffiliateMembership.objects.filter(member=user, role__in=AffiliateMembership.STAFF_ROLES).exists():
             return False
         if has_access(user, 'staff', course) or has_access(user, 'instructor', course):
             # if user is staff or instructor then he can always see ccx coach tab.
