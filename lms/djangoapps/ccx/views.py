@@ -105,9 +105,9 @@ def coach_dashboard(view):
 
         course = get_course_by_id(course_key, depth=None)
 
-        if not course.enable_ccx:
-            raise Http404
-        elif ccx and (is_staff or is_instructor):
+        # if not course.enable_ccx:
+        #     raise Http404
+        if ccx and (is_staff or is_instructor):
             return view(request, course, ccx, **kwargs)
         else:
             if ccx is not None:
