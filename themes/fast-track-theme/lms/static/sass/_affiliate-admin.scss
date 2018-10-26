@@ -29,6 +29,14 @@
   .edit-affiliate-container {
     width: unset;
 
+    input::placeholder {
+      opacity: 0.5;
+    }
+
+    input {
+      color: #222;
+    }
+
     #add_member_form {
       margin-bottom: 40px;
 
