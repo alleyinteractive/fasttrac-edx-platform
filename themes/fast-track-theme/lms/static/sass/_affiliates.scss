@@ -247,10 +247,6 @@ h1.explore-header {
     opacity: 0.5;
   }
 
-  input {
-    color: #222;
-  }
-
   input[type=number] {
     width: calc(100% - 357px);
   }
@@ -382,7 +378,7 @@ h1.explore-header {
     border-radius: 0;
     font-style: normal;
     background: transparent;
-    color: #555;
+    color: #222;
 
     transition-duration: .5s;
 
