@@ -264,17 +264,17 @@
 
           <div class="form-control">
             <label for="">Public Contact Phone Number</label>
-            <input type="tel" value="${affiliate.phone_number}" name="phone_number" placeholder="format: xxx-xxx-xxxx", pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+            <input type="tel" value="${affiliate.phone_number}" name="phone_number" placeholder="xxx-xxx-xxxx", pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
           </div>
 
           <div class="form-control">
             <label for="">Affiliate Phone Number</label>
-            <input type="tel" value="${affiliate.phone_number_private}" name="phone_number_private" placeholder="format: xxx-xxx-xxxx", pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+            <input type="tel" value="${affiliate.phone_number_private}" name="phone_number_private" placeholder="xxx-xxx-xxxx", pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
           </div>
 
           <div class="form-control">
             <label for="">Affiliate Website URL</label>
-            <input type="url" value="${affiliate.website}" name="website">
+            <input type="url" value="${affiliate.website}" name="website"  placeholder="https://example.com">
           </div>
 
           <div class="form-control">
@@ -284,17 +284,17 @@
 
           <div class="form-control">
             <label for="">Facebook URL</label>
-            <input type="url" value="${affiliate.facebook}" name="facebook">
+            <input type="url" value="${affiliate.facebook}" name="facebook" placeholder="https://example.com">
           </div>
 
           <div class="form-control">
             <label for="">Twitter URL</label>
-            <input type="url" value="${affiliate.twitter}" name="twitter">
+            <input type="url" value="${affiliate.twitter}" name="twitter" placeholder="https://example.com">
           </div>
 
           <div class="form-control">
             <label for="">LinkedIn URL</label>
-            <input type="url" value="${affiliate.linkedin}" name="linkedin">
+            <input type="url" value="${affiliate.linkedin}" name="linkedin" placeholder="https://example.com">
           </div>
 
           <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />

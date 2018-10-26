@@ -243,6 +243,14 @@ h1.explore-header {
   width: 60%;
   margin: auto;
 
+  input::placeholder {
+    opacity: 0.5;
+  }
+
+  input {
+    color: #222;
+  }
+
   input[type=number] {
     width: calc(100% - 357px);
   }
