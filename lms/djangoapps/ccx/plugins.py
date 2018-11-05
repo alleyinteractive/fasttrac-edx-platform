@@ -30,6 +30,9 @@ class CcxCourseTab(CourseTab):
         if not settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
             # If ccx is not enable do not show ccx coach tab.
             return False
+        if not hasattr(course.id, 'ccx'):
+            # If is main Facilitator Guide course
+            return False
         if not AffiliateMembership.objects.filter(member=user, role__in=AffiliateMembership.STAFF_ROLES).exists():
             return False
         if has_access(user, 'staff', course) or has_access(user, 'instructor', course):
