@@ -730,6 +730,10 @@ label.u-field-title {
     a {
       color: #222;
     }
+
+    .u-field-footer {
+      height: 0px;
+    }
   }
 
   &.mode-edit {
@@ -738,6 +742,28 @@ label.u-field-title {
     textarea {
       width: 350px;
     }
+  }
+
+  #u-field-message-email {
+    float: unset;
+    width: 350px;
+
+    .u-field-message-notification {
+      color: red;
+      font-style: italic;
+
+      .fa-exclamation-triangle {
+        display: none;
+      }
+
+      .fa-pencil {
+        float: right;
+        margin-top: -30px;
+        width: 25px;
+      }
+    }
+
+
   }
 }
 
