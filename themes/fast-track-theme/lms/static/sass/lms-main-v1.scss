@@ -720,6 +720,7 @@ label.u-field-title {
 
   .email-change-info {
     display: block;
+    width: 350px;
     font-style: italic;
     font-size: 10px;
     margin-bottom: 20px;
@@ -733,6 +734,10 @@ label.u-field-title {
 
   &.mode-edit {
     height: unset;
+
+    textarea {
+      width: 350px;
+    }
   }
 }
 
