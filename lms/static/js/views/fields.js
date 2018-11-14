@@ -544,6 +544,11 @@
                 } else {
                     this.adjustTextareaHeight();
                 }
+
+                if (event.keyCode === 27) {
+                    event.preventDefault();
+                    this.showDisplayMode(true);
+                }
             },
 
             adjustTextareaHeight: function() {
