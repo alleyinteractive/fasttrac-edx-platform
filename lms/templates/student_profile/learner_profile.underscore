@@ -2,6 +2,7 @@
     <div class="wrapper-profile-field-account-privacy"></div>
     <div class="wrapper-profile-sections account-settings-container">
         <div class="wrapper-profile-section-one">
+            <span class="user-profile-pending-email-change <%- pendingEmailChangeClass %>">You have an email address change pending.<br>Please check your email to confirm address change.</span>
             <div class="profile-image-field">
             </div>
             <div class="profile-section-one-fields">
