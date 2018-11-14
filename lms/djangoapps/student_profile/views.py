@@ -16,7 +16,7 @@ from openedx.core.djangoapps.user_api.errors import UserNotFound, UserNotAuthori
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from student.models import User
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from student.models import UserProfile
+from student.models import UserProfile, PendingEmailChange
 
 
 @login_required
@@ -74,6 +74,7 @@ def learner_profile_context(request, profile_username, user_is_staff):
     context = {
         'data': {
             'profile_user_id': profile_user.id,
+            'pending_email_change': PendingEmailChange.objects.filter(user=profile_user).exists(),
             'default_public_account_fields': settings.ACCOUNT_VISIBILITY_CONFIGURATION['public_fields'],
             'default_visibility': settings.ACCOUNT_VISIBILITY_CONFIGURATION['default_visibility'],
             'accounts_api_url': reverse("accounts_api", kwargs={'username': profile_username}),

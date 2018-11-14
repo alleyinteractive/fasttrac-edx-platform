@@ -172,6 +172,15 @@
         display: inline-block;
         margin-top: ($baseline*1.5);
         @include margin-left($baseline/2);
+
+        .user-profile-pending-email-change {
+            display: block;
+            margin-bottom: 20px;
+            width: 40%;
+            padding: 5px;
+            font-style: italic;
+            background: #f7f76c;
+        }
     }
 
     .profile-section-one-fields {

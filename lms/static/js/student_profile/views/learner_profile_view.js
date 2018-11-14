@@ -47,7 +47,7 @@
                 this.sectionTwoView = new SectionTwoTab({
                     viewList: this.options.sectionTwoFieldViews,
                     showFullProfile: this.showFullProfile,
-                    ownProfile: this.options.ownProfile
+                    ownProfile: this.options.ownProfile,
                 });
 
                 var tabs = [
@@ -57,6 +57,7 @@
                 HtmlUtils.setHtml(this.$el, HtmlUtils.template(learnerProfileTemplate)({
                     username: self.options.accountSettingsModel.get('username'),
                     ownProfile: self.options.ownProfile,
+                    pendingEmailChangeClass: this.options.pendingEmailChange ? '' : 'hidden',
                     showFullProfile: self.showFullProfile()
                 }));
                 this.renderFields();

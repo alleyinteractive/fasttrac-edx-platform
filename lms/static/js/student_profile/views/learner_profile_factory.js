@@ -242,6 +242,7 @@
             var learnerProfileView = new LearnerProfileView({
                 el: learnerProfileElement,
                 ownProfile: options.own_profile,
+                pendingEmailChange: options.pending_email_change,
                 has_preferences_access: options.has_preferences_access,
                 accountSettingsModel: accountSettingsModel,
                 preferencesModel: accountPreferencesModel,
