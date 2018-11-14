@@ -568,6 +568,14 @@
 
             saveValue: function () {
                 var attributes = {};
+                var emailRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+                if (
+                    this.options.valueAttribute === 'email' &&
+                    this.modelValue() != this.fieldValue() &&
+                    emailRegex.test(String(this.fieldValue()).toLocaleLowerCase())
+                ) {
+                    $('.user-profile-pending-email-change').removeClass('hidden');
+                }
                 attributes[this.options.valueAttribute] = this.fieldValue();
                 this.saveAttributes(attributes);
             },
