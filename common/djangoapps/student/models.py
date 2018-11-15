@@ -788,6 +788,7 @@ class PendingEmailChange(models.Model):
     user = models.OneToOneField(User, unique=True, db_index=True)
     new_email = models.CharField(blank=True, max_length=255, db_index=True)
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
+    notification = models.BooleanField(default=True)
 
     def request_change(self, email):
         """Request a change to a user's email.
@@ -803,6 +804,7 @@ class PendingEmailChange(models.Model):
         """
         self.new_email = email
         self.activation_key = uuid.uuid4().hex
+        self.notification = True
         self.save()
         return self.activation_key
 
