@@ -74,7 +74,7 @@ def learner_profile_context(request, profile_username, user_is_staff):
     context = {
         'data': {
             'profile_user_id': profile_user.id,
-            'pending_email_change': PendingEmailChange.objects.filter(user=profile_user).exists(),
+            'pending_email_change': PendingEmailChange.objects.filter(user=profile_user, notification=True).exists(),
             'default_public_account_fields': settings.ACCOUNT_VISIBILITY_CONFIGURATION['public_fields'],
             'default_visibility': settings.ACCOUNT_VISIBILITY_CONFIGURATION['default_visibility'],
             'accounts_api_url': reverse("accounts_api", kwargs={'username': profile_username}),

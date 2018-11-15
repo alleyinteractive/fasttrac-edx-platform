@@ -2394,6 +2394,7 @@ def do_email_change_request(user, new_email, activation_key=None):
 
     pec.new_email = new_email
     pec.activation_key = activation_key
+    pec.notification = True
     pec.save()
 
     context = {

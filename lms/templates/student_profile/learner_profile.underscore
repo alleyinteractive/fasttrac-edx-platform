@@ -2,7 +2,10 @@
     <div class="wrapper-profile-field-account-privacy"></div>
     <div class="wrapper-profile-sections account-settings-container">
         <div class="wrapper-profile-section-one">
-            <span class="user-profile-pending-email-change <%- pendingEmailChangeClass %>">You have an email address change pending.<br>Please check your email to confirm address change.</span>
+            <div class="user-profile-pending-email-change <%- pendingEmailChangeClass %>"
+                <span>You have an email address change pending.<br>Please check your email to confirm address change.</span>
+                <i class="fa fa-times" data-user="<%- username %>"></i>
+            </div>
             <div class="profile-image-field">
             </div>
             <div class="profile-section-one-fields">
@@ -14,3 +17,24 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    $(document).ready(function() {
+        $('.user-profile-pending-email-change i').click(function() {
+            var username = $(this).data('user');
+
+            $.ajax({
+                method: 'PATCH',
+                url: '/api/user/v1/accounts/' + username,
+                dataType: 'json',
+                contentType: "application/merge-patch+json",
+                data: JSON.stringify({
+                    'disable_pending_email_change_notification': true
+                })
+            });
+
+            $('.user-profile-pending-email-change').addClass('hidden');
+        });
+    });
+</script>

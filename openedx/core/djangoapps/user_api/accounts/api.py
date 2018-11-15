@@ -11,7 +11,7 @@ from django.core.validators import validate_email, validate_slug, ValidationErro
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.djangoapps.user_api.errors import PreferenceValidationError
 
-from student.models import User, UserProfile, Registration
+from student.models import User, UserProfile, Registration, PendingEmailChange
 from student import views as student_views
 from util.model_utils import emit_setting_changed_event
 
@@ -128,6 +128,9 @@ def update_account_settings(requesting_user, update, username=None):
 
     if requesting_user.username != username:
         raise UserNotAuthorized()
+
+    if 'disable_pending_email_change_notification' in update:
+        PendingEmailChange.objects.filter(user=existing_user).update(notification=False)
 
     if 'first_name' in update or 'last_name' in update:
         if 'first_name' in update:
