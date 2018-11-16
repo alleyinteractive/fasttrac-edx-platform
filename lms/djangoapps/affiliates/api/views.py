@@ -157,7 +157,7 @@ class AffiliateEntityDetailsViewSet(AffiliateViewMixin, APIView):
 
 class AffiliateMembershipViewSet(APIView):
     """Views for creating and removing affiliate memberships."""
-    permission_classes = (IsStaffOrProgramDirector,)
+    permission_classes = (IsGlobalStaffOrAffiliateStaff,)
 
     def rejection_response(self, text, status=400):
         """Returns a rejection response with the passed in text and status code."""
