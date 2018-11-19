@@ -5,6 +5,16 @@
     font-style: italic;
   }
 
+  .current-affiliate {
+    display: inline-block;
+    text-transform: uppercase;
+    margin-left: 20px;
+    line-height: 50px;
+    font-weight: 500;
+    font-size: 1.7rem;
+    color: #222;
+  }
+
   .affiliate-select-wrapper {
     margin-bottom: 40px;
     border-bottom: 1px solid $ft-gray;
