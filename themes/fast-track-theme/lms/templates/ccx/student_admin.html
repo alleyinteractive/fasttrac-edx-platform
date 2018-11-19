@@ -23,7 +23,7 @@
                             title="Student is enrolled but inactive."
                         % endif
                     >
-                        <td>${student_enrollment.user.profile.name}</td>
+                        <td>${student_enrollment.user.profile.name.encode('utf-8')}</td>
                         <td>${student_enrollment.user.username}</td>
                         <td>${student_enrollment.user.email}</td>
                         <td>${student_enrollment.created.strftime("%m/%d/%Y")}</td>
