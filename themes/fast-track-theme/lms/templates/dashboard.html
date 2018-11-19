@@ -316,7 +316,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
       data.forEach(function(it) {
         $addFacDiv.append(
-          '<p class="hidden ' + it.affiliate.slug + '">' + it.affiliate.name + ' does not have facilitators. <a href="/affiliates/edit/' + it.affiliate.slug + '">Add facilitators.</a></p>'
+          '<p class="hidden ' + it.affiliate.slug + '">' + it.affiliate.name + ' does not have facilitators. <a href="/affiliates/affiliate-admin/' + it.affiliate.slug + '">Add facilitators.</a></p>'
         );
       });
     }
@@ -352,7 +352,7 @@ from openedx.core.djangolib.markup import HTML, Text
             showSection('nofac');
             $noFacilitatorsWrapper.find('a').attr(
               'href',
-              '/affiliates/edit/' + data[0].affiliate.slug
+              '/affiliates/affiliate-admin/' + data[0].affiliate.slug
             );
           } else {
             showSection('select');

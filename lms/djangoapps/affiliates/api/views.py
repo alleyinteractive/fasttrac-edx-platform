@@ -77,6 +77,11 @@ def _get_path_of_arbitrary_backend_for_user(user):
     return None
 
 
+def rejection_response(text, status=400):
+    """Returns a rejection response with the passed in text and status code."""
+    return Response(data={'error': '{}'.format(text)}, status=status, content_type='application/json')
+
+
 class ImpersonateView(APIView):
     """
     Login as a different user.
@@ -159,10 +164,6 @@ class AffiliateMembershipViewSet(APIView):
     """Views for creating and removing affiliate memberships."""
     permission_classes = (IsGlobalStaffOrAffiliateStaff,)
 
-    def rejection_response(self, text, status=400):
-        """Returns a rejection response with the passed in text and status code."""
-        return Response(data={'error': '{}'.format(text)}, status=status, content_type='application/json')
-
     def success_response(self, status=201, invite_object=None, membership_object=None):
         """Returns a success response with serialized object and status code."""
         response = {}
@@ -193,12 +194,12 @@ class AffiliateMembershipViewSet(APIView):
         role = request.POST.get('role')
 
         if not email:
-            return self.rejection_response('Email is empty.')
+            return rejection_response('Email is empty.')
 
         if role not in AffiliateMembership.ROLES:
-            return self.rejection_response('Role invalid.')
+            return rejection_response('Role invalid.')
         if role == AffiliateMembership.STAFF and not request.user.is_staff:
-            return self.rejection_response('You are not allowed to do that.')
+            return rejection_response('You are not allowed to do that.')
 
         affiliate = AffiliateEntity.objects.get(slug=affiliate_slug)
         params = {
@@ -214,19 +215,19 @@ class AffiliateMembershipViewSet(APIView):
             params['active'] = True
 
             if AffiliateInvite.objects.filter(**params).exists():
-                return self.rejection_response('Invite already exists.')
+                return rejection_response('Invite already exists.')
 
             invite = AffiliateInvite.objects.create(**params)
             return self.success_response(invite_object=invite)
 
         params['member'] = user
         if AffiliateMembership.objects.filter(**params).exists():
-            return self.rejection_response('Membership already exists.')
+            return rejection_response('Membership already exists.')
 
         try:
             membership = AffiliateMembership.objects.create(**params)
         except IntegrityError:
-            return self.rejection_response('An error happened.')
+            return rejection_response('An error happened.')
         return self.success_response(membership_object=membership)
 
     def delete(self, request, affiliate_slug):
@@ -235,7 +236,7 @@ class AffiliateMembershipViewSet(APIView):
         role = request.POST.get('role')
 
         if role == AffiliateMembership.STAFF and not request.user.is_staff:
-            return self.rejection_response('You are not allowed to do that.')
+            return rejection_response('You are not allowed to do that.')
 
         try:
             membership = AffiliateMembership.objects.get(
@@ -244,25 +245,42 @@ class AffiliateMembershipViewSet(APIView):
                 role=role
             )
         except AffiliateMembership.DoesNotExist:
-            return self.rejection_response('Membership not found.', status=404)
+            return rejection_response('Membership not found.', status=404)
 
         membership.delete()
         return self.success_response(status=204)
 
 
 class AffiliateMembershipDetailsViewSet(APIView):
-    permission_classes = (IsStaffOrProgramDirector,)
+    permission_classes = (IsGlobalStaffOrAffiliateStaff,)
 
-    def delete(self, request, affiliate_slug, membership_id):
-        AffiliateMembership.objects.get(id=membership_id).delete()
+    def delete(self, request, affiliate_slug, membership_id):  # pylint: disable=unused-argument
+        try:
+            membership = AffiliateMembership.objects.get(id=membership_id)
+        except AffiliateMembership.DoesNotExist:
+            return rejection_response('Membership not found.', status=404)
+
+        if membership.role == AffiliateMembership.STAFF and not request.user.is_staff:
+            return rejection_response('You are not allowed to do that.')
+
+        try:
+            AffiliateMembership.objects.get(id=membership_id).delete()
+        except ValueError as err:
+            return rejection_response(err.message)
+
         return Response(status=204)
 
 
 class AffiliateInviteDetailsViewSet(APIView):
-    permission_classes = (IsStaffOrProgramDirector,)
+    permission_classes = (IsGlobalStaffOrAffiliateStaff,)
 
-    def delete(self, request, affiliate_slug, invite_id):
-        AffiliateInvite.objects.get(id=invite_id).delete()
+    def delete(self, request, affiliate_slug, invite_id):  # pylint: disable=unused-argument
+        try:
+            invite = AffiliateInvite.objects.get(id=invite_id)
+        except AffiliateInvite.DoesNotExist:
+            return rejection_response('Invite not found.', status=404)
+
+        invite.delete()
         return Response(status=204)
 
 

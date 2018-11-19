@@ -10,11 +10,18 @@
 <div id="affiliate-admin" class="container" data-affiliate-slug="${affiliate.slug}">
   <div class="affiliate-select-wrapper">
     <span>Current affiliate: </span>
+    % if (affiliate in staff_affiliates and len(staff_affiliates) == 1) or (affiliate not in staff_affiliates and len(staff_affiliates)):
+    <span class="current-affiliate">${affiliate.name}</span>
+    % else:
     <select id="affiliate-select">
-      % for aff in staff_affiliates:
-      <option value="${aff.slug}" ${'selected' if aff.slug == affiliate.slug else ''}>${aff.name}</option>
-      % endfor
+        % if affiliate not in staff_affiliates:
+        <option value="${affiliate.slug}" selected>${affiliate.name}</option>
+        % endif
+        % for aff in staff_affiliates:
+        <option value="${aff.slug}" ${'selected' if aff.slug == affiliate.slug else ''}>${aff.name}</option>
+        % endfor
     </select>
+    % endif
   </div>
 
   <nav class="top-nav">
@@ -59,6 +66,7 @@
 
 
           <h2>Affiliate Users</h2>
+          <p id="affiliate-users-error" class="error hidden"></p>
           <table id="affiliate_membership_table">
             <thead>
               <th>Name</th>
@@ -85,6 +93,7 @@
           </table>
 
           <h2>Invited Users</h2>
+          <p id="invited-users-error" class="error hidden"></p>
           <table id="affiliate_invites_table">
             <thead>
               <th>Email</th>
@@ -502,8 +511,10 @@
 
     $(document).on('click', 'a.remove-member', function() {
       var $tableRow = $(this).closest('tr'),
-          membershipId = $(this).data('membership-id');
+          membershipId = $(this).data('membership-id'),
+          $errorField = $('#affiliate-users-error');
 
+      $errorField.addClass('hidden');
       $.ajax({
         url: '/api/affiliates/' + AFFILIATE_SLUG + '/membership/' + membershipId,
         method: 'DELETE',
@@ -511,15 +522,17 @@
           $tableRow.remove();
         },
         error: function(data) {
-          console.log("Error: ", data);
+          $errorField.text(data.responseJSON.error).removeClass('hidden');
         }
       });
     });
 
     $(document).on('click', 'a.remove-invite', function() {
       var $tableRow = $(this).closest('tr'),
-          inviteId = $(this).data('invite-id');
+          inviteId = $(this).data('invite-id'),
+          $errorField = $('#invited-users-error');
 
+      $errorField.addClass('hidden');
       $.ajax({
         url: '/api/affiliates/' + AFFILIATE_SLUG + '/membership/invite/' + inviteId,
         method: 'DELETE',
@@ -527,7 +540,7 @@
           $tableRow.remove();
         },
         error: function(data) {
-          console.log("Error: ", data);
+          $errorField.text(data.responseJSON.error).removeClass('hidden');
         }
       });
     });
