@@ -61,7 +61,7 @@
         </thead>
         % for membership in affiliate.memberships.order_by('member__profile__name'):
         <tr>
-          <td>${membership.member.profile.name}</td>
+          <td>${membership.member.profile.name.encode('utf-8')}</td>
           <td>${membership.member.email}</td>
           <td>${membership.get_role_display()}</td>
           <td>

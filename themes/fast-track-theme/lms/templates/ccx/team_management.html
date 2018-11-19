@@ -26,7 +26,7 @@
         </tr>
         %for ccx_coach_permission in ccx_coach_permissions:
             <tr>
-                <td>${ccx_coach_permission.user.profile.name}</td>
+                <td>${ccx_coach_permission.user.profile.name.encode('utf-8')}</td>
                 <td>Facilitator</td>
                 <td>${ccx_coach_permission.user.email}</td>
                 <td>
@@ -34,7 +34,7 @@
                         data-remove-url="${modify_access_url}"
                         data-unique-student-identifier="${ccx_coach_permission.user.username}"
                         data-rolename="${ccx_coach_permission.role}"
-                        data-name="${ccx_coach_permission.user.profile.name}"
+                        data-name="${ccx_coach_permission.user.profile.name.encode('utf-8')}"
                         data-action="revoke">
                             <i class="fa fa-times-circle remove-icon"></i>Remove
                     </span>
@@ -51,7 +51,7 @@
         <select name="unique_student_identifier" autocomplete="off">
             % for member in facilitator_dropdown_choices:
                 <option value="${member.username}">
-                    ${member.profile.name}
+                    ${member.profile.name.encode('utf-8')}
                 </option>
             % endfor
         </select>

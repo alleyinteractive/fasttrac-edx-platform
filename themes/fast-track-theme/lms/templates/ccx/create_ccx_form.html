@@ -201,7 +201,7 @@
             % if facilitators:
             <select id="facilitators" class="ccx-select">
                 % for member in facilitators:
-                    <option value="${member.id}">${'{} ({})'.format(member.profile.name, member.email)}</option>
+                    <option value="${member.id}">${'{} ({})'.format(member.profile.name.encode('utf-8'), member.email)}</option>
                 % endfor
             </select>
             <button id="add-facilitator" class="ft-button-action" type="button">
