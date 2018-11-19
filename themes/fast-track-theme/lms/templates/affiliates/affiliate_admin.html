@@ -369,6 +369,11 @@
   </section>
 
   <section id="course-mngmt" class="hidden">
+    % if not courses:
+    <div class="no-courses-msg">
+      <p>No courses have been created for this affiliate. You can create your first course <a href="/">here.</a></p>
+    </div>
+    % else:
     <ul>
       % for course in courses:
       <li class="affiliate-course-card">
@@ -410,6 +415,7 @@
         </li>
       % endfor
     </ul>
+    % endif
   </section>
 
 </div>

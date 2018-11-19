@@ -108,6 +108,13 @@
   }
 
   #course-mngmt {
+    min-height: calc(100vh - 750px);
+
+    .no-courses-msg {
+      text-align:center;
+      font-size: 18px;
+    }
+
     li.affiliate-course-card {
       @include affiliate-course-card;
     }
