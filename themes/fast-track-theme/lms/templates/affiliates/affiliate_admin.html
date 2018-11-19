@@ -10,11 +10,18 @@
 <div id="affiliate-admin" class="container" data-affiliate-slug="${affiliate.slug}">
   <div class="affiliate-select-wrapper">
     <span>Current affiliate: </span>
+    % if (affiliate in staff_affiliates and len(staff_affiliates) == 1) or (affiliate not in staff_affiliates and len(staff_affiliates)):
+    <span class="current-affiliate">${affiliate.name}</span>
+    % else:
     <select id="affiliate-select">
-      % for aff in staff_affiliates:
-      <option value="${aff.slug}" ${'selected' if aff.slug == affiliate.slug else ''}>${aff.name}</option>
-      % endfor
+        % if affiliate not in staff_affiliates:
+        <option value="${affiliate.slug}" selected>${affiliate.name}</option>
+        % endif
+        % for aff in staff_affiliates:
+        <option value="${aff.slug}" ${'selected' if aff.slug == affiliate.slug else ''}>${aff.name}</option>
+        % endfor
     </select>
+    % endif
   </div>
 
   <nav class="top-nav">
