@@ -119,7 +119,7 @@ from affiliates.models import AffiliateMembership
           <h1>
             % if ccx:
               ${ccx.display_name}
-              <a href="/affiliates/${ccx.coach.profile.affiliate.slug}">${ccx.coach.profile.affiliate.name}</a>
+              <a href="/affiliates/${ccx.affiliate.slug}">${ccx.affiliate.name}</a>
             % else:
               ${course.display_name_with_default_escaped}
               <a href="#">${course.display_org_with_default | h}</a>
