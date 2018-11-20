@@ -147,7 +147,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
           </span>
           <span class="info-author">
             % if is_ccx:
-              ${ccx_custom_course.coach.profile.affiliate.name}
+              ${ccx_custom_course.affiliate.name}
             % else:
               ${enrollment.author}
             % endif
