@@ -9,6 +9,7 @@
   margin: 30px;
 
   .team-mgmt-table {
+    width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
     border: 1px solid #f76b1c;
@@ -21,7 +22,6 @@
     word-break: normal;
     vertical-align: top;
     text-align: left;
-    min-width: 230px;
   }
 
   .team-mgmt-table th {
@@ -31,7 +31,6 @@
     padding: 10px 5px;
     overflow: hidden;
     word-break: normal;
-    min-width: 230px;
   }
 
   .team-mgmt-table .thead {
