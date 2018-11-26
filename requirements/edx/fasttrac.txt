@@ -1,5 +1,5 @@
 # Replace default edX search with FastTrac modified version
-git+https://github.com/mbareta/edx-search@fasttrac#egg=edx-search==0.1.3
+git+https://github.com/ExtensionEngine/edx-search@fasttrac#egg=edx-search==0.1.3
 
 # Custom input problem type
 git+https://github.com/ExtensionEngine/ft-input-problem-type-xblock.git@FT-1.0#egg=ft-input-problem-type-xblock==FT-1.0
