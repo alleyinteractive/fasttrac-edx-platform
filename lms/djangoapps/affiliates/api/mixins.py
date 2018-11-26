@@ -22,21 +22,23 @@ class AffiliateViewMixin(object):
 
     def get_affiliate_attributes_data(self, request_data):
         """
-        Returns a dictionary of the updatedable attributes in the request data.
+        Returns a dictionary of the updateable attributes in the request data.
         """
         attributes = {}
 
         for attr in self.UPDATEABLE_ATTRIBUTES:
             if attr in request_data:
-                attributes = {
-                    attr: self._clean_attribute(request_data.get(attr))
-                }
+                attributes[attr] = self._clean_attribute(request_data.get(attr))
         return attributes
 
     def create_new_affiliate(self, request):
+        """
+        Creates a new AffiliateEntity instance based on data in the request.
+        """
         affiliate_request_data = self.get_affiliate_attributes_data(request.POST)
         affiliate = AffiliateEntity(**affiliate_request_data)
 
+        # Only global staff users can set parent-child relationships
         if request.user.is_staff:
             parent_id = int(request.POST.get('parent', 0))
             if parent_id:
@@ -51,7 +53,9 @@ class AffiliateViewMixin(object):
             subs = dict(request.POST)['sub-affiliates']
             AffiliateEntity.objects.filter(id__in=subs).update(parent=affiliate)
 
-        # Affiliates app sends the PD ID (email)
+        # Affiliates app sends the PD ID (email).
+        # If the attribute is sent (e.g. request comes from the affiliate app),
+        # automatically create the PD membership for the passed in user.
         program_director_id = request.POST.get('member_identifier')
         if program_director_id:
             member = get_student_from_identifier(program_director_id)
@@ -64,6 +68,9 @@ class AffiliateViewMixin(object):
         return affiliate
 
     def update_affiliate(self, affiliate_slug, request):
+        """
+        Updates an AffiliateEntity instance based on data in the request.
+        """
         affiliate_update_attributes = self.get_affiliate_attributes_data(request.data)
 
         # We are using filter here to get a QS list on which .update() can be called,

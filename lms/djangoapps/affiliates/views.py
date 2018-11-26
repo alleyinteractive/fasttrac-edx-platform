@@ -91,6 +91,7 @@ class ImpersonateView(IsStaffMixin, View):
     template_name = 'affiliates/impersonate.html'
 
     def get(self, request):
+        """Renders the impersonation middle-step where the user is logged out of the workspace app."""
         context = {
             'workspace_logout_url': '{}/users/logout?no_redirect=1'.format(settings.WORKSPACE_URL),
             'impersonated_email': request.GET.get('impersonated_email')
@@ -99,6 +100,7 @@ class ImpersonateView(IsStaffMixin, View):
 
 
 def index(request):
+    """View for displaying list of (active) affiliates."""
     affiliate_id = request.GET.get('affiliate_id', '')
     affiliate_city = request.GET.get('affiliate_city', '')
     affiliate_state = request.GET.get('affiliate_state', '')
@@ -150,6 +152,7 @@ def index(request):
 
 
 def show(request, slug):
+    """Display of a single affiliate."""
     try:
         affiliate = AffiliateEntity.objects.get(slug=slug)
     except AffiliateEntity.DoesNotExist:
@@ -163,6 +166,10 @@ def show(request, slug):
 
 @only_program_director
 def new(request):    # pylint: disable=unused-argument
+    """
+    IN THE PROCESS OF BEING DEPRICATED!
+    Display the form for creating a new affiliate.
+    """
     all_affiliates = AffiliateEntity.objects.all()
 
     return render_to_response('affiliates/form.html', {
@@ -177,6 +184,10 @@ def new(request):    # pylint: disable=unused-argument
 
 @only_program_director
 def create(request):
+    """
+    IN THE PROCESS OF BEING DEPRICATED!
+    Create a new affiliate.
+    """
     affiliate = AffiliateEntity()
     post_data = request.POST.copy().dict()
 
@@ -233,6 +244,10 @@ def create(request):
 
 @only_staff
 def edit(request, slug):
+    """
+    IN THE PROCESS OF BEING DEPRICATED!
+    Edit an affiliate.
+    """
     affiliates = AffiliateEntity.objects.all()
     affiliate = affiliates.get(slug=slug)
 
@@ -297,12 +312,17 @@ def edit(request, slug):
 
 @only_program_director
 def delete(request, slug):    # pylint: disable=unused-argument
+    """
+    IN THE PROCESS OF BEING DEPRICATED!
+    Delete an affiliate.
+    """
     AffiliateEntity.objects.get(slug=slug).delete()
 
     return redirect('affiliates:index')
 
 
 def payment(request):    # pylint: disable=unused-argument
+    """Display the payment page."""
     return render_to_response('affiliates/payment.html', {
         'preview': settings.PAYMENT_PREVIEW
     })
@@ -310,6 +330,10 @@ def payment(request):    # pylint: disable=unused-argument
 
 @only_staff
 def add_member(request, slug):
+    """
+    IN THE PROCESS OF BEING DEPRICATED!
+    Create a new affiliate membership.
+    """
     member_identifier = request.POST.get('member_identifier')
     role = request.POST.get('role')
     affiliate = AffiliateEntity.objects.get(slug=slug)
@@ -343,6 +367,10 @@ def add_member(request, slug):
 
 @only_staff
 def remove_member(request, slug, member_id):
+    """
+    IN THE PROCESS OF BEING DEPRICATED!
+    Remove an affiliate membership.
+    """
     role = request.GET.get('role')
 
     if role == 'staff' and not request.user.is_staff:
@@ -365,6 +393,10 @@ def remove_member(request, slug, member_id):
 
 @only_staff
 def remove_invite(request, slug, invite_id):
+    """
+    IN THE PROCESS OF BEING DEPRICATED!
+    Remove an affiliate invite.
+    """
     try:
         AffiliateInvite.objects.get(id=invite_id).delete()
     except ValueError as e:
@@ -375,6 +407,10 @@ def remove_invite(request, slug, invite_id):
 
 @only_staff
 def toggle_active_status(request, slug):    # pylint: disable=unused-argument
+    """
+    IN THE PROCESS OF BEING DEPRICATED!
+    Handler for the Active/Deactive button action.
+    """
     affiliate = AffiliateEntity.objects.select_for_update().get(slug=slug)
     affiliate.active = not affiliate.active
     affiliate.save()
@@ -399,6 +435,7 @@ class AffiliateAdminView(IsGlobalStaffOrAffiliateStaff, View):
     template_name = 'affiliates/affiliate_admin.html'
 
     def get_affiliates(self, user):
+        """Retrieve all affiliates where the passed in user is a staff member."""
         membership_affiliate_ids = AffiliateMembership.objects.filter(
             member=user, role__in=AffiliateMembership.STAFF_ROLES
         ).values_list('affiliate_id', flat=True)
@@ -408,7 +445,7 @@ class AffiliateAdminView(IsGlobalStaffOrAffiliateStaff, View):
         all_affiliates = AffiliateEntity.objects.all()
         staff_affiliates = self.get_affiliates(user)
 
-        # Staff user does not have to an affiliate staff member in a CCX to see it.
+        # Staff user does not have to be an affiliate staff member in a CCX to see it.
         if user.is_staff:
             current_affiliate = all_affiliates.get(slug=affiliate_slug)
         else:
@@ -436,6 +473,7 @@ class AffiliateAdminView(IsGlobalStaffOrAffiliateStaff, View):
 
     def get(self, request, affiliate_slug=None):
         if not affiliate_slug:
+            # Defaults to the affiliate in the user's profile
             affiliate = request.user.profile.affiliate
             return redirect(reverse('affiliates:affiliate-admin', kwargs={'affiliate_slug': affiliate.slug}))
 
