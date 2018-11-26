@@ -158,6 +158,9 @@ def export_csv_user_report():
 
 @CELERY_APP.task
 def export_csv_course_report(time_report=True):
+    """
+    Celery task for saving course reports as CSV and uploading to S3
+    """
     fasttrac_course_key = settings.FASTTRAC_COURSE_KEY.split(':')[1]
     ccxs = CustomCourseForEdX.objects.filter(course_id__icontains=fasttrac_course_key)
 

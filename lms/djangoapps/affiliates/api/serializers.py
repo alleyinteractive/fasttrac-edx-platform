@@ -33,4 +33,5 @@ class AffiliateInviteSerializer(serializers.ModelSerializer):
         model = AffiliateInvite
 
     def get_readable_invited_at(self, obj):
+        # Example: January 12, 2018
         return obj.invited_at.strftime('%B %d, %Y')

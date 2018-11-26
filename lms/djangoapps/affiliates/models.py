@@ -101,6 +101,11 @@ class AffiliateEntity(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        """
+        Before saving the affiliate:
+         * generate a slug
+         * add location coordinates
+        """
         slug = slugify(self.name)
 
         slug_exists = AffiliateEntity.objects.filter(slug=slug).exclude(pk=self.pk).exists()
@@ -121,6 +126,7 @@ class AffiliateEntity(models.Model):
         self._full_address = new_full_address
 
     def delete(self):
+        """Remove all associated courses before deleting the affiliate."""
         with transaction.atomic():
             self.courses.delete()
             super(AffiliateEntity, self).delete()
@@ -129,6 +135,7 @@ class AffiliateEntity(models.Model):
         return '{}, {}, {}'.format(self.address, self.zipcode, self.city)
 
     def get_location_coordinates(self):
+        """Returns the latitude and longitude of the address retrieved from Google Maps."""
         geocoding_api_key = settings.GEOCODING_API_KEY
         params = self.build_full_address()
         if self.state != 'NA':
@@ -167,6 +174,8 @@ class AffiliateEntity(models.Model):
     def website_url(self):
         if self.website.startswith('http'):
             return self.website
+        # Here we assume that not all the affiliates have HTTPS set up,
+        # and that the ones that do will redirect to HTTPS.
         return 'http://{}'.format(self.website)
 
     @property
@@ -201,6 +210,7 @@ class AffiliateEntity(models.Model):
 
     @property
     def last_affiliate_learner(self):
+        """Last learner that logged in."""
         member_ids = self.members.values_list('id', flat=True)
         learner_enrollments = self.enrollments.exclude(user_id__in=member_ids)
         learner_ids = [e.user_id for e in learner_enrollments]
@@ -266,7 +276,7 @@ def remove_mailchimp_interests(sender, instance, **kwargs):  # pylint: disable=u
 @receiver(post_save, sender=AffiliateMembership, dispatch_uid="add_affiliate_course_enrollments")
 def add_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """
-    Allow staff or instructor access to affiliate member into
+    Allow staff or instructor level access to affiliate member into
     all affiliate courses if they are staff or instructor member.
     """
     if not instance.role == AffiliateMembership.CCX_COACH:
@@ -280,9 +290,10 @@ def add_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: dis
             except IntegrityError:
                 LOG.error('IntegrityError: Allow access failed.')
 
-    # Program Director and Course Manager needs to be CCX coach on FastTrac course
+    # FastTrac main course and Facilitator Guide course
     course_overviews = CourseOverview.objects.exclude(id__startswith='ccx-')
 
+    # Program Director and Course Manager needs to be a CCX coach on FastTrac course
     if instance.role in AffiliateMembership.STAFF_ROLES:
         for course_overview in course_overviews:
             course_id = course_overview.id
@@ -326,7 +337,8 @@ def remove_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: 
 
         revoke_access(course, instance.member, instance.role, False)
 
-    # Remove CCX coach on FastTrac course
+    # Remove CCX coach on FastTrac course if the user is a staff member in ONLY the affiliate
+    # for which the membership has been deleted.
     is_staff_in_other_affiliate = AffiliateMembership.objects.filter(
         member=instance.member, role__in=AffiliateMembership.STAFF_ROLES
     ).exists()
@@ -372,6 +384,7 @@ class AffiliateInvite(models.Model):
 
 @receiver(post_save, sender=AffiliateInvite, dispatch_uid="send_invite_email")
 def send_invite_email(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
+    """Send an email to the invited user with instructions on how to register."""
     if created:
         from django.core.mail import send_mail
         from django.template import loader

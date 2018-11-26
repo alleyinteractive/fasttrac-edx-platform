@@ -31,17 +31,21 @@ LOG = logging.getLogger(__name__)
 
 class IsStaffOrProgramDirector(BasePermission):
     def has_permission(self, request, view):
+        """Returns True for global staff and program director of an affiliate."""
         if request.user.is_anonymous():
             return False
 
         if request.user.is_staff:
             return True
 
+        # If an individual affiliate page (eg. editing an affiliate) is opened,
+        # only the PD of that affiliate can access it, along with the global staff user
         affiliate_slug = view.kwargs.get('affiliate_slug')
         if affiliate_slug:
             return AffiliateMembership.objects.filter(
                 member=request.user, role=AffiliateMembership.STAFF, affiliate__slug=affiliate_slug
             ).exists()
+
         return AffiliateMembership.objects.filter(
             member=request.user, role=AffiliateMembership.STAFF
         ).exists()
@@ -56,11 +60,14 @@ class IsGlobalStaffOrAffiliateStaff(BasePermission):
         if request.user.is_staff:
             return True
 
+        # If an individual affiliate page (eg. editing an affiliate) is opened,
+        # only the PD of that affiliate can access it, along with the global staff user
         affiliate_slug = view.kwargs.get('affiliate_slug')
         if affiliate_slug:
             return AffiliateMembership.objects.filter(
                 member=request.user, role__in=AffiliateMembership.STAFF_ROLES, affiliate__slug=affiliate_slug
             ).exists()
+
         return AffiliateMembership.objects.filter(
             member=request.user, role__in=AffiliateMembership.STAFF_ROLES
         ).exists()
@@ -89,6 +96,7 @@ class ImpersonateView(APIView):
     permission_classes = (IsAdminUser,)
 
     def get_user(self, email):
+        """Returns the User instance or None."""
         try:
             user = User.objects.get(email=email)
             return user
@@ -96,11 +104,16 @@ class ImpersonateView(APIView):
             return None
 
     def post(self, request):
+        """
+        Logs in the current user as the user whose email is passed.
+        If `check_user` email is passed returns a response that the user exists.
+        """
         email = request.POST.get('email')
         check_user = request.POST.get('check_user')
 
         user = self.get_user(email)
         if not user:
+            # TODO: use `rejection_response()`
             return Response(
                 data={'msg': 'User with email {} does not exist.'.format(email)},
                 status=404,
@@ -125,6 +138,9 @@ class AffiliateEntityViewSet(AffiliateViewMixin, APIView):
     """Views for creating new affiliates."""
     permission_classes = (IsStaffOrProgramDirector,)
 
+    # The get() method is missing because we haven't yet transitioned
+    # to API-based affiliates list page.
+
     def post(self, request):
         """Creates a new AffiliateEntity instance."""
         affiliate = AffiliateEntity()
@@ -146,13 +162,13 @@ class AffiliateEntityDetailsViewSet(AffiliateViewMixin, APIView):
         """Returns the affiliate details."""
         affiliate = AffiliateEntity.objects.get(slug=affiliate_slug)
         response_data = AffiliateEntitySerializer(affiliate).data
-        return Response(response_data)
+        return Response(data=response_data)
 
     def patch(self, request, affiliate_slug):
         """Updates the affiliate."""
         affiliate = self.update_affiliate(affiliate_slug, request)
         response_data = AffiliateEntitySerializer(affiliate).data
-        return Response(data=response_data, status=200)
+        return Response(data=response_data)
 
     def delete(self, request, affiliate_slug):  # pylint: disable=unused-argument
         """Deletes the affiliate."""
@@ -175,6 +191,10 @@ class AffiliateMembershipViewSet(APIView):
         return Response(data=response, status=status, content_type='application/json')
 
     def get(self, request, affiliate_slug):
+        """
+        Returns serialized data of all the memberships in the affiliate with the passed slug.
+        If `role` param is passed, then returns only the data for the memberships of that role.
+        """
         role = request.GET.get('role')
         params = {'affiliate__slug': affiliate_slug}
 
@@ -188,7 +208,7 @@ class AffiliateMembershipViewSet(APIView):
     def post(self, request, affiliate_slug):
         """
         Creates a new affiliate membership.
-        If the invited user is not yet registered on the platform it creates a new invite for tha user.
+        If the invited user is not yet registered on the platform it creates a new invite for that user.
         """
         email = request.POST.get('email')
         role = request.POST.get('role')
@@ -198,6 +218,7 @@ class AffiliateMembershipViewSet(APIView):
 
         if role not in AffiliateMembership.ROLES:
             return rejection_response('Role invalid.')
+        # Only global staff users are allowed to create PD's for affiliates.
         if role == AffiliateMembership.STAFF and not request.user.is_staff:
             return rejection_response('You are not allowed to do that.')
 
@@ -235,6 +256,7 @@ class AffiliateMembershipViewSet(APIView):
         member_id = request.POST.get('member_id')
         role = request.POST.get('role')
 
+        # Only global staff users are allowed to remove PD's from affiliates.
         if role == AffiliateMembership.STAFF and not request.user.is_staff:
             return rejection_response('You are not allowed to do that.')
 
@@ -255,11 +277,13 @@ class AffiliateMembershipDetailsViewSet(APIView):
     permission_classes = (IsGlobalStaffOrAffiliateStaff,)
 
     def delete(self, request, affiliate_slug, membership_id):  # pylint: disable=unused-argument
+        """Removes the affiliate membership specified by the `membership_id`."""
         try:
             membership = AffiliateMembership.objects.get(id=membership_id)
         except AffiliateMembership.DoesNotExist:
             return rejection_response('Membership not found.', status=404)
 
+        # Only global staff users are allowed to remove PD's from affiliates.
         if membership.role == AffiliateMembership.STAFF and not request.user.is_staff:
             return rejection_response('You are not allowed to do that.')
 
@@ -275,6 +299,7 @@ class AffiliateInviteDetailsViewSet(APIView):
     permission_classes = (IsGlobalStaffOrAffiliateStaff,)
 
     def delete(self, request, affiliate_slug, invite_id):  # pylint: disable=unused-argument
+        """Removes the affiliate invite specified by the `invite_id`."""
         try:
             invite = AffiliateInvite.objects.get(id=invite_id)
         except AffiliateInvite.DoesNotExist:
@@ -326,8 +351,8 @@ class GetAffiliates(APIView):
 
     def get(self, request):
         """
-        Returns all the affiliates of the user making the request.
-        Where the user is a PD or CM.
+        Returns all the affiliates of the user making the request
+        where the user is a PD or CM.
 
         If 'has-facilitators' parameter is sent, then returns only those affiliates
         that have facilitators.
