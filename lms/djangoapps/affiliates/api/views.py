@@ -269,6 +269,16 @@ class AffiliateMembershipViewSet(APIView):
         except AffiliateMembership.DoesNotExist:
             return rejection_response('Membership not found.', status=404)
 
+        # An affiliate needs to have at least one Program Director,
+        # so we don't allow removing the only PD in an affiliate.
+
+        other_pd_membership = AffiliateMembership.objects.filter(
+            affiliate=membership.affiliate, role=AffiliateMembership.STAFF
+        ).exclude(id=membership.id).first()
+
+        if role == AffiliateMembership.STAFF and not other_pd_membership:
+            return rejection_response('Affiliate needs to have at least one program director.')
+
         membership.delete()
         return self.success_response(status=204)
 
@@ -286,6 +296,16 @@ class AffiliateMembershipDetailsViewSet(APIView):
         # Only global staff users are allowed to remove PD's from affiliates.
         if membership.role == AffiliateMembership.STAFF and not request.user.is_staff:
             return rejection_response('You are not allowed to do that.')
+
+        # An affiliate needs to have at least one Program Director,
+        # so we don't allow removing the only PD in an affiliate.
+
+        other_pd_membership = AffiliateMembership.objects.filter(
+            affiliate=membership.affiliate, role=AffiliateMembership.STAFF
+        ).exclude(id=membership.id).first()
+
+        if membership.role == AffiliateMembership.STAFF and not other_pd_membership:
+            return rejection_response('Affiliate needs to have at least one program director.')
 
         try:
             AffiliateMembership.objects.get(id=membership_id).delete()
