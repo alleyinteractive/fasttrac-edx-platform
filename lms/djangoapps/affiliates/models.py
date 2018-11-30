@@ -29,6 +29,38 @@ def user_directory_path(instance, filename):
     return 'user_{0}/{1}'.format(instance.id, filename)
 
 
+def update_mailchimp_interest(affiliate_membership, value):
+    mailchimp_api_key = settings.MAILCHIMP_API_KEY
+    mailing_list_id = settings.MAILCHIMP_LIST_ID
+
+    # skip if mailchimp not configured
+    if mailchimp_api_key and mailing_list_id:
+        email_hash = hashlib.md5(affiliate_membership.member.email.lower()).hexdigest()
+        mailchimp_url = 'https://us15.api.mailchimp.com/3.0/lists/{}/members/{}'.format(mailing_list_id, email_hash)
+
+        interest_id = affiliate_membership.mailchimp_interests[affiliate_membership.role]
+        affiliate = affiliate_membership.member.profile.affiliate
+        is_affiliate_user = affiliate_membership.member.profile.is_affiliate_user
+
+        data = {
+            'email_address': affiliate_membership.member.email,
+            'status': 'subscribed',
+            'merge_fields': {
+                'AFFILIATE': (affiliate and affiliate.name) or '',
+            },
+            'interests': {
+                interest_id: value,
+                settings.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not is_affiliate_user,  # Entrepreneur User
+                settings.AFFILIATE_MAILCHIMP_INTEREST_ID: is_affiliate_user  # Affiliate User
+            }
+        }
+
+        # TODO: notify admin if this fails (send email)
+        r = requests.put(mailchimp_url, auth=('fasttrac', mailchimp_api_key), json=data)
+        if not r.status_code == 200:
+            LOG.error('Affiliate membership update error: %s', r.content)
+
+
 class AffiliateEntity(models.Model):
     slug = models.SlugField(max_length=255, unique=True, default='')
     parent = models.ForeignKey('self', related_name='children', blank=True, null=True, on_delete=models.SET_NULL)
@@ -69,6 +101,11 @@ class AffiliateEntity(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        """
+        Before saving the affiliate:
+         * generate a slug
+         * add location coordinates
+        """
         slug = slugify(self.name)
 
         slug_exists = AffiliateEntity.objects.filter(slug=slug).exclude(pk=self.pk).exists()
@@ -89,6 +126,7 @@ class AffiliateEntity(models.Model):
         self._full_address = new_full_address
 
     def delete(self):
+        """Remove all associated courses before deleting the affiliate."""
         with transaction.atomic():
             self.courses.delete()
             super(AffiliateEntity, self).delete()
@@ -97,6 +135,7 @@ class AffiliateEntity(models.Model):
         return '{}, {}, {}'.format(self.address, self.zipcode, self.city)
 
     def get_location_coordinates(self):
+        """Returns the latitude and longitude of the address retrieved from Google Maps."""
         geocoding_api_key = settings.GEOCODING_API_KEY
         params = self.build_full_address()
         if self.state != 'NA':
@@ -135,6 +174,8 @@ class AffiliateEntity(models.Model):
     def website_url(self):
         if self.website.startswith('http'):
             return self.website
+        # Here we assume that not all the affiliates have HTTPS set up,
+        # and that the ones that do will redirect to HTTPS.
         return 'http://{}'.format(self.website)
 
     @property
@@ -169,6 +210,7 @@ class AffiliateEntity(models.Model):
 
     @property
     def last_affiliate_learner(self):
+        """Last learner that logged in."""
         member_ids = self.members.values_list('id', flat=True)
         learner_enrollments = self.enrollments.exclude(user_id__in=member_ids)
         learner_ids = [e.user_id for e in learner_enrollments]
@@ -191,10 +233,20 @@ class AffiliateMembership(models.Model):
         STAFF: 'Program Director',
     }
 
+    STAFF_ROLES = [
+        STAFF,
+        INSTRUCTOR
+    ]
+
     role_choices = (
         (CCX_COACH, 'Facilitator'),
         (INSTRUCTOR, 'Course Manager'),
         (STAFF, 'Program Director'),
+    )
+
+    non_pd_role_choices = (
+        (CCX_COACH, 'Facilitator'),
+        (INSTRUCTOR, 'Course Manager'),
     )
 
     mailchimp_interests = {
@@ -203,71 +255,12 @@ class AffiliateMembership(models.Model):
         STAFF: 'c6f38d6306'
     }
 
+    class Meta:
+        unique_together = ('member', 'affiliate', 'role')
+
     member = models.ForeignKey(User)
     affiliate = models.ForeignKey(AffiliateEntity, on_delete=models.CASCADE)
     role = models.CharField(choices=role_choices, max_length=255)
-
-
-class AffiliateInvite(models.Model):
-    email = models.CharField(max_length=255)
-    role = models.CharField(choices=AffiliateMembership.role_choices, max_length=255)
-    affiliate = models.ForeignKey(AffiliateEntity, on_delete=models.CASCADE)
-
-    invited_by = models.ForeignKey(User)
-    invited_at = models.DateTimeField(auto_now=True)
-
-    active = models.BooleanField(default=True)
-
-
-def update_mailchimp_interest(affiliate_membership, value):
-    mailchimp_api_key = settings.MAILCHIMP_API_KEY
-    mailing_list_id = settings.MAILCHIMP_LIST_ID
-
-    # skip if mailchimp not configured
-    if mailchimp_api_key and mailing_list_id:
-        email_hash = hashlib.md5(affiliate_membership.member.email.lower()).hexdigest()
-        mailchimp_url = 'https://us15.api.mailchimp.com/3.0/lists/{}/members/{}'.format(mailing_list_id, email_hash)
-
-        interest_id = affiliate_membership.mailchimp_interests[affiliate_membership.role]
-        affiliate = affiliate_membership.member.profile.affiliate
-        is_affiliate_user = affiliate_membership.member.profile.is_affiliate_user
-
-        data = {
-            'email_address': affiliate_membership.member.email,
-            'status': 'subscribed',
-            'merge_fields': {
-                'AFFILIATE': (affiliate and affiliate.name) or '',
-            },
-            'interests': {
-                interest_id: value,
-                settings.ENTREPRENEUR_MAILCHIMP_INTEREST_ID: not is_affiliate_user,  # Entrepreneur User
-                settings.AFFILIATE_MAILCHIMP_INTEREST_ID: is_affiliate_user  # Affiliate User
-            }
-        }
-
-        # TODO: notify admin if this fails (send email)
-        r = requests.put(mailchimp_url, auth=('fasttrac', mailchimp_api_key), json=data)
-        if not r.status_code == 200:
-            LOG.error('Affiliate membership update error: %s', r.content)
-
-
-@receiver(post_save, sender=AffiliateInvite, dispatch_uid="send_invite_email")
-def send_invite_email(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
-    if created:
-        from django.core.mail import send_mail
-        from django.template import loader
-
-        context = {
-            'site_name': settings.SITE_NAME,
-            'role': instance.get_role_display(),
-            'affiliate_name': instance.affiliate.name
-        }
-
-        from_address = settings.DEFAULT_FROM_EMAIL
-        subject = 'FastTrac Affiliate Invite'
-        message = loader.render_to_string('emails/affiliate_invitation.txt', context)
-
-        send_mail(subject, message, from_address, [instance.email], fail_silently=False)
 
 
 @receiver(post_save, sender=AffiliateMembership, dispatch_uid="add_mailchimp_interests")
@@ -283,7 +276,7 @@ def remove_mailchimp_interests(sender, instance, **kwargs):  # pylint: disable=u
 @receiver(post_save, sender=AffiliateMembership, dispatch_uid="add_affiliate_course_enrollments")
 def add_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """
-    Allow staff or instructor access to affiliate member into
+    Allow staff or instructor level access to affiliate member into
     all affiliate courses if they are staff or instructor member.
     """
     if not instance.role == AffiliateMembership.CCX_COACH:
@@ -297,10 +290,11 @@ def add_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: dis
             except IntegrityError:
                 LOG.error('IntegrityError: Allow access failed.')
 
-    # Program Director and Course Manager needs to be CCX coach on FastTrac course
+    # FastTrac main course and Facilitator Guide course
     course_overviews = CourseOverview.objects.exclude(id__startswith='ccx-')
 
-    if instance.role == AffiliateMembership.STAFF or instance.role == AffiliateMembership.INSTRUCTOR:
+    # Program Director and Course Manager needs to be a CCX coach on FastTrac course
+    if instance.role in AffiliateMembership.STAFF_ROLES:
         for course_overview in course_overviews:
             course_id = course_overview.id
             course = get_course_by_id(course_id)
@@ -343,8 +337,12 @@ def remove_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: 
 
         revoke_access(course, instance.member, instance.role, False)
 
-    # Remove CCX coach on FastTrac course
-    if instance.role == AffiliateMembership.STAFF or instance.role == AffiliateMembership.INSTRUCTOR:
+    # Remove CCX coach on FastTrac course if the user is a staff member in ONLY the affiliate
+    # for which the membership has been deleted.
+    is_staff_in_other_affiliate = AffiliateMembership.objects.filter(
+        member=instance.member, role__in=AffiliateMembership.STAFF_ROLES
+    ).exists()
+    if instance.role in AffiliateMembership.STAFF_ROLES and not is_staff_in_other_affiliate:
         course_overviews = CourseOverview.objects.exclude(id__startswith='ccx-')
         for course_overview in course_overviews:
             course_id = course_overview.id
@@ -355,8 +353,50 @@ def remove_affiliate_course_enrollments(sender, instance, **kwargs):  # pylint: 
 
 @receiver(pre_delete, sender=AffiliateMembership, dispatch_uid="validate_course_dependency")
 def validate_course_dependency(sender, instance, **kwargs):  # pylint: disable=unused-argument
-    count_affiliate_memberships_of_member = AffiliateMembership.objects.filter(member=instance.member).count()
-    ccxs_for_member_exist = CustomCourseForEdX.objects.filter(coach=instance.member).exists()
+    """
+    An affiliate needs to have at least one Program Director, so we don't allow removing the
+    only PD in an affiliate. Also if the removed member is a coach in any CCX we change the coach
+    to be the first program director.
+    """
+    other_pd_membership = AffiliateMembership.objects.filter(
+        affiliate=instance.affiliate, role=AffiliateMembership.STAFF
+    ).exclude(id=instance.id).first()
 
-    if ccxs_for_member_exist and count_affiliate_memberships_of_member == 1:
-        raise ValueError('Cannot delete this member because they have affiliate custom courses.')
+    if instance.role == AffiliateMembership.STAFF and not other_pd_membership:
+        raise ValueError('Affiliate needs to have at least one program director.')
+
+    ccxs = CustomCourseForEdX.objects.filter(coach=instance.member, affiliate=instance.affiliate)
+    for ccx in ccxs:
+        ccx.coach = other_pd_membership.member
+        ccx.save()
+
+
+class AffiliateInvite(models.Model):
+    email = models.CharField(max_length=255)
+    role = models.CharField(choices=AffiliateMembership.role_choices, max_length=255)
+    affiliate = models.ForeignKey(AffiliateEntity, on_delete=models.CASCADE)
+
+    invited_by = models.ForeignKey(User)
+    invited_at = models.DateTimeField(auto_now=True)
+
+    active = models.BooleanField(default=True)
+
+
+@receiver(post_save, sender=AffiliateInvite, dispatch_uid="send_invite_email")
+def send_invite_email(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
+    """Send an email to the invited user with instructions on how to register."""
+    if created:
+        from django.core.mail import send_mail
+        from django.template import loader
+
+        context = {
+            'site_name': settings.SITE_NAME,
+            'role': instance.get_role_display(),
+            'affiliate_name': instance.affiliate.name
+        }
+
+        from_address = settings.DEFAULT_FROM_EMAIL
+        subject = 'FastTrac Affiliate Invite'
+        message = loader.render_to_string('emails/affiliate_invitation.txt', context)
+
+        send_mail(subject, message, from_address, [instance.email], fail_silently=False)

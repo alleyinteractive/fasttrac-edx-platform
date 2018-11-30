@@ -3,60 +3,104 @@ import logging
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
+from django.contrib.auth.models import User
 from django.core import serializers
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseNotFound
 from django.shortcuts import redirect
 from django.db.models import Q
 from django.views.generic import View
 from django_countries import countries
-from edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response, render_to_string
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from lms.envs.common import STATE_CHOICES
+from opaque_keys.edx.keys import CourseKey
 from student.models import CourseEnrollment
 
+from affiliates.permissions import IsStaffMixin, IsGlobalStaffOrAffiliateStaff
 from .decorators import only_program_director, only_staff
 from .models import AffiliateEntity, AffiliateMembership, AffiliateInvite
 
 LOG = logging.getLogger(__name__)
 
 
-class IsStaffMixin(object):
-    def has_permissions(self):
-        return self.request.user.is_staff
-
-    def dispatch(self, request, *args, **kwargs):
-        if not self.has_permissions():
-            LOG.info('Unauthorized attempt to access site admin by %s', self.request.user.username)
-            return redirect('root')
-        return super(IsStaffMixin, self).dispatch(request, *args, **kwargs)
-
-
 class SiteAdminView(IsStaffMixin, View):
     template_name = 'affiliates/admin.html'
+
+    def user_statistics(self):
+        """
+        Returns a dictionary of the user statistics (count of):
+            * users: unique users registered for the site
+            * learners: unique learners
+            * admins: FastTrac admins
+            * affiliate_users: affiliate staff + affiliate enrolled users
+            * affiliate_learners: unique learners in affiliate courses
+            * affiliate_staff: PD's, Facilitators, Course Managers
+            * fasttrac_learners: learners enrolled in the FT course but NOT in a CCX course
+        """
+        fasttrac_course_id = CourseKey.from_string(settings.FASTTRAC_COURSE_KEY)
+        facilitator_course_id = CourseKey.from_string('course-v1:FastTrac+101+101')
+        users = User.objects.filter(~Q(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)).count()
+
+        admins = User.objects.filter(
+            Q(is_staff=True) | Q(is_superuser=True),
+        ).count()
+        learners = users - admins
+
+        affiliate_course_enrollment_user_ids = set(CourseEnrollment.objects.filter(
+            ~Q(course_id=fasttrac_course_id),
+            ~Q(course_id=facilitator_course_id)
+        ).values_list('user_id', flat=True))
+
+        affiliate_staff_ids = set(AffiliateMembership.objects.all().values_list('member_id', flat=True))
+        affiliate_staff = len(affiliate_staff_ids)
+        affiliate_learners = len(affiliate_course_enrollment_user_ids - affiliate_staff_ids)
+        affiliate_users = affiliate_staff + affiliate_learners
+
+        fasttrac_learners = CourseEnrollment.objects.filter(
+            ~Q(user_id__in=affiliate_course_enrollment_user_ids), course_id=fasttrac_course_id
+        ).values_list('user_id', flat=True).distinct().count()
+
+        return {
+            'users': users,
+            'learners': learners,
+            'admins': admins,
+            'affiliate_users': affiliate_users,
+            'affiliate_learners': affiliate_learners,
+            'affiliate_staff': affiliate_staff,
+            'fasttrac_learners': fasttrac_learners
+        }
 
     def get(self, request, *args, **kwargs):    # pylint: disable=unused-argument
         affiliates = AffiliateEntity.objects.all().order_by('name')
         ccxs = CustomCourseForEdX.objects.all()
         fasttrac_course_key = settings.FASTTRAC_COURSE_KEY
-        active_enrollments = CourseEnrollment.objects.filter(is_active=True)
-
-        total_learners = active_enrollments.count()
-        total_fasttrac_learners = active_enrollments.filter(course_id__startswith=fasttrac_course_key).count()
-        total_affiliate_learners = active_enrollments.exclude(course_id__startswith=fasttrac_course_key).count()
 
         context = {
             'affiliates': affiliates,
             'ccxs': ccxs,
             'partial_course_key': fasttrac_course_key.split(':')[1],
-            'total_learners': total_learners,
-            'total_fasttrac_learners': total_fasttrac_learners,
-            'total_affiliate_learners': total_affiliate_learners
+            'statistics': self.user_statistics()
+        }
+        return render_to_response(self.template_name, context)
+
+
+class ImpersonateView(IsStaffMixin, View):
+    template_name = 'affiliates/impersonate.html'
+
+    def get(self, request):
+        """Renders the impersonation middle-step where the user is logged out of the workspace app."""
+        context = {
+            'workspace_logout_url': '{}/users/logout?no_redirect=1'.format(settings.WORKSPACE_URL),
+            'impersonated_email': request.GET.get('impersonated_email')
         }
         return render_to_response(self.template_name, context)
 
 
 def index(request):
+    """View for displaying list of (active) affiliates."""
     affiliate_id = request.GET.get('affiliate_id', '')
     affiliate_city = request.GET.get('affiliate_city', '')
     affiliate_state = request.GET.get('affiliate_state', '')
@@ -108,7 +152,11 @@ def index(request):
 
 
 def show(request, slug):
-    affiliate = AffiliateEntity.objects.get(slug=slug)
+    """Display of a single affiliate."""
+    try:
+        affiliate = AffiliateEntity.objects.get(slug=slug)
+    except AffiliateEntity.DoesNotExist:
+        return HttpResponseNotFound(render_to_string('static_templates/404.html', {}, request=request))
     return render_to_response('affiliates/show.html', {
         'affiliate': affiliate,
         'subaffiliates': affiliate.children.all(),
@@ -118,6 +166,10 @@ def show(request, slug):
 
 @only_program_director
 def new(request):    # pylint: disable=unused-argument
+    """
+    IN THE PROCESS OF BEING DEPRICATED!
+    Display the form for creating a new affiliate.
+    """
     all_affiliates = AffiliateEntity.objects.all()
 
     return render_to_response('affiliates/form.html', {
@@ -132,6 +184,10 @@ def new(request):    # pylint: disable=unused-argument
 
 @only_program_director
 def create(request):
+    """
+    IN THE PROCESS OF BEING DEPRICATED!
+    Create a new affiliate.
+    """
     affiliate = AffiliateEntity()
     post_data = request.POST.copy().dict()
 
@@ -144,6 +200,8 @@ def create(request):
         setattr(affiliate, 'image', request.FILES['image'])
 
     for key in post_data:
+        if key == 'program-director':
+            continue
         if key == 'year_of_birth':
             setattr(affiliate, key, int(post_data[key]))
         elif key == 'parent':
@@ -155,6 +213,23 @@ def create(request):
             setattr(affiliate, key, post_data[key])
 
     affiliate.save()
+
+    program_director_email = post_data.get('program-director')
+    if program_director_email:
+        try:
+            program_director = User.objects.get(email=program_director_email)
+            membership = AffiliateMembership.objects.create(
+                member=program_director,
+                role=AffiliateMembership.STAFF,
+                affiliate=affiliate
+            )
+            LOG.info(
+                'Created new Program Director membership [%s] for affiliate [%s]',
+                membership.id, affiliate.slug
+            )
+        except User.DoesNotExist:
+            invite_new_user(affiliate, program_director_email, AffiliateMembership.STAFF, request.user)
+
     if request.user.is_staff and post_data.get('affiliate-type') == 'parent':
         subs = dict(request.POST)['sub-affiliates']
         AffiliateEntity.objects.filter(id__in=subs).update(parent=affiliate)
@@ -164,11 +239,15 @@ def create(request):
         member = get_student_from_identifier(program_director_identifier)
         AffiliateMembership.objects.create(affiliate=affiliate, member=member, role='staff')
 
-    return redirect('affiliates:show', slug=affiliate.slug)
+    return redirect('affiliates:affiliate-admin', affiliate_slug=affiliate.slug)
 
 
 @only_staff
 def edit(request, slug):
+    """
+    IN THE PROCESS OF BEING DEPRICATED!
+    Edit an affiliate.
+    """
     affiliates = AffiliateEntity.objects.all()
     affiliate = affiliates.get(slug=slug)
 
@@ -208,7 +287,7 @@ def edit(request, slug):
 
         affiliate.save()
 
-        return redirect('affiliates:show', slug=affiliate.slug)
+        return redirect('affiliates:affiliate-admin', affiliate_slug=affiliate.slug)
 
     role_choices = AffiliateMembership.role_choices
 
@@ -233,12 +312,17 @@ def edit(request, slug):
 
 @only_program_director
 def delete(request, slug):    # pylint: disable=unused-argument
+    """
+    IN THE PROCESS OF BEING DEPRICATED!
+    Delete an affiliate.
+    """
     AffiliateEntity.objects.get(slug=slug).delete()
 
     return redirect('affiliates:index')
 
 
 def payment(request):    # pylint: disable=unused-argument
+    """Display the payment page."""
     return render_to_response('affiliates/payment.html', {
         'preview': settings.PAYMENT_PREVIEW
     })
@@ -246,11 +330,15 @@ def payment(request):    # pylint: disable=unused-argument
 
 @only_staff
 def add_member(request, slug):
+    """
+    IN THE PROCESS OF BEING DEPRICATED!
+    Create a new affiliate membership.
+    """
     member_identifier = request.POST.get('member_identifier')
     role = request.POST.get('role')
     affiliate = AffiliateEntity.objects.get(slug=slug)
 
-    if role == 'staff' and not request.user.is_staff:
+    if role == AffiliateMembership.STAFF and not request.user.is_staff:
         messages.add_message(request, messages.INFO, 'You are not allowed to do that.')
         return redirect('affiliates:edit', slug=slug)
 
@@ -279,6 +367,10 @@ def add_member(request, slug):
 
 @only_staff
 def remove_member(request, slug, member_id):
+    """
+    IN THE PROCESS OF BEING DEPRICATED!
+    Remove an affiliate membership.
+    """
     role = request.GET.get('role')
 
     if role == 'staff' and not request.user.is_staff:
@@ -301,6 +393,10 @@ def remove_member(request, slug, member_id):
 
 @only_staff
 def remove_invite(request, slug, invite_id):
+    """
+    IN THE PROCESS OF BEING DEPRICATED!
+    Remove an affiliate invite.
+    """
     try:
         AffiliateInvite.objects.get(id=invite_id).delete()
     except ValueError as e:
@@ -311,6 +407,10 @@ def remove_invite(request, slug, invite_id):
 
 @only_staff
 def toggle_active_status(request, slug):    # pylint: disable=unused-argument
+    """
+    IN THE PROCESS OF BEING DEPRICATED!
+    Handler for the Active/Deactive button action.
+    """
     affiliate = AffiliateEntity.objects.select_for_update().get(slug=slug)
     affiliate.active = not affiliate.active
     affiliate.save()
@@ -323,9 +423,59 @@ def is_program_director(user, affiliate):
         return False
     else:
         return user.is_staff or AffiliateMembership.objects.filter(
-            member=user, affiliate=affiliate, role='staff'
+            member=user, affiliate=affiliate, role=AffiliateMembership.STAFF
         ).exists()
 
 
 def invite_new_user(affiliate, user_email, role, current_user):
     AffiliateInvite.objects.create(affiliate=affiliate, email=user_email, role=role, invited_by=current_user)
+
+
+class AffiliateAdminView(IsGlobalStaffOrAffiliateStaff, View):
+    template_name = 'affiliates/affiliate_admin.html'
+
+    def get_affiliates(self, user):
+        """Retrieve all affiliates where the passed in user is a staff member."""
+        membership_affiliate_ids = AffiliateMembership.objects.filter(
+            member=user, role__in=AffiliateMembership.STAFF_ROLES
+        ).values_list('affiliate_id', flat=True)
+        return AffiliateEntity.objects.filter(id__in=membership_affiliate_ids)
+
+    def get_context(self, user, affiliate_slug):
+        all_affiliates = AffiliateEntity.objects.all()
+        staff_affiliates = self.get_affiliates(user)
+
+        # Staff user does not have to be an affiliate staff member in a CCX to see it.
+        if user.is_staff:
+            current_affiliate = all_affiliates.get(slug=affiliate_slug)
+        else:
+            current_affiliate = staff_affiliates.get(slug=affiliate_slug)
+
+        role_choices = AffiliateMembership.role_choices
+        if not user.is_staff:
+            role_choices = AffiliateMembership.non_pd_role_choices
+
+        available_subs = all_affiliates.exclude(
+            id__in=current_affiliate.children.all().values_list('id', flat=True)
+        )
+
+        return {
+            'affiliate': current_affiliate,
+            'affiliates': all_affiliates,
+            'available_subs': available_subs,
+            'countries': countries,
+            'courses': CustomCourseForEdX.objects.filter(affiliate=current_affiliate),
+            'is_program_director': is_program_director(user, current_affiliate),
+            'role_choices': role_choices,
+            'staff_affiliates': staff_affiliates,
+            'state_choices': STATE_CHOICES
+        }
+
+    def get(self, request, affiliate_slug=None):
+        if not affiliate_slug:
+            # Defaults to the affiliate in the user's profile
+            affiliate = request.user.profile.affiliate
+            return redirect(reverse('affiliates:affiliate-admin', kwargs={'affiliate_slug': affiliate.slug}))
+
+        context = self.get_context(request.user, affiliate_slug)
+        return render_to_response(self.template_name, context)

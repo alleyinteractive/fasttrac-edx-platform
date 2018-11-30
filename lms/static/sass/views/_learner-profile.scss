@@ -172,6 +172,31 @@
         display: inline-block;
         margin-top: ($baseline*1.5);
         @include margin-left($baseline/2);
+
+        .user-profile-pending-email-change {
+            display: block;
+            position: relative;
+            margin-bottom: 20px;
+            width: 40%;
+            border-radius: 5px;
+            padding: 10px;
+            font-style: italic;
+            font-size: 15px;
+            background: #f7f76c;
+
+            i {
+                position: absolute;
+                top: 17px;
+                right: 10px;
+                color: #8c8c0f;
+                transition-duration: 200ms;
+
+                &:hover {
+                    cursor: pointer;
+                    color: #383809;
+                }
+            }
+        }
     }
 
     .profile-section-one-fields {

@@ -10,7 +10,7 @@
     2. Confirm this user's email address and enter it in the box below</div>
 <div class="table-wrapper">
     % if is_staff:
-        <a href="/affiliates/edit/${affiliate_entity.slug}">
+        <a href="/affiliates/affiliate-admin/${affiliate_entity.slug}">
             <i class="fa fa-edit"></i>
             Edit Affiliate Info
         </a>
@@ -26,7 +26,7 @@
         </tr>
         %for ccx_coach_permission in ccx_coach_permissions:
             <tr>
-                <td>${ccx_coach_permission.user.profile.name}</td>
+                <td>${ccx_coach_permission.user.profile.name.encode('utf-8')}</td>
                 <td>Facilitator</td>
                 <td>${ccx_coach_permission.user.email}</td>
                 <td>
@@ -34,7 +34,7 @@
                         data-remove-url="${modify_access_url}"
                         data-unique-student-identifier="${ccx_coach_permission.user.username}"
                         data-rolename="${ccx_coach_permission.role}"
-                        data-name="${ccx_coach_permission.user.profile.name}"
+                        data-name="${ccx_coach_permission.user.profile.name.encode('utf-8')}"
                         data-action="revoke">
                             <i class="fa fa-times-circle remove-icon"></i>Remove
                     </span>
@@ -42,16 +42,16 @@
             </tr>
         %endfor
     </table>
+    <p class="error hidden"></p>
     <br>
     <form id="add-coach-form" action="${modify_access_url}" method="POST">
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
 
         <label for="unique_student_identifier">Add Facilitator</label>
         <select name="unique_student_identifier" autocomplete="off">
-            <option selected disabled> Select affiliate user </option>
             % for member in facilitator_dropdown_choices:
                 <option value="${member.username}">
-                    ${member.profile.name}
+                    ${member.profile.name.encode('utf-8')}
                 </option>
             % endfor
         </select>
@@ -59,18 +59,35 @@
 
         <input type="hidden" name="action" value="allow" />
         <input type="hidden" name="rolename" value="ccx_coach" />
-        <button class="add-button" value="submit">Add Facilitator</button>
+        <button class="add-button" value="submit" ${'disabled' if not facilitator_dropdown_choices else ''}>Add Facilitator</button>
     </form>
     <%include file="/modal/error_modal.html" />
 </div>
 
 <script>
     $(document).ready(function() {
+        var $addFacilitatorBtn = $('#add-coach-form .add-button'),
+            $facilitatorSelectElement = $('#add-coach-form select'),
+            $teamManagementTable = $('.team-mgmt-table'),
+            $tableErrorField = $('.error');
+
         $('#add-coach-form').on('submit', addCoachEventHandler);
-        $('.team-mgmt-table').on('click', '.remove-coach-button', removeCoachEventHandler);
+        $teamManagementTable.on('click', '.remove-coach-button', removeCoachEventHandler);
+
+        $facilitatorSelectElement.change(function() {
+            var $selectedOption = $(this).find('option:selected');
+            if (!$selectedOption.val()) {
+                $addFacilitatorBtn.attr('disabled', true);
+            }
+        });
+
+        function getFacilitatorOptionsNumber() {
+            return $('select[name=unique_student_identifier] option').length;
+        }
 
         function addCoachEventHandler(event) {
             event.preventDefault();
+            $tableErrorField.addClass('hidden');
 
             var $form = $(event.target);
             var url = $form.attr('action');
@@ -91,7 +108,11 @@
                     }
                     else {
                         addCoachRow(responseData, url, $selectedOption.text());
-                        $selectedOption.remove()
+                        $selectedOption.remove();
+                        var numOfOptions = $('select[name=unique_student_identifier] option').length;
+                        if (!(numOfOptions)) {
+                            $addFacilitatorBtn.attr('disabled', true);
+                        }
                     }
                 }
             });
@@ -105,6 +126,16 @@
             var rolename = $button.data('rolename');
             var coachName = $button.data('name');
 
+            $tableErrorField.addClass('hidden');
+
+            // If there is only one facilitator in the table.
+            // (1 tr is the header, 1 is the single facilitator)
+            if ($teamManagementTable.find('tr').length === 2) {
+                $tableErrorField.text('Need to have at least one facilitator.')
+                                .removeClass('hidden');
+                return;
+            }
+
             $.ajax({
                 type: 'POST',
                 url: url,
@@ -115,7 +146,8 @@
                 },
                 success: function() {
                     $button.parent().parent().remove();
-                    $('#add-coach-form select').append('<option value="'+ uniqueStudentIdentifier +'">'+ coachName +'</option>')
+                    $facilitatorSelectElement.append('<option value="'+ uniqueStudentIdentifier +'">'+ coachName +'</option>');
+                    $addFacilitatorBtn.attr('disabled', false);
                 }
             });
         }

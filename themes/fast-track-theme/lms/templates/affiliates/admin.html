@@ -44,7 +44,7 @@
             <td class="inactive">Inactive</td>
           % endif
           <td><a href="/affiliates/${affiliate.slug}">View</a></td>
-          <td><a href="/affiliates/edit/${affiliate.slug}">Edit</a></td>
+          <td><a href="/affiliates/affiliate-admin/${affiliate.slug}">Edit</a></td>
         </tr>
         % endfor
       </tbody>
@@ -53,21 +53,44 @@
 
   <section id="learning-mngmt" class="hidden">
     <div id="learner-info">
-      <h1>Learner Statistics</h1>
+      <h1>
+        Learner Statistics
+        <i class="fa fa-info-circle ft-tooltip-btn">
+          <span class="ft-tooltip">
+            Total Users: count of all unique users registered for the site
+            <br> <br>
+            Total Learners: count of all unique learners
+            <br> <br>
+            Total Admin Users: count of all unique FastTrac admininstrators
+            <br> <br>
+            Total Affiliate Users: count of all affiliate staff + affiliate learners
+            <br> <br>
+            Total Affiliate Learners: count of all unique learners in affiliate courses
+            <br> <br>
+            Total Affiliate Staff: count of all Program Directors, Facilitators and Course Managers
+            <br> <br>
+            Total FastTrac Learners: count of all unique learners enrolled in the FT course, but not in a CCX course
+          </span>
+        </i>
+      </h1>
 
-      <div class="learner-info-box">
-        <h2>${total_learners}</h2>
-        <span>Total Learners</span>
-      </div>
+      <div class="learner-info-wrapper">
+        <div class="learner-info-box">
+          <ul>
+            <li>Total Users: <span>${statistics['users']}</span></li>
+            <li>Total Learners: <span>${statistics['learners']}</span></li>
+            <li>Total Admins: <span>${statistics['admins']}</span></li>
+          </ul>
+        </div>
 
-      <div class="learner-info-box">
-        <h2>${total_affiliate_learners}</h2>
-        <span>Total Affiliate Learners</span>
-      </div>
-
-      <div class="learner-info-box">
-        <h2>${total_fasttrac_learners}</h2>
-        <span>Total FastTrac Learners</span>
+        <div class="learner-info-box">
+          <ul>
+            <li>Total Affiliate Users: <span>${statistics['affiliate_users']}</span></li>
+            <li>Total Affiliate Learners: <span>${statistics['affiliate_learners']}</span></li>
+            <li>Total Affiliate Staff: <span>${statistics['affiliate_staff']}</span></li>
+            <li>Total FastTrac Learners: <span>${statistics['fasttrac_learners']}</span></li>
+          </ul>
+        </div>
       </div>
     </div>
 
@@ -267,9 +290,9 @@
         $.ajax({
           url: '/api/affiliates/impersonate',
           method: 'POST',
-          data: {email: email},
+          data: {email: email, check_user: 1},
           success: function() {
-            window.location.href = '/';
+            window.location.href = '/affiliates/impersonate/?impersonated_email=' + email;
           },
           error: function(data) {
             showError(data.responseJSON.msg);

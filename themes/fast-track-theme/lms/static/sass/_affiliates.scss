@@ -138,90 +138,7 @@ h1.explore-header {
   }
 
   .affiliate-card {
-    position: relative;
-    display: inline-block;
-    width: 20rem;
-    height: 20rem;
-    max-height: 20rem;
-    min-height: 20rem;
-    overflow: hidden;
-    border: 1px solid #ddd;
-    margin-bottom: 3rem;
-    margin-right: 1rem;
-
-    .image {
-      height: 12rem;
-      border-bottom: 1px solid #aaa;
-      width: 20rem;
-      background-repeat: no-repeat;
-      background-size: 100% 100%;
-      display: block;
-    }
-
-    // text ellipsis
-    .name, .description {
-      width: 18rem;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-
-    .name {
-      text-transform: uppercase;
-      font-weight: bold;
-      color: #999;
-      margin: 1rem 1rem 0;
-      min-height: 3rem;
-    }
-
-    .description {
-      padding: 1rem;
-      color: #555;
-      font-size: .9rem;
-      padding-top: 0;
-    }
-
-    .card-footer {
-      position: absolute;
-      bottom: 0;
-      right: 1rem;
-      width: 100%;
-      text-align: right;
-
-      & > span {
-        width: 30%;
-        display: inline-block;
-        text-align: center;
-        padding: .5rem 0;
-        text-transform: uppercase;
-        color: #777;
-
-        .fa-arrow-circle-o-right {
-          color: $ft-orange;
-        }
-      }
-
-      a {
-        color: $ft-orange;
-      }
-
-      .skewed-footer-item {
-        transform: skewX(-24deg);
-        border-right: 1px solid #ddd;
-
-        & > span {
-          display: inline-block;
-          transform: skewX(24deg);
-        }
-      }
-
-      .delivery-mode-item {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        vertical-align: bottom;
-        white-space: nowrap;
-      }
-    }
+    @include affiliate-course-card;
   }
 }
 
@@ -326,6 +243,20 @@ h1.explore-header {
   width: 60%;
   margin: auto;
 
+  input::placeholder {
+    opacity: 0.5;
+  }
+
+  input[type=number] {
+    width: calc(100% - 357px);
+  }
+
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
   * {
     text-align: left;
   }
@@ -427,6 +358,7 @@ h1.explore-header {
 
   .help {
     display: block;
+    width: 300px;
     font-size: 0.9rem;
     font-weight: 400;
     color: #848484;
@@ -446,7 +378,7 @@ h1.explore-header {
     border-radius: 0;
     font-style: normal;
     background: transparent;
-    color: #555;
+    color: #222;
 
     transition-duration: .5s;
 
@@ -584,3 +516,5 @@ h1.explore-header {
     }
   }
 }
+
+@import 'affiliate-admin';

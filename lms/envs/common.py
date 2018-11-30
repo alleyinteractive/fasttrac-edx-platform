@@ -2788,7 +2788,8 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'public_email',
         'affiliate_organization_name',
         'secondary_address', 'title', 'age_category',
-        'veteran_status', 'immigrant_status', 'education', 'ethnicity'
+        'veteran_status', 'immigrant_status', 'education', 'ethnicity',
+        'is_affiliate_staff'
     ]
 }
 

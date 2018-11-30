@@ -1,6 +1,7 @@
 """HTTP end-points for the User API. """
 import copy
 import json
+import logging
 
 from opaque_keys import InvalidKeyError
 from django.conf import settings
@@ -42,6 +43,8 @@ from .accounts import (
 )
 from .accounts.api import check_account_exists
 from .serializers import UserSerializer, UserPreferenceSerializer
+
+LOG = logging.getLogger(__name__)
 
 
 class LoginSessionView(APIView):
@@ -159,7 +162,7 @@ class LoginSessionView(APIView):
 class RegistrationView(APIView):
     """HTTP end-points for creating a new user. """
 
-    DEFAULT_FIELDS = ["email", "username", "password"]
+    DEFAULT_FIELDS = ["email", "confirm_email", "username", "password"]
 
     EXTRA_FIELDS = [
         "first_name",
@@ -392,6 +395,29 @@ class RegistrationView(APIView):
             field_type="email",
             label=email_label,
             placeholder=email_placeholder,
+            restrictions={
+                "min_length": EMAIL_MIN_LENGTH,
+                "max_length": EMAIL_MAX_LENGTH,
+            },
+            required=required
+        )
+
+    def _add_confirm_email_field(self, form_desc, required=False):
+        """Add a confirm email address field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+
+        form_desc.add_field(
+            "confirm_email",
+            field_type="email",
+            label="Confirm Email",
+            placeholder='username@domain.com',
             restrictions={
                 "min_length": EMAIL_MIN_LENGTH,
                 "max_length": EMAIL_MAX_LENGTH,
@@ -1258,6 +1284,7 @@ class ChangePasswordView(APIView):
 
         user.set_password(password)
         user.save()
+        LOG.info('Changed password for user %s', user.username)
 
         return HttpResponse(json.dumps({'id': user.id, 'username': user.username}), content_type="application/json")
 

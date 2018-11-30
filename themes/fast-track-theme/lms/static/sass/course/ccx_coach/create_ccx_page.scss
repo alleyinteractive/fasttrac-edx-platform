@@ -1,6 +1,7 @@
 /* coach_dashboard.html
 ** Create course page / when there is no ccx for the current course.
 */
+@import '../variables';
 
 .edit-create-custom-course-wrapper form.ccx-form .field.custom-course-description {
   width: 100%;
@@ -82,6 +83,16 @@
 
   .horizontal-field-container {
     width: 400px;
+
+    ul#facilitators-list {
+      i.remove-btn {
+        color: $ft-orange;
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
   }
 }
 
@@ -110,4 +121,13 @@ form.ccx-form {
 
 button.ccx-button-link {
   color: #f76b1c;
+}
+
+.no-facilitator-msg {
+  font-style: italic;
+  color: red;
+
+  a {
+    color: blue;
+  }
 }

@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 
+        'gettext', 'jquery', 'underscore', 'backbone',
         'edx-ui-toolkit/js/utils/html-utils',
         'text!templates/fields/field_readonly.underscore',
         'text!templates/fields/field_dropdown.underscore',
@@ -21,7 +21,7 @@
         var FieldViews = {};
 
         FieldViews.FieldView = Backbone.View.extend({
-                
+
             fieldType: 'generic',
 
             className: function () {
@@ -209,6 +209,9 @@
                         wait: true,
                         success: function () {
                             view.saveSucceeded();
+                            if (view.options.valueAttribute === 'email') {
+                                view.showPendingEmailChangeNotification();
+                            }
                         },
                         error: function (model, xhr) {
                             view.showErrorMessage(xhr);
@@ -221,6 +224,10 @@
 
             saveSucceeded: function () {
                 this.showSuccessMessage();
+            },
+
+            showPendingEmailChangeNotification: function () {
+                $('.user-profile-pending-email-change').removeClass('hidden');
             },
 
             updateDisplayModeClass: function() {
@@ -525,7 +532,7 @@
                     value: value,
                     message: this.helpMessage,
                     messagePosition: this.options.messagePosition || 'footer',
-                    placeholderValue: this.options.placeholderValue
+                    placeholderValue: this.options.placeholderValue,
                 }));
                 this.delegateEvents();
                 this.title((this.modelValue() || this.mode === 'edit') ?
@@ -543,6 +550,11 @@
                     this.finishEditing(event);
                 } else {
                     this.adjustTextareaHeight();
+                }
+
+                if (event.keyCode === 27) {
+                    event.preventDefault();
+                    this.showDisplayMode(true);
                 }
             },
 

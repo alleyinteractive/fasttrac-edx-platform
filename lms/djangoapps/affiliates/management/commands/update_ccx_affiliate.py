@@ -1,3 +1,4 @@
+"""DEPRICATED once all the CCX courses have the `affiliate` attribute setup."""
 from django.core.management.base import BaseCommand
 
 from affiliates.models import AffiliateEntity

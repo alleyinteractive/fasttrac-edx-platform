@@ -15,9 +15,10 @@
         <div class="field">
             <label class="sr" for="ccx_name">${_('Name your CCX')}</label>
             <input name="name" id="ccx_name" class="ccx-input-field"
-                   placeholder="${_('Name of your course...')}" required/><br/>
+            placeholder="${_('Name of your course...')}" required/><br/>
         </div>
     </div>
+    <input type="hidden" name="affiliate" value="${affiliate.slug}"/>
     <div class="field-wrapper">
         <p class="field-name">${_('COURSE DESCRIPTION')}</p>
         <p> The first part of what you enter here will display when entrepreneurs are searching by courses.
@@ -92,7 +93,7 @@
                    name="enrollment_end_date"
                    id="ccx_enrollment_end_date"
                    size="10"
-                   required />
+                   required/>
             <i class="fa fa-calendar" aria-hidden="true"></i>
         </div>
         <div class="horizontal-field-container">
@@ -104,7 +105,7 @@
                    name="enrollment_end_time"
                    id="ccx_enrollment_end_time"
                    size=10
-                   required />
+                   required/>
             </br>
         </div>
     </div>
@@ -191,6 +192,30 @@
         </div>
     </div>
 
+    <div class="horizontal-field-wrapper">
+        <div class="horizontal-field-container">
+            <p class="field-name">${_('FACILITATORS')}</p>
+            <ul id="facilitators-list">
+
+            </ul>
+            % if facilitators:
+            <select id="facilitators" class="ccx-select">
+                % for member in facilitators:
+                    <option value="${member.id}">${'{} ({})'.format(member.profile.name.encode('utf-8'), member.email)}</option>
+                % endfor
+            </select>
+            <button id="add-facilitator" class="ft-button-action" type="button">
+                Add facilitator
+            </button>
+            % else:
+            <p class="no-facilitator-msg">
+                You currently don't have any facilitators assigned.
+                Please <a href="/affiliates/affiliate-admin/${affiliate.slug}">add facilitators</a> to your affiliate before creating a new course.
+            </p>
+            % endif
+        </div>
+    </div>
+
     <div class="field submit">
         <button id="create-ccx" class="ft-button-action" type="submit">
                 ${_('CREATE COURSE')}<i class="fa fa-plus"></i>
@@ -198,8 +223,69 @@
     </div>
 </form>
 
-  <script type="text/javascript">
-    $(document).ready(function() {
-      autosize($('.autosized-textarea'));
-    })
-  </script>
+<script type="text/javascript">
+$(document).ready(function() {
+    autosize($('.autosized-textarea'));
+
+
+
+    function toggleAddBtnDisable() {
+        var $selectOptions = $('#facilitators option'),
+            $addFacilitatorBtn = $('#add-facilitator');
+        $addFacilitatorBtn.attr('disabled', $selectOptions.length === 0);
+    }
+
+    $('#add-facilitator').click(function(event) {
+        var $selected = $('#facilitators option:selected'),
+            facilitatorId = $selected.val(),
+            facilitator = $selected.text();
+
+        if (typeof facilitatorId === 'undefined') {
+            return false;
+        }
+
+        $('#facilitators-list').append(
+            '<li>' +
+                '<span>' + facilitator + ' </span>' +
+                '<i class="remove-btn fa fa-times"></i>' +
+                '<input type="hidden" name="facilitators" value="' + facilitatorId + '">' +
+            '</li>'
+        );
+
+        $('#facilitators option[value="' + facilitatorId + '"]').remove();
+        toggleAddBtnDisable();
+    });
+
+    $(document).on('click', '#facilitators-list .remove-btn', function() {
+        var $parent = $(this).parent();
+        var value = $parent.find('input').val();
+        var facilitator = $parent.find('span').text();
+        $parent.remove();
+
+        $('#facilitators').append(
+            '<option value="' + value + '">' + facilitator + '</option>'
+        );
+
+        toggleAddBtnDisable();
+    });
+
+    $('form.ccx-form').submit(function() {
+        var $errorMessage = $('#ccx-create-message');
+        function scrollToError() {
+            $('html, body').animate({
+                scrollTop: $errorMessage.offset().top - 100
+            }, 200);
+        }
+
+        if(!($('#facilitators-list li').length)) {
+            $errorMessage.html('You need to add facilitators!');
+            $errorMessage.show();
+            scrollToError();
+            return false;
+        } else {
+            $errorMessage.hide();
+            return true;
+        }
+    });
+});
+</script>

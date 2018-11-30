@@ -15,6 +15,7 @@ def send_slack_notification(request, error):
                     'fallback': '```{}```'.format(error),
                     'pretext': 'New error on {}'.format(request.META.get('HTTP_HOST')),
                     'color': 'danger',
+                    'text': '```{}```'.format(error),
                     'fields': [
                         {'title': 'path', 'value': request.META.get('PATH_INFO')},
                         {'title': 'method', 'value': request.method, 'short': True},
@@ -24,8 +25,7 @@ def send_slack_notification(request, error):
                             'short': True
                         },
                         {'title': 'user', 'value': request.user.username, 'short': True},
-                        {'title': 'user agent', 'value': request.META.get('HTTP_USER_AGENT')},
-                        {'title': 'exception', 'value': '```{}```'.format(error)},
+                        {'title': 'user agent', 'value': request.META.get('HTTP_USER_AGENT')}
                     ]
                 }
             ],

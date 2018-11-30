@@ -1,3 +1,4 @@
+
 <div class="wrapper-u-field">
     <div class="u-field-header">
         <% if (mode === 'edit') { %>
@@ -15,11 +16,14 @@
 
     <div class="u-field-value" id="u-field-value-<%- id %>"
         <% if (mode === 'edit') { %>
-            aria-labelledby="u-field-title-<%- id %>"><textarea id="u-field-textarea-<%- id %>" rows="4"
+            aria-labelledby="u-field-title-<%- id %>"><textarea id="u-field-textarea-<%- id %>" rows="1"
             <% if (message) { %>
                 aria-describedby="u-field-message-help-<%- id %>"
             <% } %>
             ><%- value %></textarea>
+            <% if (id === 'email') { %>
+                <span class="email-change-info">You will receive an email with a link to confirm the email change.</span>
+            <% } %>
         <% } else if (editable === 'never') { %>
             ><p class="sr"><%- screenReaderTitle %></p><span class="u-field-value-readonly" aria-hidden="false"
             <% if (message) { %>

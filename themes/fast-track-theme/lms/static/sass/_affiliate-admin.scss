@@ -1,0 +1,122 @@
+#affiliate-admin {
+  p.error {
+    padding: 10px 0;
+    color: red;
+    font-style: italic;
+  }
+
+  .current-affiliate {
+    display: inline-block;
+    text-transform: uppercase;
+    margin-left: 20px;
+    line-height: 50px;
+    font-weight: 500;
+    font-size: 1.7rem;
+    color: #222;
+  }
+
+  .affiliate-select-wrapper {
+    margin-bottom: 40px;
+    border-bottom: 1px solid $ft-gray;
+
+    select#affiliate-select {
+      @include header-nav-link;
+
+      height: 50px;
+      margin-left: 20px;
+      margin-bottom: 0px;
+      color: #222;
+      border: none;
+      outline: none;
+      background: transparent;
+
+      option {
+        @include header-nav-link;
+      }
+    }
+  }
+
+  nav.top-nav {
+    li {
+      @include header-nav-link;
+    }
+  }
+
+  .edit-affiliate-container {
+    width: unset;
+
+    input {
+      color: #222;
+
+      &::placeholder {
+        opacity: 0.5;
+      }
+
+      &[type=submit] {
+        color: white;
+      }
+    }
+
+    #add_member_form {
+      margin-bottom: 40px;
+
+      input.add-member-email {
+        width: 40%;
+        margin-bottom: 0px;
+        margin-left: 0px;
+      }
+
+      select.add-member-role {
+        width: 20%;
+        margin-right: 10px;
+        margin-bottom: 0px;
+      }
+
+      button.add-member-btn {
+        @include ft-button;
+        height: 35px;
+        text-align: center;
+      }
+    }
+
+    a.remove-member,
+    a.remove-invite {
+      &:hover {
+        text-decoration: none;
+        cursor: pointer;
+      }
+    }
+
+    h1.explore-header {
+      cursor: unset;
+    }
+
+    .toggle-affiliate-status {
+      @include ft-button;
+      float: right;
+    }
+
+    input[type=number] {
+      width: calc(100% - 357px);
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+  #course-mngmt {
+    min-height: calc(100vh - 750px);
+
+    .no-courses-msg {
+      text-align:center;
+      font-size: 18px;
+    }
+
+    li.affiliate-course-card {
+      @include affiliate-course-card;
+    }
+  }
+}

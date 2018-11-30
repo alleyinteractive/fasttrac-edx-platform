@@ -74,6 +74,10 @@ class IsCourseStaffInstructor(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
+        # Added to allow staff users to delete courses.
+        if hasattr(request, 'user') and request.user.is_staff:
+            return True
+
         return (hasattr(request, 'user') and
                 # either the user is a staff or instructor of the master course
                 (hasattr(obj, 'course_id') and
