@@ -320,6 +320,7 @@ def deactivate_invite(sender, instance, created, **kwargs):  # pylint: disable=u
             invite = AffiliateInvite.objects.get(
                 email=instance.member.email,
                 affiliate=instance.affiliate,
+                role=instance.role,
                 active=True
             )
             invite.active = False
