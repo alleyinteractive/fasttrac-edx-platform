@@ -635,9 +635,9 @@ def add_member_to_affiliate(sender, instance, created, **kwargs):
     if created:
         from affiliates.models import AffiliateInvite, AffiliateMembership
 
-        invite = AffiliateInvite.objects.filter(email=instance.user.email).first()
+        invites = AffiliateInvite.objects.filter(email=instance.user.email)
 
-        if invite:
+        for invite in invites:
             AffiliateMembership.objects.create(
                 affiliate=invite.affiliate,
                 role=invite.role,
