@@ -51,6 +51,7 @@ from openedx.core.djangolib.js_utils import (
     <%block name="header_extras"></%block>
 
     <script type="text/javascript">
+      if ('studio.fasttrac.org' !== window.location.hostname) {
         var bugmuncher_options = {
             api_key: "cd9d0312a0c59b558394"
         };
@@ -61,6 +62,7 @@ from openedx.core.djangolib.js_utils import (
             e.setAttribute("src", "//cdn.bugmuncher.com/bugmuncher.js"+n);
             document.getElementsByTagName("head")[0].appendChild(e);
         })();
+      }
     </script>
   </head>
 
